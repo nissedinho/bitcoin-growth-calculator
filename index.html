@@ -1,0 +1,1017 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>Bitcoin Time Machine — What If You'd Bought Bitcoin?</title>
+  <meta name="description" content="See how much your money would be worth today if you'd bought Bitcoin on any past date. Plus: see what investing a little every month would do to your wealth." />
+  <meta property="og:title" content="Bitcoin Time Machine — What If You'd Bought Bitcoin?" />
+  <meta property="og:description" content="$1,000 in Bitcoin during COVID lockdowns would be worth $20,000+ today. Find your number instantly." />
+  <meta property="og:url" content="https://YOUR_SITE_URL_HERE" />
+  <meta property="og:image" content="https://YOUR_SITE_URL_HERE/og.png" />
+  <meta name="twitter:image" content="https://YOUR_SITE_URL_HERE/og.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Bitcoin Time Machine 🚀" />
+  <meta name="twitter:description" content="How much would your money be worth if you'd bought Bitcoin instead? Find out in seconds." />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@300;400;500&family=Space+Grotesk:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --orange: #f7931a;
+      --orange-glow: rgba(247,147,26,0.25);
+      --orange-dim: rgba(247,147,26,0.08);
+      --black: #080808;
+      --surface: #0f0f0f;
+      --surface2: #161616;
+      --surface3: #1c1c1c;
+      --border: rgba(247,147,26,0.18);
+      --border-subtle: rgba(255,255,255,0.06);
+      --text: #e8e0d4;
+      --text-muted: #6b6257;
+      --green: #22c55e;
+      --green-glow: rgba(34,197,94,0.2);
+      --red: #ef4444;
+      --blue: #60a5fa;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { background: var(--black); color: var(--text); font-family: 'Space Grotesk', sans-serif; min-height: 100vh; overflow-x: hidden; }
+    body::before {
+      content: ''; position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 1000; opacity: 0.6;
+    }
+    .bg-glow { position: fixed; top: -20%; left: 50%; transform: translateX(-50%); width: 900px; height: 900px; background: radial-gradient(circle, rgba(247,147,26,0.05) 0%, transparent 65%); pointer-events: none; z-index: 0; }
+
+    /* Ticker */
+    .ticker { position: fixed; top: 0; left: 0; right: 0; height: 30px; background: var(--orange); overflow: hidden; z-index: 200; display: flex; align-items: center; }
+    .ticker-inner { display: flex; white-space: nowrap; animation: ticker 35s linear infinite; }
+    .ticker-item { font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 500; color: var(--black); padding: 0 28px; letter-spacing: 0.1em; }
+    @keyframes ticker { to { transform: translateX(-50%); } }
+
+    /* Layout */
+    .container { position: relative; z-index: 10; max-width: 860px; margin: 0 auto; padding: 66px 20px 100px; }
+
+    /* Header */
+    header { text-align: center; margin-bottom: 44px; animation: fadeUp 0.6s ease both; }
+    .btc-badge { display: inline-flex; align-items: center; gap: 8px; background: var(--orange-dim); border: 1px solid var(--border); border-radius: 100px; padding: 6px 14px 6px 10px; margin-bottom: 18px; }
+    .btc-badge-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--orange); box-shadow: 0 0 8px var(--orange); animation: pulse 2s ease-in-out infinite; }
+    .btc-badge span { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--orange); }
+    @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)}50%{opacity:.6;transform:scale(.85)} }
+    h1 { font-family: 'Bebas Neue', sans-serif; font-size: clamp(50px, 11vw, 104px); line-height: 0.9; letter-spacing: 0.02em; color: var(--text); margin-bottom: 16px; }
+    h1 em { color: var(--orange); font-style: normal; text-shadow: 0 0 80px var(--orange-glow); }
+    .subtitle { font-size: 15px; font-weight: 300; color: var(--text-muted); max-width: 420px; margin: 0 auto; line-height: 1.7; }
+    .live-price-bar { display: flex; align-items: center; justify-content: center; margin-top: 18px; }
+    .live-price-pill { display: inline-flex; align-items: center; gap: 8px; background: var(--surface2); border: 1px solid var(--border-subtle); border-radius: 100px; padding: 6px 16px; font-family: 'DM Mono', monospace; font-size: 12px; color: var(--text-muted); }
+    .live-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); flex-shrink: 0; }
+    .live-dot.fetching { background: var(--orange); animation: pulse 1s infinite; }
+    #live-price-val { color: var(--text); font-weight: 500; }
+
+    /* Section tabs */
+    .tabs { display: flex; gap: 0; margin-bottom: 0; border-bottom: 1px solid var(--border-subtle); animation: fadeUp 0.6s 0.05s ease both; }
+    .tab-btn {
+      flex: 1; padding: 14px 10px; background: transparent; border: none; cursor: pointer;
+      font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--text-muted); transition: all 0.2s; position: relative;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .tab-btn::after { content: ''; position: absolute; bottom: -1px; left: 0; right: 0; height: 2px; background: var(--orange); transform: scaleX(0); transition: transform 0.2s; }
+    .tab-btn.active { color: var(--orange); }
+    .tab-btn.active::after { transform: scaleX(1); }
+    .tab-btn:hover:not(.active) { color: var(--text); }
+
+    /* Card */
+    .card { background: var(--surface); border: 1px solid var(--border); border-top: none; border-radius: 0 0 2px 2px; padding: 32px 36px 28px; position: relative; animation: fadeUp 0.6s 0.1s ease both; }
+    @media (max-width: 560px) { .card { padding: 22px 18px 18px; } }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* Moment chips */
+    .moments-label { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 10px; }
+    .moments { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 10px; }
+    .moment-chip { background: var(--surface2); border: 1px solid var(--border-subtle); border-radius: 2px; padding: 7px 13px; cursor: pointer; font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text-muted); transition: all 0.15s; line-height: 1.4; text-align: left; -webkit-tap-highlight-color: transparent; }
+    .moment-chip:hover, .moment-chip.active { border-color: var(--orange); color: var(--orange); background: var(--orange-dim); }
+    .moment-chip strong { display: block; font-weight: 500; color: var(--text); font-size: 10px; margin-bottom: 1px; }
+    .moment-chip.active strong { color: var(--orange); }
+    .moment-chip.hidden { display: none; }
+    .show-more-btn { background: none; border: 1px dashed rgba(255,255,255,0.1); border-radius: 2px; padding: 7px 16px; cursor: pointer; font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text-muted); margin-bottom: 22px; transition: all 0.15s; display: block; -webkit-tap-highlight-color: transparent; }
+    .show-more-btn:hover { border-color: var(--orange); color: var(--orange); }
+
+    /* Form */
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 18px; }
+    @media (max-width: 560px) { .form-row { grid-template-columns: 1fr; } }
+    .field { display: flex; flex-direction: column; gap: 7px; }
+    label { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-muted); }
+    .input-wrap { position: relative; }
+    .input-prefix { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); font-family: 'DM Mono', monospace; font-size: 14px; color: var(--orange); pointer-events: none; }
+    input[type="number"], input[type="date"], input[type="email"], select {
+      width: 100%; background: var(--surface2); border: 1px solid var(--border-subtle); border-radius: 2px;
+      padding: 13px 13px 13px 30px; font-family: 'DM Mono', monospace; font-size: 15px;
+      color: var(--text); outline: none; transition: border-color 0.15s, box-shadow 0.15s;
+      -webkit-appearance: none; min-height: 50px;
+    }
+    input[type="date"], select { padding-left: 13px; }
+    input[type="email"] { padding-left: 13px; }
+    input:focus, select:focus { border-color: var(--orange); box-shadow: 0 0 0 3px var(--orange-dim); }
+    input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(60%) sepia(50%) saturate(400%) hue-rotate(350deg); cursor: pointer; }
+    input[type="number"] { -moz-appearance: textfield; }
+    input[type="number"]::-webkit-outer-spin-button, input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
+    select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b6257' stroke-width='1.5'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; cursor: pointer; }
+    select option { background: #1a1a1a; }
+
+    /* Button */
+    .btn { width: 100%; padding: 17px; background: var(--orange); border: none; border-radius: 2px; font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 0.08em; color: var(--black); cursor: pointer; position: relative; overflow: hidden; transition: transform 0.1s, box-shadow 0.2s; -webkit-tap-highlight-color: transparent; }
+    .btn:hover { box-shadow: 0 0 50px var(--orange-glow); transform: translateY(-1px); }
+    .btn:active { transform: translateY(0); }
+    .btn-shimmer { position: absolute; inset: 0; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.28), transparent); transform: translateX(-100%); transition: transform 0.45s; }
+    .btn:hover .btn-shimmer { transform: translateX(100%); }
+
+    /* Error / loading */
+    .error { display: none; margin-top: 16px; background: rgba(239,68,68,0.07); border: 1px solid rgba(239,68,68,0.28); border-radius: 2px; padding: 13px 16px; color: #fca5a5; font-size: 13px; font-family: 'DM Mono', monospace; line-height: 1.5; }
+    .error.active { display: block; }
+    .loading { display: none; text-align: center; padding: 32px 0 16px; }
+    .loading.active { display: block; }
+    .spinner { width: 34px; height: 34px; border: 2px solid rgba(247,147,26,0.12); border-top-color: var(--orange); border-radius: 50%; animation: spin 0.7s linear infinite; margin: 0 auto 12px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    #loading-msg { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.12em; color: var(--text-muted); }
+
+    /* Divider */
+    .divider { height: 1px; margin: 24px 0; background: linear-gradient(90deg, transparent, var(--border-subtle), transparent); }
+
+    /* ── Time Machine Result ── */
+    .result { display: none; animation: resultIn 0.45s ease both; }
+    .result.active { display: block; }
+    @keyframes resultIn { from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)} }
+    .result-hero { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; flex-wrap: wrap; margin-bottom: 22px; }
+    .result-label { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px; }
+    .current-value { font-family: 'Bebas Neue', sans-serif; font-size: clamp(42px, 9vw, 76px); color: var(--green); text-shadow: 0 0 50px var(--green-glow); line-height: 1; letter-spacing: 0.02em; }
+    .current-value.loss { color: var(--red); text-shadow: none; }
+    .invested-sub { font-family: 'DM Mono', monospace; font-size: 13px; color: var(--text-muted); margin-top: 5px; }
+    .multiplier-box { background: var(--green-glow); border: 1px solid rgba(34,197,94,0.28); border-radius: 2px; padding: 12px 20px; text-align: center; flex-shrink: 0; }
+    .multiplier-box.loss { background: rgba(239,68,68,0.08); border-color: rgba(239,68,68,0.28); }
+    .multiplier-val { font-family: 'Bebas Neue', sans-serif; font-size: 38px; color: var(--green); line-height: 1; }
+    .multiplier-val.loss { color: var(--red); }
+    .multiplier-sub { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--green); opacity: 0.7; }
+    .multiplier-sub.loss { color: var(--red); }
+    .stats { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 14px; }
+    @media (max-width: 480px) { .stats { grid-template-columns: repeat(2,1fr); } }
+    .stat { background: var(--surface2); border: 1px solid var(--border-subtle); border-radius: 2px; padding: 13px; }
+    .stat-label { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px; }
+    .stat-val { font-family: 'DM Mono', monospace; font-size: 14px; font-weight: 500; color: var(--text); }
+    .stat-val.green { color: var(--green); }
+    .stat-val.orange { color: var(--orange); }
+    .stat-val.red { color: var(--red); }
+    .btc-row { display: flex; align-items: center; justify-content: space-between; background: var(--surface2); border: 1px solid var(--border); border-radius: 2px; padding: 13px 16px; margin-bottom: 14px; }
+    .btc-row-label { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); }
+    .btc-row-val { font-family: 'DM Mono', monospace; font-size: 14px; color: var(--orange); }
+    .bar-labels { display: flex; justify-content: space-between; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px; }
+    .bar-track { height: 5px; background: var(--surface3); overflow: hidden; }
+    .bar-fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--orange), var(--green)); transition: width 1.1s cubic-bezier(0.16,1,0.3,1); }
+    .bar-fill.loss { background: linear-gradient(90deg, var(--red), rgba(239,68,68,0.4)); }
+    .fact-note { margin-top: 14px; padding: 12px 16px; background: var(--orange-dim); border-left: 2px solid var(--orange); font-family: 'DM Mono', monospace; font-size: 12px; color: var(--text-muted); line-height: 1.7; font-style: italic; }
+
+    /* Share */
+    .share-section { margin-top: 18px; padding-top: 18px; border-top: 1px solid var(--border-subtle); }
+    .share-label { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 10px; }
+    .share-buttons { display: flex; gap: 10px; flex-wrap: wrap; }
+    .share-btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: 2px; cursor: pointer; font-family: 'DM Mono', monospace; font-size: 12px; letter-spacing: 0.05em; border: none; transition: all 0.15s; -webkit-tap-highlight-color: transparent; }
+    .share-btn-x { background: #1a1a1a; color: var(--text); border: 1px solid rgba(255,255,255,0.12); }
+    .share-btn-x:hover { border-color: rgba(255,255,255,0.3); }
+    .share-btn-copy { background: var(--orange-dim); color: var(--orange); border: 1px solid var(--border); }
+    .share-btn-copy:hover { background: rgba(247,147,26,0.14); }
+    .share-btn-copy.copied { color: var(--green); border-color: rgba(34,197,94,0.3); background: var(--green-glow); }
+
+    /* ── Email capture — appears after result ── */
+    .email-capture {
+      display: none; margin-top: 20px;
+      background: linear-gradient(135deg, rgba(247,147,26,0.07), rgba(247,147,26,0.03));
+      border: 1px solid var(--border); border-radius: 2px; padding: 24px;
+      position: relative; overflow: hidden;
+      animation: resultIn 0.5s 0.2s ease both;
+    }
+    .email-capture::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, var(--orange), transparent); }
+    .email-capture.active { display: block; }
+    .email-capture.submitted { display: none; }
+    .ec-eyebrow { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--orange); margin-bottom: 8px; }
+    .ec-headline { font-family: 'Bebas Neue', sans-serif; font-size: 28px; color: var(--text); line-height: 1.1; margin-bottom: 6px; letter-spacing: 0.03em; }
+    .ec-sub { font-size: 13px; color: var(--text-muted); line-height: 1.6; margin-bottom: 16px; }
+    .ec-sub strong { color: var(--text); font-weight: 500; }
+    .ec-row { display: flex; gap: 10px; }
+    @media (max-width: 500px) { .ec-row { flex-direction: column; } }
+    .ec-input { flex: 1; background: var(--surface2); border: 1px solid var(--border-subtle); border-radius: 2px; padding: 12px 14px; font-family: 'DM Mono', monospace; font-size: 14px; color: var(--text); outline: none; transition: border-color 0.15s; min-height: 48px; }
+    .ec-input:focus { border-color: var(--orange); box-shadow: 0 0 0 3px var(--orange-dim); }
+    .ec-input::placeholder { color: var(--text-muted); }
+    .ec-btn { padding: 12px 22px; background: var(--orange); border: none; border-radius: 2px; font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 0.06em; color: var(--black); cursor: pointer; white-space: nowrap; transition: opacity 0.15s; -webkit-tap-highlight-color: transparent; }
+    .ec-btn:hover { opacity: 0.9; }
+    .ec-privacy { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--text-muted); margin-top: 10px; }
+
+    /* Email success */
+    .email-success {
+      display: none; margin-top: 20px;
+      background: var(--green-glow); border: 1px solid rgba(34,197,94,0.28);
+      border-radius: 2px; padding: 20px 24px;
+      animation: resultIn 0.4s ease both;
+    }
+    .email-success.active { display: flex; align-items: center; gap: 14px; }
+    .email-success-icon { font-size: 28px; flex-shrink: 0; }
+    .email-success-text strong { display: block; font-family: 'Space Grotesk', sans-serif; font-size: 15px; font-weight: 600; color: var(--green); margin-bottom: 4px; }
+    .email-success-text span { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--text-muted); }
+
+    /* ── DCA Calculator ── */
+    .dca-intro { font-size: 14px; color: var(--text-muted); line-height: 1.7; margin-bottom: 22px; padding: 14px 16px; background: var(--orange-dim); border-left: 2px solid var(--orange); font-family: 'DM Mono', monospace; }
+    .dca-intro strong { color: var(--text); }
+    .dca-form-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; margin-bottom: 18px; }
+    @media (max-width: 600px) { .dca-form-grid { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 380px) { .dca-form-grid { grid-template-columns: 1fr; } }
+
+    /* DCA Result */
+    .dca-result { display: none; animation: resultIn 0.45s ease both; }
+    .dca-result.active { display: block; }
+    .dca-hero { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 18px; }
+    @media (max-width: 500px) { .dca-hero { grid-template-columns: 1fr 1fr; } }
+    .dca-hero-card { background: var(--surface2); border: 1px solid var(--border-subtle); border-radius: 2px; padding: 16px; text-align: center; }
+    .dca-hero-card.highlight { border-color: var(--green); background: var(--green-glow); }
+    .dca-hero-card.invested-card { border-color: rgba(247,147,26,0.3); }
+    .dca-hero-label { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px; }
+    .dca-hero-val { font-family: 'Bebas Neue', sans-serif; font-size: clamp(22px, 5vw, 34px); color: var(--text); line-height: 1; }
+    .dca-hero-card.highlight .dca-hero-val { color: var(--green); text-shadow: 0 0 30px var(--green-glow); }
+    .dca-hero-card.invested-card .dca-hero-val { color: var(--orange); }
+
+    /* Chart */
+    .chart-wrap { position: relative; margin-bottom: 16px; }
+    .chart-label { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 10px; }
+    canvas { width: 100% !important; height: 180px !important; display: block; }
+
+    /* Chart legend */
+    .chart-legend { display: flex; gap: 20px; margin-top: 10px; flex-wrap: wrap; }
+    .legend-item { display: flex; align-items: center; gap: 7px; font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text-muted); }
+    .legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+
+    /* DCA fact box */
+    .dca-fact { margin-top: 4px; padding: 12px 16px; background: var(--surface2); border: 1px solid var(--border-subtle); border-radius: 2px; font-family: 'DM Mono', monospace; font-size: 12px; color: var(--text-muted); line-height: 1.7; }
+    .dca-fact strong { color: var(--orange); }
+
+    /* DCA email nudge */
+    .dca-email-nudge {
+      display: none; margin-top: 18px;
+      border: 1px solid var(--border); border-radius: 2px; padding: 20px 22px;
+      background: linear-gradient(135deg, rgba(247,147,26,0.06), transparent);
+      position: relative;
+    }
+    .dca-email-nudge::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, var(--orange), transparent); }
+    .dca-email-nudge.active { display: block; animation: resultIn 0.4s 0.3s ease both; }
+    .den-headline { font-family: 'Bebas Neue', sans-serif; font-size: 22px; color: var(--text); letter-spacing: 0.03em; margin-bottom: 5px; }
+    .den-sub { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--text-muted); line-height: 1.6; margin-bottom: 14px; }
+    .den-row { display: flex; gap: 10px; }
+    @media (max-width: 500px) { .den-row { flex-direction: column; } }
+
+    /* Footer */
+    footer { margin-top: 48px; text-align: center; font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text-muted); line-height: 1.9; animation: fadeUp 0.6s 0.25s ease both; }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)} }
+
+    /* Affiliate CTA */
+    .affiliate-cta {
+      margin-top: 20px; padding: 18px 22px;
+      background: var(--surface2); border: 1px solid var(--border-subtle); border-radius: 2px;
+      display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+    }
+    .affiliate-text { font-size: 13px; color: var(--text-muted); line-height: 1.5; }
+    .affiliate-text strong { display: block; color: var(--text); font-size: 14px; margin-bottom: 3px; }
+    .affiliate-btn { padding: 11px 20px; background: var(--orange); border: none; border-radius: 2px; font-family: 'Bebas Neue', sans-serif; font-size: 17px; letter-spacing: 0.06em; color: var(--black); cursor: pointer; white-space: nowrap; text-decoration: none; display: inline-block; transition: opacity 0.15s; -webkit-tap-highlight-color: transparent; }
+    .affiliate-btn:hover { opacity: 0.88; }
+  </style>
+</head>
+<body>
+<div class="bg-glow"></div>
+<div class="ticker"><div class="ticker-inner" id="ticker-inner"></div></div>
+
+<div class="container">
+
+  <!-- Header -->
+  <header>
+    <div class="btc-badge"><div class="btc-badge-dot"></div><span>Bitcoin Time Machine</span></div>
+    <h1>WHAT IF YOU'D<br>BOUGHT <em>BITCOIN</em>?</h1>
+    <p class="subtitle">Every time you didn't — the money you spent on something else. See what it'd be worth now.</p>
+    <div class="live-price-bar">
+      <div class="live-price-pill">
+        <div class="live-dot fetching" id="live-dot"></div>
+        <span>BTC / USD&nbsp;&nbsp;</span>
+        <span id="live-price-val">fetching…</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab-btn active" id="tab-tm" onclick="switchTab('tm')">⏱ Time Machine</button>
+    <button class="tab-btn" id="tab-dca" onclick="switchTab('dca')">📈 DCA Calculator</button>
+  </div>
+
+  <div class="card">
+
+    <!-- ══ TIME MACHINE PANEL ══ -->
+    <div class="tab-panel active" id="panel-tm">
+
+      <div class="moments-label">What if you'd bought Bitcoin instead of…</div>
+      <div class="moments" id="moments">
+        <button class="moment-chip" data-date="2020-03-16" data-amount="1000"><strong>Surviving lockdown</strong>Mar 2020 · $1,000</button>
+        <button class="moment-chip" data-date="2022-11-30" data-amount="1200"><strong>Your last iPhone</strong>Nov 2022 · $1,200</button>
+        <button class="moment-chip" data-date="2021-01-08" data-amount="1000"><strong>When GameStop exploded</strong>Jan 2021 · $1,000</button>
+        <button class="moment-chip" data-date="2019-06-15" data-amount="3000"><strong>That vacation you took</strong>Summer 2019 · $3,000</button>
+        <button class="moment-chip" data-date="2020-09-01" data-amount="800"><strong>A year of Netflix</strong>Sep 2020 · $800</button>
+        <button class="moment-chip" data-date="2022-10-27" data-amount="1000"><strong>When Elon bought Twitter</strong>Oct 2022 · $1,000</button>
+        <button class="moment-chip" data-date="2018-09-01" data-amount="1000"><strong>Your last car payment</strong>Sep 2018 · $1,000</button>
+        <button class="moment-chip" data-date="2023-01-01" data-amount="500"><strong>Your 2023 gym membership</strong>Jan 2023 · $500</button>
+
+        <button class="moment-chip hidden" data-date="2022-11-30" data-amount="1000"><strong>When ChatGPT launched</strong>Nov 2022 · $1,000</button>
+        <button class="moment-chip hidden" data-date="2021-04-14" data-amount="1000"><strong>Coinbase's IPO day</strong>Apr 2021 · $1,000</button>
+        <button class="moment-chip hidden" data-date-offset="1825" data-amount="1000"><strong>Exactly 5 years ago</strong><span class="chip-date-label"></span> · $1,000</button>
+        <button class="moment-chip hidden" data-date-offset="3650" data-amount="1000"><strong>Exactly 10 years ago</strong><span class="chip-date-label"></span> · $1,000</button>
+        <button class="moment-chip hidden" data-date="2017-01-20" data-amount="1000"><strong>Trump's first inauguration</strong>Jan 2017 · $1,000</button>
+        <button class="moment-chip hidden" data-date="2020-01-31" data-amount="1000"><strong>The day Brexit happened</strong>Jan 2020 · $1,000</button>
+        <button class="moment-chip hidden" data-date="2023-08-01" data-amount="2500"><strong>A used car down payment</strong>Aug 2023 · $2,500</button>
+      </div>
+      <button class="show-more-btn" id="show-more-btn" onclick="toggleMoreChips()">+ 7 more moments</button>
+
+      <div class="form-row">
+        <div class="field">
+          <label>Investment Amount (USD)</label>
+          <div class="input-wrap"><span class="input-prefix">$</span><input type="number" id="tm-amount" placeholder="1000" min="1" inputmode="decimal" /></div>
+        </div>
+        <div class="field">
+          <label>Purchase Date</label>
+          <div class="input-wrap"><input type="date" id="tm-date" /></div>
+        </div>
+      </div>
+
+      <button class="btn" id="calc-btn"><span class="btn-shimmer"></span>CALCULATE MY RETURNS</button>
+      <div class="error" id="tm-error"></div>
+      <div class="loading" id="tm-loading"><div class="spinner"></div><div id="loading-msg">FETCHING LIVE BTC PRICE…</div></div>
+
+      <div class="result" id="tm-result">
+        <div class="divider"></div>
+        <div class="result-hero">
+          <div>
+            <div class="result-label">Your investment today</div>
+            <div class="current-value" id="tm-current-value">$0</div>
+            <div class="invested-sub" id="tm-invested-sub">Invested: $0</div>
+          </div>
+          <div class="multiplier-box" id="tm-mult-box">
+            <div class="multiplier-val" id="tm-mult-val">0×</div>
+            <div class="multiplier-sub" id="tm-mult-sub">RETURN</div>
+          </div>
+        </div>
+        <div class="stats">
+          <div class="stat"><div class="stat-label">BTC Price Then</div><div class="stat-val orange" id="tm-price-then">—</div></div>
+          <div class="stat"><div class="stat-label">BTC Price Now</div><div class="stat-val orange" id="tm-price-now">—</div></div>
+          <div class="stat"><div class="stat-label">Total Gain</div><div class="stat-val" id="tm-gain">—</div></div>
+          <div class="stat"><div class="stat-label">% Return</div><div class="stat-val" id="tm-pct">—</div></div>
+          <div class="stat"><div class="stat-label">Time Held</div><div class="stat-val" id="tm-years">—</div></div>
+          <div class="stat"><div class="stat-label">Ann. Return</div><div class="stat-val" id="tm-ann">—</div></div>
+        </div>
+        <div class="btc-row"><div class="btc-row-label">Bitcoin you would have bought</div><div class="btc-row-val" id="tm-btc">₿ 0.00000000</div></div>
+        <div class="bar-labels"><span>Invested</span><span>Today's value</span></div>
+        <div class="bar-track"><div class="bar-fill" id="tm-bar"></div></div>
+        <div class="fact-note" id="tm-note"></div>
+
+        <!-- Share -->
+        <div class="share-section">
+          <div class="share-label">Share your result</div>
+          <div class="share-buttons">
+            <button class="share-btn share-btn-x" id="share-x">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.738l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+              Post to X
+            </button>
+            <button class="share-btn share-btn-copy" id="share-copy">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              <span id="copy-label">Copy result</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Affiliate CTA -->
+        <div class="affiliate-cta">
+          <div class="affiliate-text">
+            <strong>Ready to actually buy Bitcoin?</strong>
+            Get $10 in free Bitcoin when you sign up and trade on Coinbase.
+          </div>
+          <a class="affiliate-btn" id="affiliate-btn" href="#" target="_blank" rel="noopener">Start on Coinbase →</a>
+        </div>
+
+        <!-- Email capture — shown after result -->
+        <div class="email-capture" id="email-capture">
+          <div class="ec-eyebrow">₿ Free Weekly Email</div>
+          <div class="ec-headline">THE NUMBERS, EVERY MONDAY.</div>
+          <div class="ec-sub">Current BTC price. What $100 last week would be worth. One historical fact. No hype, no predictions — just <strong>the actual numbers</strong>, every Monday morning.</div>
+          <div class="ec-row">
+            <input class="ec-input" type="email" id="ec-email" placeholder="your@email.com" />
+            <button class="ec-btn" onclick="submitEmail()">SEND ME IT</button>
+          </div>
+          <div class="ec-privacy">No spam. Unsubscribe anytime. We hate junk mail too.</div>
+        </div>
+        <div class="email-success" id="email-success">
+          <div class="email-success-icon">🎉</div>
+          <div class="email-success-text">
+            <strong>You're in! Check your inbox.</strong>
+            <span>First email lands within the hour. In the meantime, try the DCA calculator →</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ DCA PANEL ══ -->
+    <div class="tab-panel" id="panel-dca">
+      <div class="dca-intro">
+        <strong>Dollar-Cost Averaging (DCA)</strong> means buying a fixed amount of Bitcoin on a regular schedule — ignoring the price. It's the strategy that turns ordinary people into long-term winners by removing emotion from the equation.
+      </div>
+
+      <div class="dca-form-grid">
+        <div class="field">
+          <label>Monthly amount</label>
+          <div class="input-wrap"><span class="input-prefix">$</span><input type="number" id="dca-amount" placeholder="100" min="1" inputmode="decimal" value="100" /></div>
+        </div>
+        <div class="field">
+          <label>Starting from</label>
+          <div class="input-wrap"><input type="date" id="dca-start" /></div>
+        </div>
+        <div class="field">
+          <label>Frequency</label>
+          <select id="dca-freq">
+            <option value="monthly" selected>Monthly</option>
+            <option value="weekly">Weekly</option>
+            <option value="daily">Daily</option>
+          </select>
+        </div>
+      </div>
+
+      <button class="btn" id="dca-btn"><span class="btn-shimmer"></span>SHOW ME THE MAGIC</button>
+      <div class="error" id="dca-error"></div>
+      <div class="loading" id="dca-loading"><div class="spinner"></div><div id="dca-loading-msg">CALCULATING…</div></div>
+
+      <div class="dca-result" id="dca-result">
+        <div class="divider"></div>
+
+        <div class="dca-hero">
+          <div class="dca-hero-card invested-card">
+            <div class="dca-hero-label">Total invested</div>
+            <div class="dca-hero-val" id="dca-total-invested">$0</div>
+          </div>
+          <div class="dca-hero-card highlight">
+            <div class="dca-hero-label">Worth today</div>
+            <div class="dca-hero-val" id="dca-total-value">$0</div>
+          </div>
+          <div class="dca-hero-card">
+            <div class="dca-hero-label">Total gain</div>
+            <div class="dca-hero-val" id="dca-total-gain" style="color:var(--green)">$0</div>
+          </div>
+        </div>
+
+        <div class="stats">
+          <div class="stat"><div class="stat-label">BTC Accumulated</div><div class="stat-val orange" id="dca-btc">₿ 0</div></div>
+          <div class="stat"><div class="stat-label">Avg Buy Price</div><div class="stat-val" id="dca-avg-price">$0</div></div>
+          <div class="stat"><div class="stat-label">Return</div><div class="stat-val green" id="dca-pct">0%</div></div>
+          <div class="stat"><div class="stat-label">Purchases made</div><div class="stat-val" id="dca-count">0</div></div>
+          <div class="stat"><div class="stat-label">Best single buy</div><div class="stat-val orange" id="dca-best">—</div></div>
+          <div class="stat"><div class="stat-label">Worst single buy</div><div class="stat-val red" id="dca-worst">—</div></div>
+        </div>
+
+        <div class="chart-wrap">
+          <div class="chart-label">Portfolio growth over time</div>
+          <canvas id="dca-chart"></canvas>
+          <div class="chart-legend">
+            <div class="legend-item"><div class="legend-dot" style="background:var(--orange)"></div>Amount invested</div>
+            <div class="legend-item"><div class="legend-dot" style="background:var(--green)"></div>Portfolio value</div>
+          </div>
+        </div>
+
+        <div class="dca-fact" id="dca-fact"></div>
+
+        <!-- Share DCA -->
+        <div class="share-section">
+          <div class="share-label">Share this result</div>
+          <div class="share-buttons">
+            <button class="share-btn share-btn-x" id="dca-share-x">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.738l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+              Post to X
+            </button>
+            <button class="share-btn share-btn-copy" id="dca-share-copy">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              <span id="dca-copy-label">Copy result</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- DCA email nudge — different angle than TM -->
+        <div class="dca-email-nudge" id="dca-email-nudge">
+          <div class="den-headline">WANT THIS UPDATE EVERY MONDAY?</div>
+          <div class="den-sub">We send one short email: current BTC price, what your DCA would look like this week, and one thing worth knowing. That's it. Free, no spam.</div>
+          <div class="den-row">
+            <input class="ec-input" type="email" id="dca-ec-email" placeholder="your@email.com" />
+            <button class="ec-btn" onclick="submitDcaEmail()">GET MY PLAN</button>
+          </div>
+          <div class="ec-privacy" style="margin-top:10px">No spam. Free forever. Just useful Bitcoin data.</div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /card -->
+
+  <footer>
+    <p>Historical prices from built-in dataset (Apr 2013 – present) · Live price via web search</p>
+    <p>Not financial advice · Past performance does not guarantee future results</p>
+  </footer>
+</div>
+
+<script>
+// ╔══════════════════════════════════════════════════════════╗
+// ║              CONFIGURATION — EDIT THESE                 ║
+// ╚══════════════════════════════════════════════════════════╝
+const CONFIG = {
+  // 1. Your site URL (used in share copy)
+  siteUrl: 'YOUR_SITE_URL_HERE', // e.g. 'bitcoin-timemachine.app'
+
+  // 2. Beehiiv form embed URL — get this from:
+  //    beehiiv.com → Your publication → Settings → Forms → Embed
+  beehiivFormUrl: 'YOUR_BEEHIIV_FORM_URL_HERE',
+
+  // 3. Coinbase affiliate link — sign up at:
+  //    coinbase.com/affiliates
+  affiliateUrl: 'YOUR_COINBASE_AFFILIATE_LINK_HERE',
+};
+// ════════════════════════════════════════════════════════════
+
+// ── Historical BTC monthly closes (USD) ──────────────────────────────────────
+const BTC_MONTHLY = {
+  '2013-04':130,'2013-05':129,'2013-06':97,'2013-07':91,'2013-08':118,
+  '2013-09':128,'2013-10':198,'2013-11':1057,'2013-12':732,
+  '2014-01':808,'2014-02':571,'2014-03':480,'2014-04':450,'2014-05':630,
+  '2014-06':638,'2014-07':587,'2014-08':502,'2014-09':390,'2014-10':338,
+  '2014-11':378,'2014-12':319,
+  '2015-01':217,'2015-02':257,'2015-03':246,'2015-04':235,'2015-05':233,
+  '2015-06':263,'2015-07':292,'2015-08':230,'2015-09':237,'2015-10':327,
+  '2015-11':362,'2015-12':430,
+  '2016-01':370,'2016-02':437,'2016-03':415,'2016-04':449,'2016-05':530,
+  '2016-06':675,'2016-07':628,'2016-08':573,'2016-09':608,'2016-10':701,
+  '2016-11':739,'2016-12':963,
+  '2017-01':963,'2017-02':1190,'2017-03':1072,'2017-04':1347,'2017-05':2300,
+  '2017-06':2550,'2017-07':2875,'2017-08':4748,'2017-09':4180,'2017-10':6163,
+  '2017-11':10861,'2017-12':14156,
+  '2018-01':10163,'2018-02':10551,'2018-03':6928,'2018-04':9268,'2018-05':7504,
+  '2018-06':6178,'2018-07':8220,'2018-08':7048,'2018-09':6625,'2018-10':6307,
+  '2018-11':4040,'2018-12':3742,
+  '2019-01':3457,'2019-02':3858,'2019-03':4050,'2019-04':5328,'2019-05':8720,
+  '2019-06':10800,'2019-07':10087,'2019-08':9630,'2019-09':8292,'2019-10':9210,
+  '2019-11':7566,'2019-12':7240,
+  '2020-01':9350,'2020-02':8600,'2020-03':6425,'2020-04':8630,'2020-05':9650,
+  '2020-06':9138,'2020-07':11350,'2020-08':11660,'2020-09':10765,'2020-10':13780,
+  '2020-11':19700,'2020-12':28990,
+  '2021-01':33141,'2021-02':45240,'2021-03':58800,'2021-04':57750,'2021-05':37332,
+  '2021-06':35040,'2021-07':41530,'2021-08':47140,'2021-09':43825,'2021-10':60215,
+  '2021-11':56993,'2021-12':46217,
+  '2022-01':38466,'2022-02':43193,'2022-03':45530,'2022-04':37715,'2022-05':31793,
+  '2022-06':19784,'2022-07':23296,'2022-08':20050,'2022-09':19432,'2022-10':20492,
+  '2022-11':17167,'2022-12':16547,
+  '2023-01':23130,'2023-02':23141,'2023-03':28478,'2023-04':29244,'2023-05':27219,
+  '2023-06':30478,'2023-07':29237,'2023-08':27984,'2023-09':26966,'2023-10':34677,
+  '2023-11':37734,'2023-12':42514,
+  '2024-01':42514,'2024-02':62427,'2024-03':71313,'2024-04':60624,'2024-05':67533,
+  '2024-06':62678,'2024-07':66000,'2024-08':59142,'2024-09':63301,'2024-10':72444,
+  '2024-11':97716,'2024-12':93400,
+  '2025-01':101900,'2025-02':84400,
+};
+
+function getHistoricalPrice(dateStr) {
+  const [y,m,d] = dateStr.split('-').map(Number);
+  const key = `${y}-${String(m).padStart(2,'0')}`;
+  if (!BTC_MONTHLY[key]) return null;
+  const prev = BTC_MONTHLY[prevMK(key)] ?? BTC_MONTHLY[key];
+  const curr = BTC_MONTHLY[key];
+  const next = BTC_MONTHLY[nextMK(key)] ?? BTC_MONTHLY[key];
+  const days = new Date(y,m,0).getDate();
+  const t = (d-1)/Math.max(days-1,1);
+  return t < 0.5 ? prev+(curr-prev)*(t*2) : curr+(next-curr)*((t-0.5)*2);
+}
+function prevMK(k) { const [y,m]=k.split('-').map(Number),d=new Date(y,m-2,1); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`; }
+function nextMK(k) { const [y,m]=k.split('-').map(Number),d=new Date(y,m,1); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`; }
+
+// ── Live price — fetched once, cached forever ─────────────────────────────────
+let cachedPrice = null, pricePromise = null;
+function fetchCurrentPrice() {
+  if (cachedPrice) return Promise.resolve(cachedPrice);
+  if (pricePromise) return pricePromise;
+  pricePromise = fetch('https://api.anthropic.com/v1/messages', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ model:'claude-sonnet-4-5-20250929', max_tokens:200,
+      tools:[{type:'web_search_20250305',name:'web_search'}],
+      messages:[{role:'user',content:'Current Bitcoin price USD. Reply with ONLY the number, no symbols or commas. Example: 97450'}]})
+  }).then(r=>{ if(!r.ok) throw new Error('API '+r.status); return r.json(); })
+    .then(data=>{
+      const txt = data.content.filter(b=>b.type==='text').map(b=>b.text).join('');
+      const m = txt.replace(/,/g,'').match(/\d+(?:\.\d+)?/);
+      if(!m) throw new Error('parse');
+      cachedPrice = parseFloat(m[0]); pricePromise = null; return cachedPrice;
+    });
+  return pricePromise;
+}
+
+// Pre-fetch on load
+fetchCurrentPrice().then(p=>{
+  g('live-dot').classList.remove('fetching');
+  g('live-price-val').textContent = formatUSD(p);
+  g('live-price-val').style.color = 'var(--green)';
+  tmCalculate(true);
+}).catch(()=>{
+  g('live-dot').style.background='#ef4444';
+  g('live-price-val').textContent='unavailable';
+});
+
+// ── Init ─────────────────────────────────────────────────────────────────────
+const yesterday = new Date(); yesterday.setDate(yesterday.getDate()-1);
+const threeYearsAgo = new Date(); threeYearsAgo.setFullYear(threeYearsAgo.getFullYear()-3);
+const fiveYearsAgo = new Date(); fiveYearsAgo.setFullYear(fiveYearsAgo.getFullYear()-5);
+
+g('tm-date').max = g('dca-start').max = fmt(yesterday);
+g('tm-date').min = '2013-04-28';
+g('dca-start').min = '2013-04-28';
+g('tm-date').value = '2020-03-16';
+g('tm-amount').value = '1000';
+g('dca-start').value = fmt(threeYearsAgo);
+
+// Fill relative chip labels
+document.querySelectorAll('[data-date-offset]').forEach(chip=>{
+  const d = new Date(); d.setDate(d.getDate()-parseInt(chip.dataset.dateOffset));
+  chip.dataset.date = fmt(d);
+  const lbl = chip.querySelector('.chip-date-label');
+  if(lbl) lbl.textContent = d.toLocaleDateString('en-US',{month:'short',year:'numeric'});
+});
+
+// Ticker
+(()=>{
+  const items=['₿ BITCOIN','21 MILLION CAP','SATOSHI NAKAMOTO','HODL','PROOF OF WORK','NOT YOUR KEYS NOT YOUR COINS','STORE OF VALUE','BUY THE DIP','SOUND MONEY','DIGITAL GOLD'];
+  const d=[...items,...items];
+  g('ticker-inner').innerHTML=d.map(i=>`<span class="ticker-item">· ${i}</span>`).join('');
+})();
+
+// ── Tabs ──────────────────────────────────────────────────────────────────────
+function switchTab(tab) {
+  ['tm','dca'].forEach(t=>{
+    g('tab-'+t).classList.toggle('active', t===tab);
+    g('panel-'+t).classList.toggle('active', t===tab);
+  });
+}
+
+// ── Show more chips ───────────────────────────────────────────────────────────
+function toggleMoreChips() {
+  const btn = g('show-more-btn');
+  const hidden = document.querySelectorAll('.moment-chip.hidden, .moment-chip[style*="display"]');
+  const chips = document.querySelectorAll('#moments .moment-chip');
+  const isExpanded = btn.dataset.expanded === '1';
+  chips.forEach(c=>{
+    if(c.dataset.dateOffset || ['2022-11-30b','2021-04-14','2017-01-20','2020-01-31','2023-08-01'].some(x=>c.dataset.date===x)){
+      // handled by class
+    }
+  });
+  document.querySelectorAll('#moments .moment-chip:nth-child(n+9)').forEach(c=>{
+    c.classList.toggle('hidden', isExpanded);
+  });
+  btn.dataset.expanded = isExpanded ? '0' : '1';
+  btn.textContent = isExpanded ? '+ 7 more moments' : '− Show fewer';
+}
+
+// Init: hide extra chips
+document.querySelectorAll('#moments .moment-chip:nth-child(n+9)').forEach(c=>c.classList.add('hidden'));
+
+// ── Moment chips ──────────────────────────────────────────────────────────────
+document.querySelectorAll('.moment-chip').forEach(chip=>{
+  chip.addEventListener('click',()=>{
+    document.querySelectorAll('.moment-chip').forEach(c=>c.classList.remove('active'));
+    chip.classList.add('active');
+    g('tm-amount').value = chip.dataset.amount||1000;
+    g('tm-date').value = chip.dataset.date;
+    tmCalculate();
+  });
+});
+
+// ── TIME MACHINE ──────────────────────────────────────────────────────────────
+g('calc-btn').addEventListener('click',()=>tmCalculate());
+g('tm-amount').addEventListener('keydown',e=>{ if(e.key==='Enter') tmCalculate(); });
+
+let lastTM = {};
+
+async function tmCalculate(silent=false) {
+  const amount = parseFloat(g('tm-amount').value);
+  const dateVal = g('tm-date').value;
+  hideEl('tm-result'); hideErr('tm-error');
+
+  if(!amount||amount<=0){if(!silent)showErr('tm-error','Please enter a valid dollar amount.');return;}
+  if(!dateVal){if(!silent)showErr('tm-error','Please select a purchase date.');return;}
+  const pd = new Date(dateVal+'T12:00:00Z');
+  if(pd>=new Date()){if(!silent)showErr('tm-error','Please select a date in the past.');return;}
+  if(pd<new Date('2013-04-28')){if(!silent)showErr('tm-error','Data available from April 2013.');return;}
+  const histPrice = getHistoricalPrice(dateVal);
+  if(!histPrice){if(!silent)showErr('tm-error','No data for that date. Try a nearby date.');return;}
+
+  if(cachedPrice){ tmDisplay(amount,histPrice,cachedPrice,pd); return; }
+  showEl('tm-loading'); g('loading-msg').textContent='FETCHING LIVE BTC PRICE…';
+  try {
+    const p = await fetchCurrentPrice();
+    hideEl('tm-loading'); tmDisplay(amount,histPrice,p,pd);
+  } catch(e){ hideEl('tm-loading'); showErr('tm-error','Could not fetch live price. Try again.'); }
+}
+
+function tmDisplay(invested, priceThen, priceNow, pd) {
+  const btc=invested/priceThen, now=btc*priceNow, gain=now-invested;
+  const pct=((now-invested)/invested)*100, mult=now/invested;
+  const years=(Date.now()-pd)/(1000*60*60*24*365.25), ann=(Math.pow(mult,1/years)-1)*100;
+  const up=gain>=0;
+  lastTM={invested,priceThen,priceNow,btc,now,gain,pct,mult,years,pd};
+
+  g('tm-current-value').textContent=formatUSD(now);
+  g('tm-current-value').className='current-value'+(up?'':' loss');
+  g('tm-invested-sub').textContent='Invested: '+formatUSD(invested);
+  const mTxt=mult>=1000?`${Math.round(mult/1000)}K×`:`${mult.toFixed(1)}×`;
+  g('tm-mult-val').textContent=mTxt; g('tm-mult-val').className='multiplier-val'+(up?'':' loss');
+  g('tm-mult-box').className='multiplier-box'+(up?'':' loss');
+  g('tm-mult-sub').className='multiplier-sub'+(up?'':' loss');
+  g('tm-price-then').textContent=formatUSD(priceThen);
+  g('tm-price-now').textContent=formatUSD(priceNow);
+  g('tm-gain').textContent=(up?'+':'')+formatUSD(gain); g('tm-gain').className='stat-val '+(up?'green':'red');
+  g('tm-pct').textContent=(up?'+':'')+pct.toFixed(1)+'%'; g('tm-pct').className='stat-val '+(up?'green':'red');
+  g('tm-years').textContent=years.toFixed(1)+' yrs';
+  g('tm-ann').textContent=(ann>=0?'+':'')+ann.toFixed(1)+'%/yr'; g('tm-ann').className='stat-val '+(ann>=0?'green':'red');
+  g('tm-btc').textContent='₿ '+btc.toFixed(8);
+  const bp=up?Math.min(97,Math.max(3,(1-invested/now)*100)):Math.min(50,(now/invested)*50);
+  const bar=g('tm-bar'); bar.style.width='0%'; bar.className='bar-fill'+(up?'':' loss');
+  setTimeout(()=>{ bar.style.width=bp+'%'; },60);
+  g('tm-note').textContent=buildTMNote(mult,pct,years,pd,invested,now);
+  showEl('tm-result');
+  // Show email capture after a short delay for impact
+  setTimeout(()=>{ g('email-capture').classList.add('active'); },800);
+}
+
+function buildTMNote(mult,pct,years,date,invested,now){
+  const ds=date.toLocaleDateString('en-US',{month:'long',year:'numeric'});
+  const daily=formatUSD(now/(years*365));
+  if(mult>=1000) return `A ${ds} investment that multiplied ${Math.round(mult).toLocaleString()}× — the equivalent of earning ${daily} every single day for ${years.toFixed(1)} years.`;
+  if(mult>=100)  return `${ds} buyers who held through every crash turned $${Math.round(invested).toLocaleString()} into ${formatUSD(now)}. That's ${mult.toFixed(0)}× in ${years.toFixed(1)} years.`;
+  if(mult>=10)   return `Buying in ${ds} and holding through the volatility rewarded patience with a ${pct.toFixed(0)}% return over ${years.toFixed(1)} years.`;
+  if(mult>=2)    return `A solid ${pct.toFixed(0)}% return over ${years.toFixed(1)} years. Bitcoin's long-term holders have consistently come out ahead.`;
+  if(mult>=1)    return `A modest gain from ${ds}. Many who bought around this time saw larger returns by holding through subsequent cycles.`;
+  return `This window shows a loss of ${formatUSD(Math.abs(now-invested))}. Bitcoin's volatility is real — but holders across most multi-year windows have been rewarded.`;
+}
+
+// ── DCA CALCULATOR ────────────────────────────────────────────────────────────
+g('dca-btn').addEventListener('click', dcaCalculate);
+
+let lastDCA = {}, dcaChartInstance = null;
+
+async function dcaCalculate() {
+  const amount = parseFloat(g('dca-amount').value);
+  const startVal = g('dca-start').value;
+  const freq = g('dca-freq').value;
+  hideEl('dca-result'); hideErr('dca-error');
+
+  if(!amount||amount<=0){showErr('dca-error','Please enter a valid amount.');return;}
+  if(!startVal){showErr('dca-error','Please select a start date.');return;}
+  const startDate = new Date(startVal+'T12:00:00Z');
+  if(startDate>=new Date()){showErr('dca-error','Start date must be in the past.');return;}
+  if(startDate<new Date('2013-04-28')){showErr('dca-error','Data available from April 2013.');return;}
+
+  if(cachedPrice){ dcaDisplay(amount, startDate, freq, cachedPrice); return; }
+  showEl('dca-loading'); g('dca-loading-msg').textContent='FETCHING LIVE BTC PRICE…';
+  try {
+    const p = await fetchCurrentPrice();
+    hideEl('dca-loading'); dcaDisplay(amount, startDate, freq, p);
+  } catch(e){ hideEl('dca-loading'); showErr('dca-error','Could not fetch live price. Try again.'); }
+}
+
+function dcaDisplay(amountPerPeriod, startDate, freq, currentPrice) {
+  // Generate purchase dates
+  const purchases = [];
+  const d = new Date(startDate);
+  const today = new Date();
+  const stepDays = freq==='daily'?1:freq==='weekly'?7:30;
+
+  while(d < today) {
+    const dateStr = fmt(d);
+    const price = getHistoricalPrice(dateStr) || currentPrice;
+    purchases.push({ date: new Date(d), price, btc: amountPerPeriod/price });
+    d.setDate(d.getDate()+stepDays);
+  }
+
+  if(purchases.length===0){ showErr('dca-error','No data for that period.'); return; }
+
+  const totalInvested = purchases.length * amountPerPeriod;
+  const totalBtc = purchases.reduce((s,p)=>s+p.btc,0);
+  const totalValue = totalBtc * currentPrice;
+  const totalGain = totalValue - totalInvested;
+  const pct = ((totalValue-totalInvested)/totalInvested)*100;
+  const avgPrice = totalInvested/totalBtc;
+  const best = purchases.reduce((b,p)=>p.price<b.price?p:b, purchases[0]);
+  const worst = purchases.reduce((w,p)=>p.price>w.price?p:w, purchases[0]);
+
+  lastDCA = {amountPerPeriod, freq, totalInvested, totalBtc, totalValue, totalGain, pct, purchases};
+
+  g('dca-total-invested').textContent = formatUSD(totalInvested);
+  g('dca-total-value').textContent = formatUSD(totalValue);
+  g('dca-total-gain').textContent = '+'+formatUSD(totalGain);
+  g('dca-btc').textContent = '₿ '+totalBtc.toFixed(6);
+  g('dca-avg-price').textContent = formatUSD(avgPrice);
+  g('dca-pct').textContent = '+'+pct.toFixed(1)+'%';
+  g('dca-count').textContent = purchases.length.toLocaleString();
+  g('dca-best').textContent = best.date.toLocaleDateString('en-US',{month:'short',year:'2-digit'})+' @ '+formatUSD(best.price);
+  g('dca-worst').textContent = worst.date.toLocaleDateString('en-US',{month:'short',year:'2-digit'})+' @ '+formatUSD(worst.price);
+
+  // Build chart data — sample ~60 points for performance
+  const step = Math.max(1, Math.floor(purchases.length/60));
+  const chartLabels=[], chartInvested=[], chartValue=[];
+  let runInvested=0, runBtc=0;
+  purchases.forEach((p,i)=>{
+    runInvested+=amountPerPeriod; runBtc+=p.btc;
+    if(i%step===0||i===purchases.length-1){
+      chartLabels.push(p.date.toLocaleDateString('en-US',{month:'short',year:'2-digit'}));
+      chartInvested.push(+runInvested.toFixed(2));
+      chartValue.push(+(runBtc*currentPrice).toFixed(2));
+    }
+  });
+
+  drawChart(chartLabels, chartInvested, chartValue);
+
+  // Fact
+  const perDay = formatUSD(totalGain/((Date.now()-startDate)/(1000*60*60*24)));
+  g('dca-fact').innerHTML = `Investing just <strong>${formatUSD(amountPerPeriod)}</strong> every ${freq.replace('ly','')} since ${startDate.toLocaleDateString('en-US',{month:'long',year:'numeric'})} would have grown to <strong>${formatUSD(totalValue)}</strong> — a gain of <strong>${formatUSD(totalGain)}</strong>. That's <strong>${perDay}</strong> earned per day on average, while doing absolutely nothing.`;
+
+  showEl('dca-result');
+  setTimeout(()=>{ g('dca-email-nudge').classList.add('active'); },900);
+}
+
+// ── Chart ─────────────────────────────────────────────────────────────────────
+function drawChart(labels, invested, value) {
+  const canvas = g('dca-chart');
+  const ctx = canvas.getContext('2d');
+
+  // Destroy old chart if exists
+  if(dcaChartInstance) { dcaChartInstance.destroy(); dcaChartInstance=null; }
+
+  // Scale canvas to device pixel ratio
+  const dpr = window.devicePixelRatio||1;
+  canvas.width = canvas.offsetWidth*dpr;
+  canvas.height = 180*dpr;
+  ctx.scale(dpr,dpr);
+
+  const W=canvas.offsetWidth, H=180;
+  const pad={top:12,right:12,bottom:32,left:60};
+  const iW=W-pad.left-pad.right, iH=H-pad.top-pad.bottom;
+
+  ctx.clearRect(0,0,W,H);
+
+  const allVals=[...invested,...value];
+  const minV=0, maxV=Math.max(...allVals)*1.08;
+  const n=labels.length;
+
+  function xOf(i){ return pad.left + (i/(n-1))*iW; }
+  function yOf(v){ return pad.top + (1-(v-minV)/(maxV-minV))*iH; }
+
+  // Grid lines
+  ctx.strokeStyle='rgba(255,255,255,0.05)'; ctx.lineWidth=1;
+  for(let g2=0;g2<=4;g2++){
+    const y=pad.top+(g2/4)*iH;
+    ctx.beginPath(); ctx.moveTo(pad.left,y); ctx.lineTo(pad.left+iW,y); ctx.stroke();
+    const label=formatUSD((1-g2/4)*(maxV-minV));
+    ctx.fillStyle='rgba(107,98,87,0.7)'; ctx.font='10px DM Mono,monospace'; ctx.textAlign='right';
+    ctx.fillText(label,pad.left-6,y+4);
+  }
+
+  // X labels — show ~6
+  const xStep=Math.max(1,Math.floor(n/6));
+  ctx.fillStyle='rgba(107,98,87,0.7)'; ctx.font='10px DM Mono,monospace'; ctx.textAlign='center';
+  for(let i=0;i<n;i+=xStep){
+    ctx.fillText(labels[i],xOf(i),H-6);
+  }
+
+  // Invested area
+  ctx.beginPath(); ctx.moveTo(xOf(0),yOf(invested[0]));
+  for(let i=1;i<n;i++) ctx.lineTo(xOf(i),yOf(invested[i]));
+  ctx.lineTo(xOf(n-1),yOf(0)); ctx.lineTo(xOf(0),yOf(0)); ctx.closePath();
+  ctx.fillStyle='rgba(247,147,26,0.12)'; ctx.fill();
+  ctx.beginPath(); ctx.moveTo(xOf(0),yOf(invested[0]));
+  for(let i=1;i<n;i++) ctx.lineTo(xOf(i),yOf(invested[i]));
+  ctx.strokeStyle='rgba(247,147,26,0.6)'; ctx.lineWidth=1.5; ctx.stroke();
+
+  // Value area
+  ctx.beginPath(); ctx.moveTo(xOf(0),yOf(value[0]));
+  for(let i=1;i<n;i++) ctx.lineTo(xOf(i),yOf(value[i]));
+  ctx.lineTo(xOf(n-1),yOf(0)); ctx.lineTo(xOf(0),yOf(0)); ctx.closePath();
+  const grad=ctx.createLinearGradient(0,pad.top,0,pad.top+iH);
+  grad.addColorStop(0,'rgba(34,197,94,0.25)'); grad.addColorStop(1,'rgba(34,197,94,0.02)');
+  ctx.fillStyle=grad; ctx.fill();
+  ctx.beginPath(); ctx.moveTo(xOf(0),yOf(value[0]));
+  for(let i=1;i<n;i++) ctx.lineTo(xOf(i),yOf(value[i]));
+  ctx.strokeStyle='rgba(34,197,94,0.85)'; ctx.lineWidth=2; ctx.stroke();
+
+  // Store reference for cleanup
+  dcaChartInstance = { destroy: ()=>{ ctx.clearRect(0,0,W*dpr,H*dpr); } };
+}
+
+// ── Wire CONFIG into page ─────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  // Affiliate link
+  const aBtn = g('affiliate-btn');
+  if(aBtn && CONFIG.affiliateUrl !== 'YOUR_COINBASE_AFFILIATE_LINK_HERE') {
+    aBtn.href = CONFIG.affiliateUrl;
+  } else if(aBtn) {
+    aBtn.href = 'https://coinbase.com/join';
+  }
+});
+
+// ── Email capture — Beehiiv ───────────────────────────────────────────────────
+async function submitToBeehiiv(email) {
+  if(CONFIG.beehiivFormUrl === 'YOUR_BEEHIIV_FORM_URL_HERE') {
+    // Dev mode — just log
+    console.log('Email captured (configure Beehiiv URL to go live):', email);
+    return true;
+  }
+  try {
+    const res = await fetch(CONFIG.beehiivFormUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email })
+    });
+    return res.ok;
+  } catch(e) {
+    console.error('Beehiiv submit failed:', e);
+    return false;
+  }
+}
+
+function submitEmail() {
+  const email = g('ec-email').value.trim();
+  if(!email || !email.includes('@')) { g('ec-email').focus(); return; }
+  submitToBeehiiv(email);
+  g('email-capture').classList.remove('active');
+  g('email-success').classList.add('active');
+}
+
+function submitDcaEmail() {
+  const email = g('dca-ec-email').value.trim();
+  if(!email || !email.includes('@')) { g('dca-ec-email').focus(); return; }
+  submitToBeehiiv(email);
+  g('dca-email-nudge').style.display = 'none';
+  const conf = document.createElement('div');
+  conf.style.cssText = 'margin-top:16px;padding:14px 18px;background:var(--green-glow);border:1px solid rgba(34,197,94,0.28);border-radius:2px;font-family:DM Mono,monospace;font-size:13px;color:var(--green);';
+  conf.textContent = "✓ You're in! First email lands within the hour.";
+  g('dca-result').appendChild(conf);
+}
+
+// ── DCA Share ─────────────────────────────────────────────────────────────────
+g('dca-share-x').addEventListener('click',()=>{
+  const {amountPerPeriod,freq,totalInvested,totalValue,pct} = lastDCA;
+  if(!totalInvested) return;
+  const tweet = `I ran the numbers: investing just ${formatUSD(amountPerPeriod)} ${freq} in Bitcoin would have turned ${formatUSD(totalInvested)} into ${formatUSD(totalValue)} — a ${pct.toFixed(0)}% return. 🤯\n\nThis is why people DCA. Calculate yours:`;
+  window.open('https://twitter.com/intent/tweet?text='+encodeURIComponent(tweet),'_blank');
+});
+g('dca-share-copy').addEventListener('click',async()=>{
+  const {amountPerPeriod,freq,totalInvested,totalValue,totalGain,pct,purchases} = lastDCA;
+  if(!totalInvested) return;
+  const txt = `📈 Bitcoin DCA Calculator Result\n\n${formatUSD(amountPerPeriod)} invested ${freq} for ${Math.round(purchases.length/(freq==='daily'?365:freq==='weekly'?52:12))} years\nTotal invested: ${formatUSD(totalInvested)}\nWorth today: ${formatUSD(totalValue)}\nGain: +${formatUSD(totalGain)} (+${pct.toFixed(0)}%)\n\nCalculate yours: ${CONFIG.siteUrl}`;
+  try{
+    await navigator.clipboard.writeText(txt);
+    const btn=g('dca-share-copy'); btn.classList.add('copied');
+    g('dca-copy-label').textContent='✓ Copied!';
+    setTimeout(()=>{ btn.classList.remove('copied'); g('dca-copy-label').textContent='Copy result'; },2500);
+  }catch(e){}
+});
+
+// ── TM Share ──────────────────────────────────────────────────────────────────
+g('share-x').addEventListener('click',()=>{
+  const{invested,now,mult,pd}=lastTM; if(!invested) return;
+  const iFmt=Math.round(invested).toLocaleString(), nFmt=formatUSD(now);
+  const mFmt=mult>=1000?`${Math.round(mult/1000)}K×`:`${mult.toFixed(0)}×`;
+  const date=pd.toLocaleDateString('en-US',{month:'short',year:'numeric'});
+  const tweet=`$${iFmt} spent on literally anything else in ${date} would still just be $${iFmt}.\n\nInvested in Bitcoin instead? ${nFmt} today. That's ${mFmt}. 🤯\n\nWhat would YOUR money be worth?`;
+  window.open('https://twitter.com/intent/tweet?text='+encodeURIComponent(tweet),'_blank');
+});
+g('share-copy').addEventListener('click',async()=>{
+  const{invested,now,mult,pct,pd}=lastTM; if(!invested) return;
+  const txt=`💰 Bitcoin Time Machine\n\n$${Math.round(invested).toLocaleString()} invested on ${pd.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})}\nWould be worth ${formatUSD(now)} today\nThat's ${mult>=1000?`${Math.round(mult/1000)}K×`:`${mult.toFixed(0)}×`} (+${pct.toFixed(0)}%)\n\nCalculate yours: ${CONFIG.siteUrl}`;
+  try{
+    await navigator.clipboard.writeText(txt);
+    const btn=g('share-copy'); btn.classList.add('copied'); g('copy-label').textContent='✓ Copied!';
+    setTimeout(()=>{ btn.classList.remove('copied'); g('copy-label').textContent='Copy result'; },2500);
+  }catch(e){}
+});
+
+// ── Utilities ─────────────────────────────────────────────────────────────────
+function g(id){ return document.getElementById(id); }
+function showEl(id){ g(id).classList.add('active'); }
+function hideEl(id){ g(id).classList.remove('active'); }
+function showErr(id,msg){ g(id).textContent=msg; g(id).classList.add('active'); }
+function hideErr(id){ g(id).classList.remove('active'); }
+function formatUSD(n){
+  if(n>=1e9) return '$'+(n/1e9).toFixed(2)+'B';
+  if(n>=1e6) return '$'+(n/1e6).toFixed(2)+'M';
+  return '$'+n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+}
+function fmt(d){ return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
+</script>
+</body>
+</html>
