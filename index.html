@@ -927,36 +927,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // ── Email capture — Beehiiv ───────────────────────────────────────────────────
 async function submitToBeehiiv(email) {
-
-  return true;
-  }
   try {
     const formData = new URLSearchParams();
     formData.append('email', email);
     formData.append('utm_source', 'bitcoingrowthcalculator');
     formData.append('utm_medium', 'organic');
-    
-    const res = await fetch(CONFIG.beehiivFormUrl, {
+
+    await fetch(CONFIG.beehiivFormUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: formData,
       mode: 'no-cors'
     });
+
     return true;
-  } catch(e) {
+  } catch (e) {
     console.error('Beehiiv submit failed:', e);
     return false;
   }
 }
-
-function submitEmail() {
-  const email = g('ec-email').value.trim();
-  if(!email || !email.includes('@')) { g('ec-email').focus(); return; }
-  submitToBeehiiv(email);
-  g('email-capture').classList.remove('active');
-  g('email-success').classList.add('active');
-}
-
 function submitDcaEmail() {
   const email = g('dca-ec-email').value.trim();
   if(!email || !email.includes('@')) { g('dca-ec-email').focus(); return; }
