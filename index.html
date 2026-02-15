@@ -595,34 +595,37 @@ function nextMK(k) { const [y,m]=k.split('-').map(Number),d=new Date(y,m,1); ret
 
 // ── Live price — fetched once, cached forever ─────────────────────────────────
 let cachedPrice = null, pricePromise = null;
-function fetchCurrentPrice() {
-  if (cachedPrice) return Promise.resolve(cachedPrice);
-  if (pricePromise) return pricePromise;
-  pricePromise = fetch('https://api.anthropic.com/v1/messages', {
-    method:'POST', headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({ model:'claude-sonnet-4-5-20250929', max_tokens:200,
-      tools:[{type:'web_search_20250305',name:'web_search'}],
-      messages:[{role:'user',content:'Current Bitcoin price USD. Reply with ONLY the number, no symbols or commas. Example: 97450'}]})
-  }).then(r=>{ if(!r.ok) throw new Error('API '+r.status); return r.json(); })
-    .then(data=>{
-      const txt = data.content.filter(b=>b.type==='text').map(b=>b.text).join('');
-      const m = txt.replace(/,/g,'').match(/\d+(?:\.\d+)?/);
-      if(!m) throw new Error('parse');
-      cachedPrice = parseFloat(m[0]); pricePromise = null; return cachedPrice;
-    });
-  return pricePromise;
+let cachedPrice = null;
+
+async function fetchCurrentPrice() {
+  if (cachedPrice) return cachedPrice;
+
+  try {
+    const r = await fetch("/api/price");
+    const data = await r.json();
+    cachedPrice = data.price;
+    return cachedPrice;
+  } catch (e) {
+    console.error("Price fetch failed:", e);
+    return null;
+  }
 }
 
 // Pre-fetch on load
 fetchCurrentPrice().then(p=>{
+  if(!p) {
+    g('live-price-val').textContent='unavailable';
+    return;
+  }
+
   g('live-dot').classList.remove('fetching');
   g('live-price-val').textContent = formatUSD(p);
   g('live-price-val').style.color = 'var(--green)';
   tmCalculate(true);
 }).catch(()=>{
-  g('live-dot').style.background='#ef4444';
   g('live-price-val').textContent='unavailable';
 });
+
 
 // ── Init ─────────────────────────────────────────────────────────────────────
 const yesterday = new Date(); yesterday.setDate(yesterday.getDate()-1);
