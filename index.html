@@ -594,7 +594,6 @@ function prevMK(k) { const [y,m]=k.split('-').map(Number),d=new Date(y,m-2,1); r
 function nextMK(k) { const [y,m]=k.split('-').map(Number),d=new Date(y,m,1); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`; }
 
 // ── Live price — fetched once, cached forever ─────────────────────────────────
-let cachedPrice = null, pricePromise = null;
 let cachedPrice = null;
 
 async function fetchCurrentPrice() {
