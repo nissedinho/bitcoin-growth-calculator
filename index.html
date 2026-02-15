@@ -531,7 +531,7 @@ const CONFIG = {
 
   // 2. Beehiiv form embed URL — get this from:
   //    beehiiv.com → Your publication → Settings → Forms → Embed
-  beehiivFormUrl: 'YOUR_BEEHIIV_FORM_URL_HERE',
+  beehiivFormUrl: 'https://subscribe-forms.beehiiv.com/5cef7315-a3f9-400a-9597-6806aac54862',
 
   // 3. Coinbase affiliate link — sign up at:
   //    coinbase.com
@@ -928,17 +928,22 @@ document.addEventListener('DOMContentLoaded', () => {
 // ── Email capture — Beehiiv ───────────────────────────────────────────────────
 async function submitToBeehiiv(email) {
   if(CONFIG.beehiivFormUrl === 'YOUR_BEEHIIV_FORM_URL_HERE') {
-    // Dev mode — just log
     console.log('Email captured (configure Beehiiv URL to go live):', email);
     return true;
   }
   try {
+    const formData = new URLSearchParams();
+    formData.append('email', email);
+    formData.append('utm_source', 'bitcoingrowthcalculator');
+    formData.append('utm_medium', 'organic');
+    
     const res = await fetch(CONFIG.beehiivFormUrl, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email })
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: formData,
+      mode: 'no-cors'
     });
-    return res.ok;
+    return true;
   } catch(e) {
     console.error('Beehiiv submit failed:', e);
     return false;
