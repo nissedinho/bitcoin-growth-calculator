@@ -246,10 +246,15 @@
     .dca-hero-card.invested-card .dca-hero-val { color: var(--orange); }
 
     /* Chart */
-    .chart-wrap { position: relative; margin-bottom: 16px; }
+.chart-wrap { 
+  position: relative; 
+  margin-bottom: 16px;
+  height: 350px;
+}
     .chart-label { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 10px; }
-    canvas { width: 100% !important; height: 180px !important; display: block; }
-
+  canvas { 
+  display: block; 
+}
     /* Chart legend */
     .chart-legend { display: flex; gap: 20px; margin-top: 10px; flex-wrap: wrap; }
     .legend-item { display: flex; align-items: center; gap: 7px; font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text-muted); }
