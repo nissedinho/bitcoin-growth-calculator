@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-T29BL3EPHL"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-T29BL3EPHL');
+    </script>
+
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+    <title>Bitcoin Investment FAQ — Common Questions About Bitcoin Returns</title>
+    <meta name="description" content="Answers to the most common Bitcoin investment questions: What if I bought Bitcoin in 2013? How much would $1,000 be worth? Calculate your Bitcoin returns instantly." />
+    <link rel="canonical" href="https://www.bitcoingrowthcalculator.com/faq" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Bitcoin Investment FAQ — Common Questions About Bitcoin Returns" />
+    <meta property="og:description" content="Answers to the most common Bitcoin investment questions. Calculate what your Bitcoin would be worth today." />
+    <meta property="og:url" content="https://www.bitcoingrowthcalculator.com/faq" />
+    <meta property="og:image" content="https://www.bitcoingrowthcalculator.com/og.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Bitcoin Investment FAQ — Common Questions About Bitcoin Returns" />
+    <meta name="twitter:description" content="Answers to the most common Bitcoin investment questions. Calculate what your Bitcoin would be worth today." />
+    <meta name="twitter:image" content="https://www.bitcoingrowthcalculator.com/og.png" />
+
+    <!-- FAQPage Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+            {
+                "@type": "Question",
+                "name": "What if I had bought $1,000 of Bitcoin in 2013?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "If you had invested $1,000 in Bitcoin in January 2013 when Bitcoin was around $13, you would have purchased approximately 76.9 BTC. At current prices, that investment would be worth significantly more. Use our Bitcoin Investment Calculator to see the exact current value based on any date since 2013."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "What if I had bought Bitcoin during COVID lockdowns in 2020?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Bitcoin was trading around $5,000–$9,000 during the early COVID lockdowns in March–April 2020. An investment made during that period would have seen substantial growth. Our calculator lets you pick any exact date to see your hypothetical returns."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "How do I calculate my Bitcoin investment returns?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Enter the dollar amount you would have invested and select the date of your hypothetical purchase. Our calculator uses historical Bitcoin price data to show you exactly what your investment would be worth today, including total return percentage and dollar value."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "What is Dollar-Cost Averaging (DCA) for Bitcoin?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Dollar-Cost Averaging means investing a fixed amount in Bitcoin at regular intervals (weekly, monthly) regardless of price. This strategy reduces the impact of volatility because you buy more when prices are low and less when prices are high. Our DCA Calculator shows how this strategy would have performed over any time period."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "Is it too late to invest in Bitcoin?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Historical data shows that Bitcoin has rewarded long-term holders at almost any entry point. While past performance doesn't guarantee future results, our calculator lets you explore returns from any date since 2013 to see how different entry points have performed. Many investors use Dollar-Cost Averaging to reduce timing risk."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "What was Bitcoin's price on a specific date?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Our Bitcoin Investment Calculator includes historical price data for every day since 2013. Simply select any date on the calculator to see Bitcoin's price on that day and calculate hypothetical returns from that starting point."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "How much Bitcoin can I buy with $100?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "You can buy a fraction of a Bitcoin with any amount — you don't need to buy a whole coin. The amount of Bitcoin you receive for $100 depends on the current market price. Our calculator shows real-time Bitcoin prices and lets you see how any investment amount would have grown from any historical date."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "What is the best day to buy Bitcoin?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "There's no single 'best day' to buy Bitcoin, which is why many investors use Dollar-Cost Averaging — investing small amounts regularly rather than trying to time the market. Our DCA Calculator lets you backtest this strategy over any time period to see how it would have performed."
+                }
+            }
+        ]
+    }
+    </script>
+
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg: #0a0a0f;
+            --surface: #12121a;
+            --border: #1e1e2e;
+            --text: #e0e0e6;
+            --text-muted: #8888a0;
+            --accent: #f7931a;
+            --accent-glow: rgba(247, 147, 26, 0.15);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 760px;
+            margin: 0 auto;
+            padding: 60px 24px 80px;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--accent);
+            text-decoration: none;
+            font-size: 0.9rem;
+            margin-bottom: 40px;
+            transition: opacity 0.2s;
+        }
+        .back-link:hover { opacity: 0.8; }
+        .back-link svg { width: 16px; height: 16px; }
+
+        h1 {
+            font-size: clamp(1.8rem, 5vw, 2.6rem);
+            font-weight: 700;
+            margin-bottom: 12px;
+            letter-spacing: -0.02em;
+        }
+        h1 span { color: var(--accent); }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 1.05rem;
+            margin-bottom: 48px;
+            max-width: 580px;
+        }
+
+        .faq-item {
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            margin-bottom: 16px;
+            overflow: hidden;
+            background: var(--surface);
+            transition: border-color 0.2s;
+        }
+        .faq-item:hover { border-color: rgba(247, 147, 26, 0.3); }
+
+        .faq-question {
+            width: 100%;
+            background: none;
+            border: none;
+            color: var(--text);
+            font-size: 1.05rem;
+            font-weight: 600;
+            text-align: left;
+            padding: 20px 24px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            font-family: inherit;
+            line-height: 1.4;
+        }
+        .faq-question:hover { color: var(--accent); }
+
+        .faq-icon {
+            flex-shrink: 0;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 1.5px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s, border-color 0.2s, background 0.2s;
+        }
+        .faq-item.open .faq-icon {
+            transform: rotate(45deg);
+            border-color: var(--accent);
+            background: var(--accent-glow);
+        }
+        .faq-icon svg { width: 12px; height: 12px; stroke: var(--text-muted); }
+        .faq-item.open .faq-icon svg { stroke: var(--accent); }
+
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.35s ease, padding 0.35s ease;
+        }
+        .faq-item.open .faq-answer {
+            max-height: 400px;
+        }
+
+        .faq-answer-inner {
+            padding: 0 24px 20px;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            line-height: 1.7;
+        }
+        .faq-answer-inner a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+        .faq-answer-inner a:hover { text-decoration: underline; }
+
+        .cta-box {
+            margin-top: 48px;
+            background: linear-gradient(135deg, rgba(247, 147, 26, 0.08), rgba(247, 147, 26, 0.02));
+            border: 1px solid rgba(247, 147, 26, 0.2);
+            border-radius: 16px;
+            padding: 36px 32px;
+            text-align: center;
+        }
+        .cta-box h2 {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+        }
+        .cta-box p {
+            color: var(--text-muted);
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+        }
+        .cta-btn {
+            display: inline-block;
+            background: var(--accent);
+            color: #000;
+            font-weight: 700;
+            padding: 12px 32px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 0.95rem;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .cta-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 20px rgba(247, 147, 26, 0.3);
+        }
+
+        footer {
+            margin-top: 64px;
+            padding-top: 24px;
+            border-top: 1px solid var(--border);
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            text-align: center;
+        }
+        footer a { color: var(--accent); text-decoration: none; }
+
+        @media (max-width: 480px) {
+            .container { padding: 40px 16px 60px; }
+            .faq-question { font-size: 0.95rem; padding: 16px 18px; }
+            .faq-answer-inner { padding: 0 18px 16px; font-size: 0.9rem; }
+            .cta-box { padding: 28px 20px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/" class="back-link">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+            Back to Calculator
+        </a>
+
+        <h1>Bitcoin Investment <span>FAQ</span></h1>
+        <p class="subtitle">Answers to the most common questions about Bitcoin investment returns, DCA strategy, and using our calculator.</p>
+
+        <div class="faq-list">
+            <div class="faq-item">
+                <button class="faq-question" onclick="toggleFaq(this)">
+                    What if I had bought $1,000 of Bitcoin in 2013?
+                    <span class="faq-icon"><svg viewBox="0 0 12 12" fill="none" stroke-width="2" stroke-linecap="round"><path d="M6 1v10M1 6h10"/></svg></span>
+                </button>
+                <div class="faq-answer"><div class="faq-answer-inner">
+                    If you had invested $1,000 in Bitcoin in January 2013 when Bitcoin was around $13, you would have purchased approximately 76.9 BTC. At current prices, that investment would be worth significantly more. <a href="/">Use our Bitcoin Investment Calculator</a> to see the exact current value based on any date since 2013.
+                </div></div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question" onclick="toggleFaq(this)">
+                    What if I had bought Bitcoin during COVID lockdowns in 2020?
+                    <span class="faq-icon"><svg viewBox="0 0 12 12" fill="none" stroke-width="2" stroke-linecap="round"><path d="M6 1v10M1 6h10"/></svg></span>
+                </button>
+                <div class="faq-answer"><div class="faq-answer-inner">
+                    Bitcoin was trading around $5,000–$9,000 during the early COVID lockdowns in March–April 2020. An investment made during that period would have seen substantial growth. <a href="/">Our calculator</a> lets you pick any exact date to see your hypothetical returns.
+                </div></div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question" onclick="toggleFaq(this)">
+                    How do I calculate my Bitcoin investment returns?
+                    <span class="faq-icon"><svg viewBox="0 0 12 12" fill="none" stroke-width="2" stroke-linecap="round"><path d="M6 1v10M1 6h10"/></svg></span>
+                </button>
+                <div class="faq-answer"><div class="faq-answer-inner">
+                    Enter the dollar amount you would have invested and select the date of your hypothetical purchase. <a href="/">Our calculator</a> uses historical Bitcoin price data to show you exactly what your investment would be worth today, including total return percentage and dollar value.
+                </div></div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question" onclick="toggleFaq(this)">
+                    What is Dollar-Cost Averaging (DCA) for Bitcoin?
+                    <span class="faq-icon"><svg viewBox="0 0 12 12" fill="none" stroke-width="2" stroke-linecap="round"><path d="M6 1v10M1 6h10"/></svg></span>
+                </button>
+                <div class="faq-answer"><div class="faq-answer-inner">
+                    Dollar-Cost Averaging means investing a fixed amount in Bitcoin at regular intervals (weekly, monthly) regardless of price. This strategy reduces the impact of volatility because you buy more when prices are low and less when prices are high. Our DCA Calculator shows how this strategy would have performed over any time period.
+                </div></div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question" onclick="toggleFaq(this)">
+                    Is it too late to invest in Bitcoin?
+                    <span class="faq-icon"><svg viewBox="0 0 12 12" fill="none" stroke-width="2" stroke-linecap="round"><path d="M6 1v10M1 6h10"/></svg></span>
+                </button>
+                <div class="faq-answer"><div class="faq-answer-inner">
+                    Historical data shows that Bitcoin has rewarded long-term holders at almost any entry point. While past performance doesn't guarantee future results, <a href="/">our calculator</a> lets you explore returns from any date since 2013 to see how different entry points have performed. Many investors use Dollar-Cost Averaging to reduce timing risk.
+                </div></div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question" onclick="toggleFaq(this)">
+                    What was Bitcoin's price on a specific date?
+                    <span class="faq-icon"><svg viewBox="0 0 12 12" fill="none" stroke-width="2" stroke-linecap="round"><path d="M6 1v10M1 6h10"/></svg></span>
+                </button>
+                <div class="faq-answer"><div class="faq-answer-inner">
+                    Our Bitcoin Investment Calculator includes historical price data for every day since 2013. Simply <a href="/">select any date on the calculator</a> to see Bitcoin's price on that day and calculate hypothetical returns from that starting point.
+                </div></div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question" onclick="toggleFaq(this)">
+                    How much Bitcoin can I buy with $100?
+                    <span class="faq-icon"><svg viewBox="0 0 12 12" fill="none" stroke-width="2" stroke-linecap="round"><path d="M6 1v10M1 6h10"/></svg></span>
+                </button>
+                <div class="faq-answer"><div class="faq-answer-inner">
+                    You can buy a fraction of a Bitcoin with any amount — you don't need to buy a whole coin. The amount of Bitcoin you receive for $100 depends on the current market price. <a href="/">Our calculator</a> shows real-time Bitcoin prices and lets you see how any investment amount would have grown from any historical date.
+                </div></div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question" onclick="toggleFaq(this)">
+                    What is the best day to buy Bitcoin?
+                    <span class="faq-icon"><svg viewBox="0 0 12 12" fill="none" stroke-width="2" stroke-linecap="round"><path d="M6 1v10M1 6h10"/></svg></span>
+                </button>
+                <div class="faq-answer"><div class="faq-answer-inner">
+                    There's no single "best day" to buy Bitcoin, which is why many investors use Dollar-Cost Averaging — investing small amounts regularly rather than trying to time the market. Our DCA Calculator lets you backtest this strategy over any time period to see how it would have performed.
+                </div></div>
+            </div>
+        </div>
+
+        <div class="cta-box">
+            <h2>Ready to see your numbers?</h2>
+            <p>Pick any date since 2013 and find out what your Bitcoin investment would be worth today.</p>
+            <a href="/" class="cta-btn">Try the Calculator →</a>
+        </div>
+
+        <footer>
+            <p>© 2026 <a href="/">Bitcoin Growth Calculator</a> — Not financial advice. Past performance does not guarantee future results.</p>
+        </footer>
+    </div>
+
+    <script>
+        function toggleFaq(btn) {
+            const item = btn.parentElement;
+            const wasOpen = item.classList.contains('open');
+            // Close all
+            document.querySelectorAll('.faq-item').forEach(el => el.classList.remove('open'));
+            // Toggle clicked
+            if (!wasOpen) item.classList.add('open');
+        }
+    </script>
+</body>
+</html>
