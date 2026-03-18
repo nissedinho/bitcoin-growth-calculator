@@ -1050,33 +1050,29 @@ function submitEmail() {
     const btn = Array.from(document.querySelectorAll('button')).find(b => b.textContent.includes('SEND'));
     const originalText = btn?.textContent;
     if (btn) { btn.textContent = 'SENDING...'; btn.disabled = true; }
-    let iframe = document.getElementById('beehiiv-iframe');
-    if (!iframe) {
-        iframe = document.createElement('iframe');
-        iframe.id = 'beehiiv-iframe';
-        iframe.name = 'beehiiv-iframe';
-        iframe.style.display = 'none';
-        document.body.appendChild(iframe);
-    }
-    const form = document.createElement('form');
-    form.method = 'POST';
-    form.action = CONFIG.beehiivFormUrl;
-    form.target = 'beehiiv-iframe';
-    form.style.display = 'none';
-    const input = document.createElement('input');
-    input.type = 'email';
-    input.name = 'email';
-    input.value = email;
-    form.appendChild(input);
-    document.body.appendChild(form);
-    form.submit();
-    setTimeout(() => {
-        form.remove();
-        emailInput.value = '';
-        if (btn) { btn.textContent = '\u2713 SUBSCRIBED!'; btn.disabled = false; }
-        setTimeout(() => { if (btn) btn.textContent = originalText; }, 3000);
-    }, 1500);
+
+    fetch('/api/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email })
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            emailInput.value = '';
+            if (btn) { btn.textContent = '\u2713 SUBSCRIBED!'; btn.disabled = false; }
+            setTimeout(() => { if (btn) btn.textContent = originalText; }, 3000);
+        } else {
+            throw new Error(data.error || 'Subscription failed');
+        }
+    })
+    .catch(err => {
+        console.error('Subscribe error:', err);
+        if (btn) { btn.textContent = originalText; btn.disabled = false; }
+        alert('Something went wrong. Please try again.');
+    });
 }
+
 </script>
 </body>
 </html>
