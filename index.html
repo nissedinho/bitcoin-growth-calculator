@@ -1041,6 +1041,42 @@ function formatUSD(n){
   return '$'+n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
 }
 function fmt(d){ return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
+
+// === Email Subscribe (Beehiiv) ===
+function submitEmail() {
+    const emailInput = document.querySelector('input[placeholder*="email"]');
+    const email = emailInput?.value?.trim();
+    if (!email || !email.includes('@')) { alert('Please enter a valid email address.'); return; }
+    const btn = Array.from(document.querySelectorAll('button')).find(b => b.textContent.includes('SEND'));
+    const originalText = btn?.textContent;
+    if (btn) { btn.textContent = 'SENDING...'; btn.disabled = true; }
+    let iframe = document.getElementById('beehiiv-iframe');
+    if (!iframe) {
+        iframe = document.createElement('iframe');
+        iframe.id = 'beehiiv-iframe';
+        iframe.name = 'beehiiv-iframe';
+        iframe.style.display = 'none';
+        document.body.appendChild(iframe);
+    }
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = CONFIG.beehiivFormUrl;
+    form.target = 'beehiiv-iframe';
+    form.style.display = 'none';
+    const input = document.createElement('input');
+    input.type = 'email';
+    input.name = 'email';
+    input.value = email;
+    form.appendChild(input);
+    document.body.appendChild(form);
+    form.submit();
+    setTimeout(() => {
+        form.remove();
+        emailInput.value = '';
+        if (btn) { btn.textContent = '\u2713 SUBSCRIBED!'; btn.disabled = false; }
+        setTimeout(() => { if (btn) btn.textContent = originalText; }, 3000);
+    }, 1500);
+}
 </script>
 </body>
 </html>
