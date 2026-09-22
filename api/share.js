@@ -109,3 +109,8 @@ module.exports = (req, res) => {
   res.setHeader('Cache-Control', 's-maxage=3600, stale-while-revalidate=86400');
   res.status(200).send(body);
 };
+
+// Exposed for tests. Input is validated before it reaches the HTML, so this is
+// defence in depth — which is exactly why it needs its own coverage: nothing
+// else would notice if it stopped escaping.
+module.exports.escapeHtml = escapeHtml;

@@ -906,7 +906,16 @@ async function tmCalculate(silent=false) {
   const pd = new Date(dateVal+'T12:00:00Z');
   if(pd>=new Date()){if(!silent)showErr('tm-error','Please select a date in the past.');return;}
   if(pd<new Date('2013-04-28')){if(!silent)showErr('tm-error','Data available from April 2013.');return;}
-  const histPrice = getHistoricalPrice(dateVal);
+  let histPrice = getHistoricalPrice(dateVal);
+  if(!histPrice && !cachedPrice){
+    // A date just past the end of the dataset falls back to the live price, so
+    // the lookup can only succeed once that price is in hand. The page
+    // pre-fetches on load, but a fast click can land here first.
+    showEl('tm-loading'); g('loading-msg').textContent='FETCHING LIVE BTC PRICE…';
+    try { await fetchCurrentPrice(); } catch(e) {}
+    hideEl('tm-loading');
+    histPrice = getHistoricalPrice(dateVal);
+  }
   if(!histPrice){if(!silent)showErr('tm-error','No data for that date. Try a nearby date.');return;}
 
   // Optional sell date — blank means "still holding", valued at the live price.
