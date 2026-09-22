@@ -1049,13 +1049,15 @@ function submitDcaEmail() {
 g('dca-share-x').addEventListener('click',()=>{
   const {amountPerPeriod,freq,totalInvested,totalValue,pct} = lastDCA;
   if(!totalInvested) return;
-  const tweet = `I ran the numbers: investing just ${formatUSD(amountPerPeriod)} ${freq} in Bitcoin would have turned ${formatUSD(totalInvested)} into ${formatUSD(totalValue)} — a ${pct.toFixed(0)}% return. 🤯\n\nThis is why people DCA. Calculate yours:`;
+  const tweet = pct>=0
+    ? `I ran the numbers: investing just ${formatUSD(amountPerPeriod)} ${freq} in Bitcoin would have turned ${formatUSD(totalInvested)} into ${formatUSD(totalValue)} — a +${pct.toFixed(0)}% return. 🤯\n\nThis is why people DCA. Calculate yours:`
+    : `I ran the numbers: investing ${formatUSD(amountPerPeriod)} ${freq} in Bitcoin since then would be down ${Math.abs(pct).toFixed(0)}% right now — ${formatUSD(totalInvested)} in, ${formatUSD(totalValue)} today.\n\nDCA is a long game. Calculate yours:`;
   window.open('https://twitter.com/intent/tweet?text='+encodeURIComponent(tweet),'_blank');
 });
 g('dca-share-copy').addEventListener('click',async()=>{
   const {amountPerPeriod,freq,totalInvested,totalValue,totalGain,pct,purchases} = lastDCA;
   if(!totalInvested) return;
-  const txt = `📈 Bitcoin DCA Calculator Result\n\n${formatUSD(amountPerPeriod)} invested ${freq} for ${Math.round(purchases.length/(freq==='daily'?365:freq==='weekly'?52:12))} years\nTotal invested: ${formatUSD(totalInvested)}\nWorth today: ${formatUSD(totalValue)}\nGain: +${formatUSD(totalGain)} (+${pct.toFixed(0)}%)\n\nCalculate yours: ${CONFIG.siteUrl}`;
+  const txt = `📈 Bitcoin DCA Calculator Result\n\n${formatUSD(amountPerPeriod)} invested ${freq} for ${Math.round(purchases.length/(freq==='daily'?365:freq==='weekly'?52:12))} years\nTotal invested: ${formatUSD(totalInvested)}\nWorth today: ${formatUSD(totalValue)}\nGain: ${totalGain>=0?'+':'−'}${formatUSD(Math.abs(totalGain))} (${pct>=0?'+':'−'}${Math.abs(pct).toFixed(0)}%)\n\nCalculate yours: ${CONFIG.siteUrl}`;
   try{
     await navigator.clipboard.writeText(txt);
     const btn=g('dca-share-copy'); btn.classList.add('copied');
@@ -1068,14 +1070,14 @@ g('dca-share-copy').addEventListener('click',async()=>{
 g('share-x').addEventListener('click',()=>{
   const{invested,now,mult,pd}=lastTM; if(!invested) return;
   const iFmt=Math.round(invested).toLocaleString(), nFmt=formatUSD(now);
-  const mFmt=mult>=1000?`${Math.round(mult/1000)}K×`:`${mult.toFixed(0)}×`;
+  const mFmt=fmtMult(mult);
   const date=pd.toLocaleDateString('en-US',{month:'short',year:'numeric'});
   const tweet=`$${iFmt} spent on literally anything else in ${date} would still just be $${iFmt}.\n\nInvested in Bitcoin instead? ${nFmt} today. That's ${mFmt}. 🤯\n\nWhat would YOUR money be worth?`;
   window.open('https://twitter.com/intent/tweet?text='+encodeURIComponent(tweet),'_blank');
 });
 g('share-copy').addEventListener('click',async()=>{
   const{invested,now,mult,pct,pd}=lastTM; if(!invested) return;
-  const txt=`💰 Bitcoin Time Machine\n\n$${Math.round(invested).toLocaleString()} invested on ${pd.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})}\nWould be worth ${formatUSD(now)} today\nThat's ${mult>=1000?`${Math.round(mult/1000)}K×`:`${mult.toFixed(0)}×`} (+${pct.toFixed(0)}%)\n\nCalculate yours: ${CONFIG.siteUrl}`;
+  const txt=`💰 Bitcoin Time Machine\n\n$${Math.round(invested).toLocaleString()} invested on ${pd.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})}\nWould be worth ${formatUSD(now)} today\nThat's ${fmtMult(mult)} (${pct>=0?'+':'−'}${Math.abs(pct).toFixed(0)}%)\n\nCalculate yours: ${CONFIG.siteUrl}`;
   try{
     await navigator.clipboard.writeText(txt);
     const btn=g('share-copy'); btn.classList.add('copied'); g('copy-label').textContent='✓ Copied!';
@@ -1089,6 +1091,11 @@ function showEl(id){ g(id).classList.add('active'); }
 function hideEl(id){ g(id).classList.remove('active'); }
 function showErr(id,msg){ g(id).textContent=msg; g(id).classList.add('active'); }
 function hideErr(id){ g(id).classList.remove('active'); }
+function fmtMult(m){
+  if(m>=1000) return Math.round(m/1000)+'K×';
+  if(m>=10)   return Math.round(m)+'×';
+  return m.toFixed(2).replace(/\.?0+$/,'')+'×';
+}
 function formatUSD(n){
   if(n>=1e9) return '$'+(n/1e9).toFixed(2)+'B';
   if(n>=1e6) return '$'+(n/1e6).toFixed(2)+'M';

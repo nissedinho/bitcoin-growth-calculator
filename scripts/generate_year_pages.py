@@ -25,7 +25,8 @@ JAN_PRICE = {
     2025: 102405,
 }
 
-PRICE_NOW = 85624  # fallback; pages fetch live price from /api/price
+PRICE_NOW = 86603  # keep in sync with the last BTC_MONTHLY entry in index.html;
+                   # pages overwrite this with the live price from /api/price on load
 AFFILIATE_URL = "https://coinbase.com"  # replace with your Coinbase referral link and re-run
 
 NARRATIVE = {
@@ -44,6 +45,12 @@ NARRATIVE = {
     2025: "Bitcoin peaked above $115,000 in mid-2025 before sliding into the 2026 drawdown. A January 2025 buy is underwater at today's prices — a live lesson in why timing single entries is hard (and why people DCA).",
 }
 
+def fmt_mult(m: float) -> str:
+    """Render a return multiple. Mirrors fmtMult() in the page script below."""
+    if m >= 1000: return f"{round(m/1000):,}K"
+    if m >= 10:   return f"{round(m):,}"
+    return f"{m:.2f}".rstrip("0").rstrip(".")
+
 def fmt_usd(n: float) -> str:
     if n >= 1e9: return f"${n/1e9:.2f}B"
     if n >= 1e6: return f"${n/1e6:.2f}M"
@@ -55,7 +62,9 @@ def page(year: int) -> str:
     mult = PRICE_NOW / p_then
     rows = [(100, 100*mult), (1000, 1000*mult), (10000, 10000*mult)]
     v1k = fmt_usd(1000*mult)
-    mult_txt = f"{mult:,.1f}×" if mult < 100 else f"{mult:,.0f}×"
+    mult_num = fmt_mult(mult)
+    mult_txt = mult_num + "×"
+    per_dollar = 1 / p_then  # × live price = the current multiple
     up = mult >= 1
     gain_word = "grown to" if up else "fallen to"
     title = f"What If You Bought Bitcoin in {year}? $1,000 Then = {v1k} Today"
@@ -148,11 +157,11 @@ footer {{ margin-top:40px; font-family:'DM Mono',monospace; font-size:11px; colo
 <div class="container">
 <div class="crumb"><a href="/">₿ Bitcoin Growth Calculator</a> / What if · {year}</div>
 <h1>WHAT IF YOU BOUGHT <em>BITCOIN</em> IN {year}?</h1>
-<p>In {month_label} {year}, one Bitcoin cost about <strong>{fmt_usd(p_then)}</strong>. At today's price of <strong class="live-price">{fmt_usd(PRICE_NOW)}</strong>, every dollar invested back then is worth <strong>{mult_txt.replace('×',' times')}</strong> what you paid.</p>
+<p>In {month_label} {year}, one Bitcoin cost about <strong>{fmt_usd(p_then)}</strong>. At today's price of <strong class="live-price">{fmt_usd(PRICE_NOW)}</strong>, every dollar invested back then is worth <strong data-mult="{per_dollar:.10f}" data-mult-suffix=" times">{mult_num} times</strong> what you paid.</p>
 <div class="hero-stat">
   <div class="label">$1,000 in {month_label} {year} would be worth</div>
   <div class="big" id="hero-val" data-btc="{1000/p_then:.8f}">{v1k}</div>
-  <div class="sub">{mult_txt} your money · BTC was {fmt_usd(p_then)} then</div>
+  <div class="sub"><span data-mult="{per_dollar:.10f}" data-mult-suffix="×">{mult_txt}</span> your money · BTC was {fmt_usd(p_then)} then</div>
 </div>
 <h2>The numbers</h2>
 <table>
@@ -165,7 +174,7 @@ footer {{ margin-top:40px; font-family:'DM Mono',monospace; font-size:11px; colo
 <a class="cta" href="/?utm_source=whatif&utm_medium=internal&utm_campaign={year}">TRY YOUR OWN DATE & AMOUNT →</a>
 <a class="cta secondary" href="/#dca">SEE WHAT A MONTHLY DCA WOULD HAVE DONE →</a>
 <div class="affiliate">
-  <strong>Want in for the next {10}× window?</strong>
+  <strong>Want in before the next one?</strong>
   Nobody can promise one — but if you want to own Bitcoin, <a href="{AFFILIATE_URL}" rel="noopener sponsored" target="_blank" onclick="try{{gtag('event','affiliate_click',{{placement:'whatif_{year}'}})}}catch(e){{}}">Coinbase</a> is the easiest place for most people to start, with automatic recurring buys.
 </div>
 <div class="years"><strong style="color:var(--text)">Other years:</strong><br>{other_years}</div>
@@ -176,11 +185,22 @@ footer {{ margin-top:40px; font-family:'DM Mono',monospace; font-size:11px; colo
 </div>
 <script>
 // Refresh headline numbers with the live BTC price
+const P_THEN = {p_then};
 fetch('/api/price').then(r=>r.json()).then(d=>{{
   if(!d.price) return;
   const f=n=>n>=1e9?'$'+(n/1e9).toFixed(2)+'B':n>=1e6?'$'+(n/1e6).toFixed(2)+'M':'$'+Math.round(n).toLocaleString('en-US');
+  const fmtMult=m=>m>=1000?Math.round(m/1000).toLocaleString('en-US')+'K':m>=10?Math.round(m).toLocaleString('en-US'):m.toFixed(2).replace(/\.?0+$/,'');
   document.querySelectorAll('.live-price').forEach(el=>el.textContent=f(d.price));
   document.querySelectorAll('[data-btc]').forEach(el=>{{ el.textContent=f(parseFloat(el.dataset.btc)*d.price); }});
+  // Keep the multiple and the up/down colour in step with the live price,
+  // otherwise the page shows a fresh dollar figure beside a stale "659×".
+  document.querySelectorAll('[data-mult]').forEach(el=>{{
+    el.textContent=fmtMult(parseFloat(el.dataset.mult)*d.price)+(el.dataset.multSuffix||'');
+  }});
+  const col = d.price >= P_THEN ? 'var(--green)' : 'var(--red)';
+  const hero = document.getElementById('hero-val');
+  if(hero) hero.style.color = col;
+  document.querySelectorAll('td.now').forEach(el=>el.style.color=col);
 }}).catch(()=>{{}});
 </script>
 </body>
