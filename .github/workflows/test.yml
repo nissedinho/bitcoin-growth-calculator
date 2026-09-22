@@ -1,8 +1,10 @@
 name: Tests
 
+# push is scoped to the default branch: on a PR branch, push and pull_request
+# would both fire and every run would be duplicated.
 on:
   push:
-    branches: ['**']
+    branches: [main]
   pull_request:
 
 jobs:
