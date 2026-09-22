@@ -98,8 +98,13 @@ def stooq_monthly(symbol):
 def yahoo_monthly(symbol):
     """Monthly closes from Yahoo's public chart endpoint — the fallback for
     symbols Stooq will not serve to a datacenter IP."""
+    # Explicit bounds rather than range=max: the latter came back sparse for
+    # ^GSPC (54 months across a 13-year span) while gold was near-complete.
+    start = int(datetime.datetime(2012, 1, 1, tzinfo=datetime.timezone.utc).timestamp())
+    end = int(datetime.datetime.now(datetime.timezone.utc).timestamp())
     url = ("https://query1.finance.yahoo.com/v8/finance/chart/"
-           f"{urllib.parse.quote(symbol, safe='')}?range=max&interval=1mo")
+           f"{urllib.parse.quote(symbol, safe='')}"
+           f"?period1={start}&period2={end}&interval=1mo")
     text = fetch(url)
     try:
         result = json.loads(text)["chart"]["result"][0]
