@@ -75,10 +75,10 @@ module.exports = (req, res) => {
   if (sell) target.set('sell', sell);
   const dest = `/?${target.toString()}`;
 
-  const img = new URLSearchParams({ amount: String(amount), value: String(Math.round(value)) });
-  if (date) img.set('date', date);
-  if (sell) img.set('sell', sell);
-  const imageUrl = `${SITE}/api/og?${img.toString()}`;
+  // Static card for now. A generated per-result image needs a renderer whose
+  // build I could not verify here, so the preview keeps the branded card and
+  // the numbers live in the title and description instead.
+  const imageUrl = `${SITE}/og.png`;
 
   const t = escapeHtml(title), d = escapeHtml(description);
   const body = `<!DOCTYPE html>
