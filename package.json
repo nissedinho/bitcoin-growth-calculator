@@ -1,0 +1,8 @@
+{
+  "private": true,
+  "name": "bitcoin-growth-calculator",
+  "description": "Static site; the only dependency is the OpenGraph image renderer used by api/og.js.",
+  "dependencies": {
+    "@vercel/og": "^1.0.2"
+  }
+}

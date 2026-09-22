@@ -2,9 +2,20 @@
   "redirects": [
     {
       "source": "/(.*)",
-      "has": [{ "type": "host", "value": "bitcoingrowthcalculator.com" }],
+      "has": [
+        {
+          "type": "host",
+          "value": "bitcoingrowthcalculator.com"
+        }
+      ],
       "destination": "https://www.bitcoingrowthcalculator.com/$1",
       "permanent": true
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/s",
+      "destination": "/api/share"
     }
   ]
 }
