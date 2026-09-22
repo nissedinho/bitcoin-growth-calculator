@@ -10,9 +10,8 @@
 
   gtag('config', 'G-T29BL3EPHL');
 </script>
-</script>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Bitcoin Investment Calculator — What If You'd Bought Bitcoin?</title>
   <meta name="description" content="See exactly how much money you'd have today if you bought Bitcoin at any point since 2013. Free Bitcoin return calculator with live prices and DCA simulator." />
   <link rel="canonical" href="https://www.bitcoingrowthcalculator.com/" />
@@ -428,7 +427,7 @@
             <strong>Buy Bitcoin on Coinbase</strong>
             Get $10 in free Bitcoin when you sign up and trade on Coinbase.
           </div>
-          <a class="affiliate-btn" id="affiliate-btn" href="#" target="_blank" rel="noopener">Start on Coinbase →</a>
+          <a class="affiliate-btn" id="affiliate-btn" href="#" target="_blank" rel="noopener sponsored">Start on Coinbase →</a>
         </div>
 
         <!-- Email capture — shown after result -->
@@ -519,6 +518,15 @@
 
         <div class="dca-fact" id="dca-fact"></div>
 
+        <!-- Affiliate CTA — DCA context -->
+        <div class="affiliate-cta">
+          <div class="affiliate-text">
+            <strong>Start your own DCA on Coinbase</strong>
+            Set up automatic recurring buys — daily, weekly, or monthly. Takes 2 minutes.
+          </div>
+          <a class="affiliate-btn" id="dca-affiliate-btn" href="#" target="_blank" rel="noopener sponsored">Set Up Recurring Buys →</a>
+        </div>
+
         <!-- Share DCA -->
         <div class="share-section">
           <div class="share-label">Share this result</div>
@@ -550,7 +558,23 @@
   </div><!-- /card -->
 
   <footer>
-    <p>Historical prices from built-in dataset (Apr 2013 – present) · Live price via web search</p>
+    <p style="margin-bottom:10px;">
+      <span style="color:var(--text);">What if you bought Bitcoin in…</span><br>
+      <a href="/what-if/2013/" style="color:var(--orange);text-decoration:none;">2013</a> ·
+      <a href="/what-if/2014/" style="color:var(--orange);text-decoration:none;">2014</a> ·
+      <a href="/what-if/2015/" style="color:var(--orange);text-decoration:none;">2015</a> ·
+      <a href="/what-if/2016/" style="color:var(--orange);text-decoration:none;">2016</a> ·
+      <a href="/what-if/2017/" style="color:var(--orange);text-decoration:none;">2017</a> ·
+      <a href="/what-if/2018/" style="color:var(--orange);text-decoration:none;">2018</a> ·
+      <a href="/what-if/2019/" style="color:var(--orange);text-decoration:none;">2019</a> ·
+      <a href="/what-if/2020/" style="color:var(--orange);text-decoration:none;">2020</a> ·
+      <a href="/what-if/2021/" style="color:var(--orange);text-decoration:none;">2021</a> ·
+      <a href="/what-if/2022/" style="color:var(--orange);text-decoration:none;">2022</a> ·
+      <a href="/what-if/2023/" style="color:var(--orange);text-decoration:none;">2023</a> ·
+      <a href="/what-if/2024/" style="color:var(--orange);text-decoration:none;">2024</a> ·
+      <a href="/what-if/2025/" style="color:var(--orange);text-decoration:none;">2025</a>
+    </p>
+    <p>Historical prices from built-in dataset (Apr 2013 – present) · Live price via CoinGecko</p>
     <p>Not financial advice · Past performance does not guarantee future results</p>
     <p style="margin-top:8px;"><a href="/faq" style="color:var(--orange);text-decoration:none;font-family:'DM Mono',monospace;font-size:12px;letter-spacing:0.08em;">FAQ — Common Bitcoin Questions →</a></p>
   </footer>
@@ -611,13 +635,24 @@ const BTC_MONTHLY = {
   '2024-01':42514,'2024-02':62427,'2024-03':71313,'2024-04':60624,'2024-05':67533,
   '2024-06':62678,'2024-07':66000,'2024-08':59142,'2024-09':63301,'2024-10':72444,
   '2024-11':97716,'2024-12':93400,
-  '2025-01':101900,'2025-02':84400,
+  '2025-01':102405,'2025-02':84373,'2025-03':82549,'2025-04':94207,'2025-05':104638,
+  '2025-06':107135,'2025-07':115758,'2025-08':108237,'2025-09':114056,'2025-10':109556,
+  '2025-11':90394,'2025-12':87509,
+  '2026-01':78621,'2026-02':66996,'2026-03':68233,'2026-04':76304,'2026-05':73580,
+  '2026-06':58559,'2026-07':62814,'2026-08':78549,'2026-09':86603,
 };
 
 function getHistoricalPrice(dateStr) {
   const [y,m,d] = dateStr.split('-').map(Number);
   const key = `${y}-${String(m).padStart(2,'0')}`;
-  if (!BTC_MONTHLY[key]) return null;
+  if (!BTC_MONTHLY[key]) {
+    // Date is past the end of the dataset — fall back to live price for
+    // recent dates (within ~92 days) so the calculator never hard-breaks
+    // between dataset updates.
+    const ageDays = (Date.now() - new Date(dateStr+'T12:00:00Z')) / 86400000;
+    if (ageDays >= 0 && ageDays <= 92 && cachedPrice) return cachedPrice;
+    return null;
+  }
   const prev = BTC_MONTHLY[prevMK(key)] ?? BTC_MONTHLY[key];
   const curr = BTC_MONTHLY[key];
   const next = BTC_MONTHLY[nextMK(key)] ?? BTC_MONTHLY[key];
@@ -780,6 +815,7 @@ function tmDisplay(invested, priceThen, priceNow, pd) {
   const bar=g('tm-bar'); bar.style.width='0%'; bar.className='bar-fill'+(up?'':' loss');
   setTimeout(()=>{ bar.style.width=bp+'%'; },60);
   g('tm-note').textContent=buildTMNote(mult,pct,years,pd,invested,now);
+  track('calculate',{ calculator:'time_machine', multiple: Math.round(mult*10)/10 });
   showEl('tm-result');
   // Show email capture after a short delay for impact
   setTimeout(()=>{ g('email-capture').classList.add('active'); },800);
@@ -848,12 +884,15 @@ function dcaDisplay(amountPerPeriod, startDate, freq, currentPrice) {
 
   lastDCA = {amountPerPeriod, freq, totalInvested, totalBtc, totalValue, totalGain, pct, purchases};
 
+  const dcaUp = totalGain >= 0;
   g('dca-total-invested').textContent = formatUSD(totalInvested);
   g('dca-total-value').textContent = formatUSD(totalValue);
-  g('dca-total-gain').textContent = '+'+formatUSD(totalGain);
+  g('dca-total-gain').textContent = (dcaUp?'+':'−')+formatUSD(Math.abs(totalGain));
+  g('dca-total-gain').style.color = dcaUp ? 'var(--green)' : 'var(--red)';
   g('dca-btc').textContent = '₿ '+totalBtc.toFixed(6);
   g('dca-avg-price').textContent = formatUSD(avgPrice);
-  g('dca-pct').textContent = '+'+pct.toFixed(1)+'%';
+  g('dca-pct').textContent = (dcaUp?'+':'')+pct.toFixed(1)+'%';
+  g('dca-pct').className = 'stat-val '+(dcaUp?'green':'red');
   g('dca-count').textContent = purchases.length.toLocaleString();
   g('dca-best').textContent = best.date.toLocaleDateString('en-US',{month:'short',year:'2-digit'})+' @ '+formatUSD(best.price);
   g('dca-worst').textContent = worst.date.toLocaleDateString('en-US',{month:'short',year:'2-digit'})+' @ '+formatUSD(worst.price);
@@ -874,9 +913,15 @@ function dcaDisplay(amountPerPeriod, startDate, freq, currentPrice) {
   drawChart(chartLabels, chartInvested, chartValue);
 
   // Fact
-  const perDay = formatUSD(totalGain/((Date.now()-startDate)/(1000*60*60*24)));
-  g('dca-fact').innerHTML = `Investing just <strong>${formatUSD(amountPerPeriod)}</strong> every ${freq.replace('ly','')} since ${startDate.toLocaleDateString('en-US',{month:'long',year:'numeric'})} would have grown to <strong>${formatUSD(totalValue)}</strong> — a gain of <strong>${formatUSD(totalGain)}</strong>. That's <strong>${perDay}</strong> earned per day on average, while doing absolutely nothing.`;
+  const startLabel = startDate.toLocaleDateString('en-US',{month:'long',year:'numeric'});
+  if (dcaUp) {
+    const perDay = formatUSD(totalGain/((Date.now()-startDate)/(1000*60*60*24)));
+    g('dca-fact').innerHTML = `Investing just <strong>${formatUSD(amountPerPeriod)}</strong> every ${freq.replace('ly','')} since ${startLabel} would have grown to <strong>${formatUSD(totalValue)}</strong> — a gain of <strong>${formatUSD(totalGain)}</strong>. That's <strong>${perDay}</strong> earned per day on average, while doing absolutely nothing.`;
+  } else {
+    g('dca-fact').innerHTML = `A DCA started in ${startLabel} is currently down <strong>${formatUSD(Math.abs(totalGain))}</strong> — but you'd have accumulated <strong>₿ ${totalBtc.toFixed(4)}</strong> at an average price of <strong>${formatUSD(totalInvested/totalBtc)}</strong>. Every bear-market DCA window in Bitcoin's history has eventually turned green; try a longer window above to see it.`;
+  }
 
+  track('calculate',{ calculator:'dca', gain_positive: dcaUp });
   showEl('dca-result');
   setTimeout(()=>{ g('dca-email-nudge').classList.add('active'); },900);
 }
@@ -950,14 +995,21 @@ function drawChart(labels, invested, value) {
 }
 
 // ── Wire CONFIG into page ─────────────────────────────────────────────────────
+function track(name, params) {
+  try { if (typeof gtag === 'function') gtag('event', name, params || {}); } catch(e) {}
+}
 document.addEventListener('DOMContentLoaded', () => {
-  // Affiliate link
-  const aBtn = g('affiliate-btn');
-  if(aBtn && CONFIG.affiliateUrl !== 'YOUR_COINBASE_AFFILIATE_LINK_HERE') {
-    aBtn.href = CONFIG.affiliateUrl;
-  } else if(aBtn) {
-    aBtn.href = 'https://coinbase.com';
-  }
+  // Affiliate links (TM + DCA)
+  const affiliateHref = CONFIG.affiliateUrl !== 'YOUR_COINBASE_AFFILIATE_LINK_HERE'
+    ? CONFIG.affiliateUrl : 'https://coinbase.com';
+  [['affiliate-btn','time_machine'],['dca-affiliate-btn','dca']].forEach(([id,loc])=>{
+    const btn = g(id);
+    if(!btn) return;
+    btn.href = affiliateHref;
+    btn.addEventListener('click', ()=>track('affiliate_click',{ placement: loc }));
+  });
+  // Deep link: #dca opens the DCA tab (shareable / linkable from SEO pages)
+  if (location.hash === '#dca') switchTab('dca');
 });
 
 // ── Email capture — Beehiiv ───────────────────────────────────────────────────
@@ -985,6 +1037,7 @@ function submitDcaEmail() {
   const email = g('dca-ec-email').value.trim();
   if(!email || !email.includes('@')) { g('dca-ec-email').focus(); return; }
   submitToBeehiiv(email);
+  track('email_signup',{ placement:'dca' });
   g('dca-email-nudge').style.display = 'none';
   const conf = document.createElement('div');
   conf.style.cssText = 'margin-top:16px;padding:14px 18px;background:var(--green-glow);border:1px solid rgba(34,197,94,0.28);border-radius:2px;font-family:DM Mono,monospace;font-size:13px;color:var(--green);';
@@ -1060,6 +1113,7 @@ function submitEmail() {
     .then(r => r.json())
     .then(data => {
         if (data.success) {
+            track('email_signup',{ placement:'time_machine' });
             emailInput.value = '';
             if (btn) { btn.textContent = '\u2713 SUBSCRIBED!'; btn.disabled = false; }
             setTimeout(() => { if (btn) btn.textContent = originalText; }, 3000);
