@@ -141,7 +141,65 @@ def test_coingecko_url_has_no_paid_interval_param():
     """`interval` is a paid-plan parameter; sending it made the public endpoint
     reject the request on the first live run."""
     assert "interval=" not in upd.COINGECKO, upd.COINGECKO
-    assert "days=max" in upd.COINGECKO
+
+
+fs = load("fetch_series")
+
+
+def test_coverage_rejects_a_sparse_series():
+    """Yahoo answered successfully with 54 of ~160 months for the S&P. A series
+    full of holes looks like data but is worse than a clean failure."""
+    full = {f"{y}-{m:02d}": 1 for y in range(2013, 2027) for m in range(1, 13)}
+    sparse = {k: v for i, (k, v) in enumerate(sorted(full.items())) if i % 3 == 0}
+    dense = {k: v for i, (k, v) in enumerate(sorted(full.items())) if i % 10 != 0}
+    assert fs.coverage(full) == 1.0
+    assert fs.coverage(sparse) < fs.MIN_COVERAGE, "sparse series would be accepted"
+    assert fs.coverage(dense) >= fs.MIN_COVERAGE, "near-complete series would be rejected"
+
+
+def test_months_between():
+    assert fs.months_between("2013-04", "2026-09") == 162
+    assert fs.months_between("2013-12", "2014-01") == 2
+    assert fs.months_between("2013-04", "2013-04") == 1
+
+
+def test_coingecko_respects_the_public_365_day_limit():
+    """days=max returns HTTP 401 on the public tier: 'Your request exceeds the
+    allowed time range.'"""
+    assert "days=365" in upd.COINGECKO, upd.COINGECKO
+    assert "days=max" not in upd.COINGECKO
+
+
+def test_daily_history_accumulates_across_runs():
+    """Each run can only reach a year back, so runs must merge rather than
+    replace - otherwise the daily series never grows past 365 days."""
+    import tempfile, shutil, json as _json
+    tmp = tempfile.mkdtemp()
+    try:
+        data_dir = os.path.join(tmp, "data")
+        os.makedirs(data_dir)
+        with open(os.path.join(data_dir, "btc_daily.json"), "w") as f:
+            _json.dump({"prices": {"2020-01-01": 7200.0, "2020-01-02": 7300.0}}, f)
+        previous = upd.load_json(os.path.join(data_dir, "btc_daily.json"), {}).get("prices", {})
+        fetched = {"2026-09-20": 86000.0, "2026-09-21": 86500.0}
+        merged = dict(previous)
+        merged.update(fetched)
+        assert len(merged) == 4, merged
+        assert "2020-01-01" in merged, "older days must survive a new fetch"
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+
+
+def test_existing_months_are_preserved():
+    """A refresh that only reaches recent months must not drop the rest."""
+    existing = upd.existing_monthly()
+    assert len(existing) >= 150, f"only read {len(existing)} months from index.html"
+    recent = {"2026-09": 99999}
+    combined = dict(existing)
+    combined.update(recent)
+    assert len(combined) >= len(existing)
+    assert combined["2026-09"] == 99999
+    assert combined["2013-04"] == existing["2013-04"], "old months must be untouched"
 
 
 # ── the guard must actually fail on bad data ──────────────────────────────────

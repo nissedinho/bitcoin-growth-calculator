@@ -21,8 +21,12 @@ import datetime
 from _sources import DATA_DIR, REPO_ROOT, fetch, load_json, write_json
 
 # Free, key-free, and returns the whole history in one call.
+# The public tier refuses anything beyond 365 days ("Your request exceeds the
+# allowed time range", HTTP 401). So each run fetches the last year and merges
+# it into whatever previous runs already collected - the daily history
+# accumulates over time instead of needing one impossible bulk fetch.
 COINGECKO = ("https://api.coingecko.com/api/v3/coins/bitcoin/market_chart"
-             "?vs_currency=usd&days=max")
+             "?vs_currency=usd&days=365")
 START = "2013-04"
 
 
@@ -35,7 +39,7 @@ def fetch_daily():
         raise RuntimeError(
             f"CoinGecko did not return JSON — got: {' '.join(raw.split())[:160]}") from None
     prices = payload.get("prices") or []
-    if len(prices) < 365:
+    if len(prices) < 300:
         snippet = " ".join(raw.split())[:160]
         raise RuntimeError(f"CoinGecko returned only {len(prices)} points — got: {snippet}")
     out = {}
@@ -78,6 +82,16 @@ def render_block(monthly):
     return "const BTC_MONTHLY = {\n" + "\n".join(lines) + "\n};"
 
 
+def existing_monthly():
+    """The BTC_MONTHLY currently in index.html, so a partial refresh never drops
+    months the new fetch could not reach."""
+    html = open(os.path.join(REPO_ROOT, "index.html")).read()
+    block = re.search(r"const BTC_MONTHLY = \{.*?\n\};", html, re.S)
+    if not block:
+        return {}
+    return {k: int(v) for k, v in re.findall(r"'(\d{4}-\d{2})':(\d+)", block.group(0))}
+
+
 def update_index(monthly):
     path = os.path.join(REPO_ROOT, "index.html")
     html = open(path).read()
@@ -99,22 +113,33 @@ def main():
         print("Leaving the existing dataset in place.", file=sys.stderr)
         return 1
 
-    daily = {d: p for d, p in daily.items() if d[:7] >= START}
-    monthly = monthly_from_daily(daily)
-    if len(monthly) < 100:
-        print(f"Refusing to write a suspiciously short dataset ({len(monthly)} months).",
-              file=sys.stderr)
-        return 1
+    fetched = {d: p for d, p in daily.items() if d[:7] >= START}
 
+    # Merge over what earlier runs collected so the daily series grows.
     previous = load_json(os.path.join(DATA_DIR, "btc_daily.json"), {}).get("prices", {})
+    merged = dict(previous)
+    merged.update(fetched)
+    merged = dict(sorted(merged.items()))
+
     write_json(os.path.join(DATA_DIR, "btc_daily.json"), {
         "generated": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
-        "prices": daily,
+        "prices": merged,
     })
-    print(f"  daily   {len(daily)} days ({len(daily) - len(previous):+d} vs last run)")
-    print(f"  monthly {len(monthly)} months, latest {max(monthly)} = ${monthly[max(monthly)]:,}")
+    print(f"  daily   {len(merged)} days total ({len(merged) - len(previous):+d} new this run)")
 
-    if update_index(monthly):
+    # Only rewrite BTC_MONTHLY where the merged daily data actually covers the
+    # month; months outside the window keep their existing values.
+    monthly = monthly_from_daily(merged)
+    existing = existing_monthly()
+    combined = dict(existing)
+    combined.update(monthly)
+    if len(combined) < 100:
+        print(f"Refusing to write a suspiciously short dataset ({len(combined)} months).",
+              file=sys.stderr)
+        return 1
+    print(f"  monthly {len(combined)} months, latest {max(combined)} = ${combined[max(combined)]:,}")
+
+    if update_index(combined):
         print("  index.html BTC_MONTHLY updated")
     else:
         print("  index.html BTC_MONTHLY already current")
