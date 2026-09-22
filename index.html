@@ -130,6 +130,19 @@
     .field { display: flex; flex-direction: column; gap: 7px; }
     label { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-muted); }
     .input-wrap { position: relative; }
+    .label-hint { text-transform: none; letter-spacing: 0.04em; color: var(--text-muted); opacity: 0.75; font-size: 9px; }
+    .input-suffix { position: absolute; right: 13px; top: 50%; transform: translateY(-50%); font-family: 'DM Mono', monospace; font-size: 14px; color: var(--orange); pointer-events: none; }
+    .compare { margin-top: 16px; }
+    .compare-label { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 10px; }
+    .cmp-row { display: grid; grid-template-columns: 1fr auto auto; gap: 10px; align-items: center; padding: 9px 12px; border-bottom: 1px solid var(--border-subtle); font-family: 'DM Mono', monospace; font-size: 12px; }
+    .cmp-row:last-child { border-bottom: none; }
+    .cmp-row .cmp-name { color: var(--text-muted); }
+    .cmp-row.is-btc { background: var(--orange-dim); }
+    .cmp-row.is-btc .cmp-name { color: var(--orange); }
+    .cmp-val { color: var(--text); text-align: right; }
+    .cmp-pct { text-align: right; min-width: 74px; }
+    .cmp-pct.green { color: var(--green); } .cmp-pct.red { color: var(--red); }
+    .dca-compare-note { margin-top: 10px; font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text-muted); line-height: 1.7; }
     .input-prefix { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); font-family: 'DM Mono', monospace; font-size: 14px; color: var(--orange); pointer-events: none; }
     input[type="number"], input[type="date"], input[type="email"], select {
       width: 100%; background: var(--surface2); border: 1px solid var(--border-subtle); border-radius: 2px;
@@ -376,6 +389,17 @@
         </div>
       </div>
 
+      <div class="form-row">
+        <div class="field">
+          <label>Sell Date <span class="label-hint">— blank = still holding</span></label>
+          <div class="input-wrap"><input type="date" id="tm-sell-date" /></div>
+        </div>
+        <div class="field">
+          <label>Capital Gains Tax <span class="label-hint">— optional</span></label>
+          <div class="input-wrap"><input type="number" id="tm-tax" placeholder="0" min="0" max="60" step="1" inputmode="decimal" /><span class="input-suffix">%</span></div>
+        </div>
+      </div>
+
       <button class="btn" id="calc-btn"><span class="btn-shimmer"></span>CALCULATE MY RETURNS</button>
       <div class="error" id="tm-error"></div>
       <div class="loading" id="tm-loading"><div class="spinner"></div><div id="loading-msg">FETCHING LIVE BTC PRICE…</div></div>
@@ -400,6 +424,13 @@
           <div class="stat"><div class="stat-label">% Return</div><div class="stat-val" id="tm-pct">—</div></div>
           <div class="stat"><div class="stat-label">Time Held</div><div class="stat-val" id="tm-years">—</div></div>
           <div class="stat"><div class="stat-label">Ann. Return</div><div class="stat-val" id="tm-ann">—</div></div>
+          <div class="stat"><div class="stat-label">Worst Drawdown</div><div class="stat-val red" id="tm-dd">—</div></div>
+          <div class="stat" id="tm-tax-stat" style="display:none;"><div class="stat-label">After Tax</div><div class="stat-val" id="tm-after-tax">—</div></div>
+          <div class="stat" id="tm-real-stat" style="display:none;"><div class="stat-label">In Today's $</div><div class="stat-val" id="tm-real">—</div></div>
+        </div>
+        <div class="compare" id="tm-compare" style="display:none;">
+          <div class="compare-label">Same money, other assets</div>
+          <div id="tm-compare-rows"></div>
         </div>
         <div class="btc-row"><div class="btc-row-label">Bitcoin you would have bought</div><div class="btc-row-val" id="tm-btc">₿ 0.00000000</div></div>
         <div class="bar-labels"><span>Invested</span><span>Today's value</span></div>
@@ -514,6 +545,12 @@
             <div class="legend-item"><div class="legend-dot" style="background:var(--orange)"></div>Amount invested</div>
             <div class="legend-item"><div class="legend-dot" style="background:var(--green)"></div>Portfolio value</div>
           </div>
+        </div>
+
+        <div class="compare" id="dca-compare" style="display:none;">
+          <div class="compare-label">DCA vs. buying it all at once</div>
+          <div id="dca-compare-rows"></div>
+          <div class="dca-compare-note" id="dca-compare-note"></div>
         </div>
 
         <div class="dca-fact" id="dca-fact"></div>
@@ -642,7 +679,97 @@ const BTC_MONTHLY = {
   '2026-06':58559,'2026-07':62814,'2026-08':78549,'2026-09':86603,
 };
 
+// Monthly keys from a..b inclusive, clamped to the dataset.
+function monthKeysBetween(aKey, bKey) {
+  const keys = Object.keys(BTC_MONTHLY);
+  const i = keys.indexOf(aKey), j = keys.indexOf(bKey);
+  if (i < 0 || j < 0 || j < i) return [];
+  return keys.slice(i, j + 1);
+}
+
+// Worst peak-to-trough fall the holder would have sat through.
+function maxDrawdown(startKey, endKey) {
+  const keys = monthKeysBetween(startKey, endKey);
+  if (keys.length < 2) return null;
+  let peak = -Infinity, peakKey = null, worst = 0, atPeak = null, atTrough = null;
+  for (const k of keys) {
+    const p = BTC_MONTHLY[k];
+    if (p > peak) { peak = p; peakKey = k; }
+    const dd = (p - peak) / peak;
+    if (dd < worst) { worst = dd; atPeak = peakKey; atTrough = k; }
+  }
+  if (worst === 0) return null;
+  return { pct: worst * 100, peakKey: atPeak, troughKey: atTrough };
+}
+
+function monthLabel(key) {
+  const [y, m] = key.split('-').map(Number);
+  return new Date(Date.UTC(y, m - 1, 1)).toLocaleDateString('en-US', { month: 'short', year: 'numeric', timeZone: 'UTC' });
+}
+
+// Optional extra series (CPI, S&P 500, gold) produced by scripts/fetch_series.py.
+// Absent on a fresh checkout until the data workflow has run once — every
+// feature that uses it checks for null first and simply stays hidden.
+let SERIES = null, seriesLoaded = false;
+async function loadSeries() {
+  if (seriesLoaded) return SERIES;
+  seriesLoaded = true;
+  try {
+    const r = await fetch('/data/series.json');
+    if (r.ok) SERIES = await r.json();
+  } catch (e) { SERIES = null; }
+  return SERIES;
+}
+
+// Nearest available month at or before `key` in a monthly series.
+function seriesAt(name, key) {
+  const series = SERIES && SERIES[name];
+  if (!series) return null;
+  if (series[key] != null) return series[key];
+  const keys = Object.keys(series).sort();
+  let best = null;
+  for (const k of keys) { if (k <= key) best = series[k]; else break; }
+  return best;
+}
+
+function monthKey(dateStr) {
+  const [y, m] = dateStr.split('-').map(Number);
+  return `${y}-${String(m).padStart(2, '0')}`;
+}
+
+// Exact daily closes, when the data workflow has produced them. Until then the
+// monthly interpolation below is used, so this is a precision upgrade rather
+// than a dependency.
+let DAILY = null;
+(function loadDaily(){
+  try {
+    fetch('/data/btc_daily.json')
+      .then(r => r.ok ? r.json() : null)
+      .then(j => { if (j && j.prices) { DAILY = j.prices; retryAfterDaily(); } })
+      .catch(() => {});
+  } catch(e) {}
+})();
+
+// Re-run whatever is already on screen once exact prices arrive, so a result
+// rendered from the monthly approximation quietly sharpens instead of going stale.
+function retryAfterDaily(){
+  try {
+    if (lastTM && lastTM.invested) tmCalculate(true);
+    if (lastDCA && lastDCA.totalInvested) dcaCalculate(true);
+  } catch(e) {}
+}
+
 function getHistoricalPrice(dateStr) {
+  if (DAILY) {
+    if (DAILY[dateStr] != null) return DAILY[dateStr];
+    // Fall back to the most recent earlier day (markets have gaps; BTC rarely,
+    // but the series can still miss a day).
+    const d0 = new Date(dateStr + 'T12:00:00Z');
+    for (let back = 1; back <= 7; back++) {
+      const probe = new Date(d0.getTime() - back * 86400000).toISOString().slice(0, 10);
+      if (DAILY[probe] != null) return DAILY[probe];
+    }
+  }
   const [y,m,d] = dateStr.split('-').map(Number);
   const key = `${y}-${String(m).padStart(2,'0')}`;
   if (!BTC_MONTHLY[key]) {
@@ -782,20 +909,34 @@ async function tmCalculate(silent=false) {
   const histPrice = getHistoricalPrice(dateVal);
   if(!histPrice){if(!silent)showErr('tm-error','No data for that date. Try a nearby date.');return;}
 
-  if(cachedPrice){ tmDisplay(amount,histPrice,cachedPrice,pd); return; }
+  // Optional sell date — blank means "still holding", valued at the live price.
+  const sellVal = g('tm-sell-date').value;
+  let sellDate = null, sellPrice = null;
+  if(sellVal){
+    sellDate = new Date(sellVal+'T12:00:00Z');
+    if(sellDate<=pd){if(!silent)showErr('tm-error','Sell date must be after the purchase date.');return;}
+    if(sellDate>new Date()){if(!silent)showErr('tm-error','Sell date must be in the past.');return;}
+    sellPrice = getHistoricalPrice(sellVal);
+    if(!sellPrice){if(!silent)showErr('tm-error','No data for that sell date. Try a nearby date.');return;}
+  }
+
+  loadSeries();
+  if(sellPrice){ tmDisplay(amount,histPrice,sellPrice,pd,sellDate); return; }
+  if(cachedPrice){ tmDisplay(amount,histPrice,cachedPrice,pd,null); return; }
   showEl('tm-loading'); g('loading-msg').textContent='FETCHING LIVE BTC PRICE…';
   try {
     const p = await fetchCurrentPrice();
-    hideEl('tm-loading'); tmDisplay(amount,histPrice,p,pd);
+    hideEl('tm-loading'); tmDisplay(amount,histPrice,p,pd,null);
   } catch(e){ hideEl('tm-loading'); showErr('tm-error','Could not fetch live price. Try again.'); }
 }
 
-function tmDisplay(invested, priceThen, priceNow, pd) {
+function tmDisplay(invested, priceThen, priceNow, pd, sellDate) {
   const btc=invested/priceThen, now=btc*priceNow, gain=now-invested;
   const pct=((now-invested)/invested)*100, mult=now/invested;
-  const years=(Date.now()-pd)/(1000*60*60*24*365.25), ann=(Math.pow(mult,1/years)-1)*100;
+  const endMs = sellDate ? sellDate.getTime() : Date.now();
+  const years=(endMs-pd)/(1000*60*60*24*365.25), ann=(Math.pow(mult,1/years)-1)*100;
   const up=gain>=0;
-  lastTM={invested,priceThen,priceNow,btc,now,gain,pct,mult,years,pd};
+  lastTM={invested,priceThen,priceNow,btc,now,gain,pct,mult,years,pd,sellDate};
 
   g('tm-current-value').textContent=formatUSD(now);
   g('tm-current-value').className='current-value'+(up?'':' loss');
@@ -806,6 +947,10 @@ function tmDisplay(invested, priceThen, priceNow, pd) {
   g('tm-mult-sub').className='multiplier-sub'+(up?'':' loss');
   g('tm-price-then').textContent=formatUSD(priceThen);
   g('tm-price-now').textContent=formatUSD(priceNow);
+  document.querySelector('#tm-result .result-label').textContent =
+    sellDate ? 'Your investment at sale' : 'Your investment today';
+  g('tm-result').querySelectorAll('.bar-labels span')[1].textContent =
+    sellDate ? 'Value at sale' : "Today's value";
   g('tm-gain').textContent=(up?'+':'')+formatUSD(gain); g('tm-gain').className='stat-val '+(up?'green':'red');
   g('tm-pct').textContent=(up?'+':'')+pct.toFixed(1)+'%'; g('tm-pct').className='stat-val '+(up?'green':'red');
   g('tm-years').textContent=years.toFixed(1)+' yrs';
@@ -814,22 +959,86 @@ function tmDisplay(invested, priceThen, priceNow, pd) {
   const bp=up?Math.min(97,Math.max(3,(1-invested/now)*100)):Math.min(50,(now/invested)*50);
   const bar=g('tm-bar'); bar.style.width='0%'; bar.className='bar-fill'+(up?'':' loss');
   setTimeout(()=>{ bar.style.width=bp+'%'; },60);
-  g('tm-note').textContent=buildTMNote(mult,pct,years,pd,invested,now);
-  track('calculate',{ calculator:'time_machine', multiple: Math.round(mult*10)/10 });
+  // Worst drawdown the holder sat through — the honest counterweight to the gain.
+  const endKey = sellDate ? monthKey(sellDate.toISOString().slice(0,10))
+                          : Object.keys(BTC_MONTHLY)[Object.keys(BTC_MONTHLY).length-1];
+  const dd = maxDrawdown(monthKey(pd.toISOString().slice(0,10)), endKey);
+  g('tm-dd').textContent = dd ? dd.pct.toFixed(0)+'%' : '—';
+  g('tm-dd').title = dd ? `Peak ${monthLabel(dd.peakKey)} → trough ${monthLabel(dd.troughKey)}` : '';
+
+  // Capital gains — tax only ever applies to a gain.
+  const taxRate = Math.min(60, Math.max(0, parseFloat(g('tm-tax').value)||0));
+  if(taxRate>0 && gain>0){
+    const afterTax = now - gain*(taxRate/100);
+    g('tm-after-tax').textContent = formatUSD(afterTax);
+    g('tm-tax-stat').style.display='';
+  } else {
+    g('tm-tax-stat').style.display='none';
+  }
+
+  g('tm-note').textContent=buildTMNote(mult,pct,years,pd,invested,now,dd);
+  tmExtras(invested, btc, priceThen, priceNow, pd, sellDate, now);
+  updatePermalink({ amount: Math.round(invested), date: pd.toISOString().slice(0,10),
+                    sell: sellDate?sellDate.toISOString().slice(0,10):'', tax: g('tm-tax').value });
+  track('calculate',{ calculator:'time_machine', multiple: Math.round(mult*10)/10, sold: !!sellDate });
   showEl('tm-result');
   // Show email capture after a short delay for impact
   setTimeout(()=>{ g('email-capture').classList.add('active'); },800);
 }
 
-function buildTMNote(mult,pct,years,date,invested,now){
+// Inflation-adjusted value and the same money in other assets. Both depend on
+// data/series.json; each block hides itself when its series is missing.
+async function tmExtras(invested, btc, priceThen, priceNow, pd, sellDate, nowValue){
+  await loadSeries();
+  const startKey = monthKey(pd.toISOString().slice(0,10));
+  const endKey = sellDate ? monthKey(sellDate.toISOString().slice(0,10))
+                          : Object.keys(BTC_MONTHLY)[Object.keys(BTC_MONTHLY).length-1];
+
+  // Real value: what the original stake would need to be worth just to break even.
+  const cpiThen = seriesAt('cpi', startKey), cpiNow = seriesAt('cpi', endKey);
+  if(cpiThen && cpiNow){
+    const realGain = nowValue/(cpiNow/cpiThen) - invested;
+    g('tm-real').textContent = formatUSD(nowValue/(cpiNow/cpiThen));
+    g('tm-real').className = 'stat-val '+(realGain>=0?'green':'red');
+    g('tm-real').title = `${formatUSD(invested)} in ${monthLabel(startKey)} is about ${formatUSD(invested*(cpiNow/cpiThen))} in ${monthLabel(endKey)} money`;
+    g('tm-real-stat').style.display='';
+  } else {
+    g('tm-real-stat').style.display='none';
+  }
+
+  // Same dollars into other assets over the same window.
+  const rows = [{name:'Bitcoin', value:nowValue, btc:true}];
+  const add=(label,name)=>{
+    const a=seriesAt(name,startKey), b=seriesAt(name,endKey);
+    if(a&&b) rows.push({name:label, value: invested*(b/a)});
+  };
+  add('S&P 500','sp500');
+  add('Gold','gold');
+  if(SERIES && SERIES.savings_apy != null){
+    const yrs=(( sellDate? sellDate.getTime():Date.now())-pd)/(1000*60*60*24*365.25);
+    rows.push({name:`Savings (${SERIES.savings_apy}% APY)`, value: invested*Math.pow(1+SERIES.savings_apy/100, yrs)});
+  }
+  if(rows.length<2){ g('tm-compare').style.display='none'; return; }
+  g('tm-compare-rows').innerHTML = rows.map(r=>{
+    const p=((r.value-invested)/invested)*100;
+    return `<div class="cmp-row${r.btc?' is-btc':''}">`
+      +`<span class="cmp-name">${r.name}</span>`
+      +`<span class="cmp-val">${formatUSD(r.value)}</span>`
+      +`<span class="cmp-pct ${p>=0?'green':'red'}">${p>=0?'+':'−'}${Math.abs(p).toFixed(0)}%</span></div>`;
+  }).join('');
+  g('tm-compare').style.display='';
+}
+
+function buildTMNote(mult,pct,years,date,invested,now,dd){
   const ds=date.toLocaleDateString('en-US',{month:'long',year:'numeric'});
   const daily=formatUSD(now/(years*365));
-  if(mult>=1000) return `A ${ds} investment that multiplied ${Math.round(mult).toLocaleString()}× — the equivalent of earning ${daily} every single day for ${years.toFixed(1)} years.`;
-  if(mult>=100)  return `${ds} buyers who held through every crash turned $${Math.round(invested).toLocaleString()} into ${formatUSD(now)}. That's ${mult.toFixed(0)}× in ${years.toFixed(1)} years.`;
-  if(mult>=10)   return `Buying in ${ds} and holding through the volatility rewarded patience with a ${pct.toFixed(0)}% return over ${years.toFixed(1)} years.`;
-  if(mult>=2)    return `A solid ${pct.toFixed(0)}% return over ${years.toFixed(1)} years. Bitcoin's long-term holders have consistently come out ahead.`;
-  if(mult>=1)    return `A modest gain from ${ds}. Many who bought around this time saw larger returns by holding through subsequent cycles.`;
-  return `This window shows a loss of ${formatUSD(Math.abs(now-invested))}. Bitcoin's volatility is real — but holders across most multi-year windows have been rewarded.`;
+  const held=dd?` Getting there meant holding through a ${Math.abs(dd.pct).toFixed(0)}% drawdown (${monthLabel(dd.peakKey)} → ${monthLabel(dd.troughKey)}).`:'';
+  if(mult>=1000) return `A ${ds} investment that multiplied ${Math.round(mult).toLocaleString()}× — the equivalent of earning ${daily} every single day for ${years.toFixed(1)} years.`+held;
+  if(mult>=100)  return `${ds} buyers who held through every crash turned $${Math.round(invested).toLocaleString()} into ${formatUSD(now)}. That's ${mult.toFixed(0)}× in ${years.toFixed(1)} years.`+held;
+  if(mult>=10)   return `Buying in ${ds} and holding through the volatility rewarded patience with a ${pct.toFixed(0)}% return over ${years.toFixed(1)} years.`+held;
+  if(mult>=2)    return `A solid ${pct.toFixed(0)}% return over ${years.toFixed(1)} years. Bitcoin's long-term holders have consistently come out ahead.`+held;
+  if(mult>=1)    return `A modest gain from ${ds}. Many who bought around this time saw larger returns by holding through subsequent cycles.`+held;
+  return `This window shows a loss of ${formatUSD(Math.abs(now-invested))}. Bitcoin's volatility is real — but holders across most multi-year windows have been rewarded.`+held;
 }
 
 // ── DCA CALCULATOR ────────────────────────────────────────────────────────────
@@ -837,24 +1046,24 @@ g('dca-btn').addEventListener('click', dcaCalculate);
 
 let lastDCA = {}, dcaChartInstance = null;
 
-async function dcaCalculate() {
+async function dcaCalculate(silent=false) {
   const amount = parseFloat(g('dca-amount').value);
   const startVal = g('dca-start').value;
   const freq = g('dca-freq').value;
   hideEl('dca-result'); hideErr('dca-error');
 
-  if(!amount||amount<=0){showErr('dca-error','Please enter a valid amount.');return;}
-  if(!startVal){showErr('dca-error','Please select a start date.');return;}
+  if(!amount||amount<=0){if(!silent)showErr('dca-error','Please enter a valid amount.');return;}
+  if(!startVal){if(!silent)showErr('dca-error','Please select a start date.');return;}
   const startDate = new Date(startVal+'T12:00:00Z');
-  if(startDate>=new Date()){showErr('dca-error','Start date must be in the past.');return;}
-  if(startDate<new Date('2013-04-28')){showErr('dca-error','Data available from April 2013.');return;}
+  if(startDate>=new Date()){if(!silent)showErr('dca-error','Start date must be in the past.');return;}
+  if(startDate<new Date('2013-04-28')){if(!silent)showErr('dca-error','Data available from April 2013.');return;}
 
   if(cachedPrice){ dcaDisplay(amount, startDate, freq, cachedPrice); return; }
   showEl('dca-loading'); g('dca-loading-msg').textContent='FETCHING LIVE BTC PRICE…';
   try {
     const p = await fetchCurrentPrice();
     hideEl('dca-loading'); dcaDisplay(amount, startDate, freq, p);
-  } catch(e){ hideEl('dca-loading'); showErr('dca-error','Could not fetch live price. Try again.'); }
+  } catch(e){ hideEl('dca-loading'); if(!silent)showErr('dca-error','Could not fetch live price. Try again.'); }
 }
 
 function dcaDisplay(amountPerPeriod, startDate, freq, currentPrice) {
@@ -882,7 +1091,7 @@ function dcaDisplay(amountPerPeriod, startDate, freq, currentPrice) {
   const best = purchases.reduce((b,p)=>p.price<b.price?p:b, purchases[0]);
   const worst = purchases.reduce((w,p)=>p.price>w.price?p:w, purchases[0]);
 
-  lastDCA = {amountPerPeriod, freq, totalInvested, totalBtc, totalValue, totalGain, pct, purchases};
+  lastDCA = {amountPerPeriod, freq, totalInvested, totalBtc, totalValue, totalGain, pct, purchases, startISO: startDate.toISOString().slice(0,10)};
 
   const dcaUp = totalGain >= 0;
   g('dca-total-invested').textContent = formatUSD(totalInvested);
@@ -921,6 +1130,34 @@ function dcaDisplay(amountPerPeriod, startDate, freq, currentPrice) {
     g('dca-fact').innerHTML = `A DCA started in ${startLabel} is currently down <strong>${formatUSD(Math.abs(totalGain))}</strong> — but you'd have accumulated <strong>₿ ${totalBtc.toFixed(4)}</strong> at an average price of <strong>${formatUSD(totalInvested/totalBtc)}</strong>. Every bear-market DCA window in Bitcoin's history has eventually turned green; try a longer window above to see it.`;
   }
 
+  // Same money, all at once on the start date — the question every DCA article asks.
+  const lumpPrice = getHistoricalPrice(startDate.toISOString().slice(0,10));
+  if(lumpPrice){
+    const lumpBtc = totalInvested/lumpPrice, lumpValue = lumpBtc*currentPrice;
+    const rows = [
+      {name:'Dollar-cost averaging', value: totalValue, btc:true},
+      {name:'Lump sum on day one',   value: lumpValue}
+    ];
+    g('dca-compare-rows').innerHTML = rows.map(r=>{
+      const p=((r.value-totalInvested)/totalInvested)*100;
+      return `<div class="cmp-row${r.btc?' is-btc':''}">`
+        +`<span class="cmp-name">${r.name}</span>`
+        +`<span class="cmp-val">${formatUSD(r.value)}</span>`
+        +`<span class="cmp-pct ${p>=0?'green':'red'}">${p>=0?'+':'−'}${Math.abs(p).toFixed(0)}%</span></div>`;
+    }).join('');
+    const diff = totalValue-lumpValue;
+    g('dca-compare-note').textContent = Math.abs(diff) < totalInvested*0.005
+      ? `Both routes land within a rounding error of each other over this window.`
+      : diff>0
+        ? `Spreading the buys beat going all-in on day one by ${formatUSD(diff)} — you kept buying while the price fell.`
+        : `Going all-in on day one would have beaten DCA by ${formatUSD(Math.abs(diff))}, because BTC mostly rose over this window. DCA trades some upside for not having to pick the day.`;
+    g('dca-compare').style.display='';
+  } else {
+    g('dca-compare').style.display='none';
+  }
+
+  updatePermalink({ tab:'dca', amount: amountPerPeriod,
+                    start: startDate.toISOString().slice(0,10), freq });
   track('calculate',{ calculator:'dca', gain_positive: dcaUp });
   showEl('dca-result');
   setTimeout(()=>{ g('dca-email-nudge').classList.add('active'); },900);
@@ -1010,7 +1247,48 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   // Deep link: #dca opens the DCA tab (shareable / linkable from SEO pages)
   if (location.hash === '#dca') switchTab('dca');
+  applyPermalink();
 });
+
+// ── Permalinks ────────────────────────────────────────────────────────────────
+// Shared links carry their inputs, so a result opens as the sender saw it
+// instead of an empty form.
+function applyPermalink(){
+  const q = new URLSearchParams(location.search);
+  if(![...q.keys()].length) return;
+  const set=(id,v)=>{ if(v!=null&&v!=='') g(id).value=v; };
+  const tab=q.get('tab');
+  if(tab==='dca'){
+    switchTab('dca');
+    set('dca-amount', q.get('amount'));
+    set('dca-start',  q.get('start'));
+    const f=q.get('freq');
+    if(f && ['daily','weekly','monthly'].includes(f)) g('dca-freq').value=f;
+    if(q.get('amount')||q.get('start')) dcaCalculate(true);
+  } else {
+    set('tm-amount',    q.get('amount'));
+    set('tm-date',      q.get('date'));
+    set('tm-sell-date', q.get('sell'));
+    set('tm-tax',       q.get('tax'));
+    if(q.get('amount')||q.get('date')) tmCalculate(true);
+  }
+}
+
+// Rewrite the address bar after a calculation so copying the URL shares the result.
+function updatePermalink(params){
+  try{
+    const q=new URLSearchParams();
+    Object.entries(params).forEach(([k,v])=>{ if(v!=null&&v!=='') q.set(k,v); });
+    const url=location.pathname+(q.toString()?'?'+q:'')+location.hash;
+    history.replaceState(null,'',url);
+  }catch(e){}
+}
+
+function permalinkFor(params){
+  const q=new URLSearchParams();
+  Object.entries(params).forEach(([k,v])=>{ if(v!=null&&v!=='') q.set(k,v); });
+  return `https://${CONFIG.siteUrl}/?${q}`;
+}
 
 // ── Email capture — Beehiiv ───────────────────────────────────────────────────
 async function submitToBeehiiv(email) {
@@ -1057,7 +1335,7 @@ g('dca-share-x').addEventListener('click',()=>{
 g('dca-share-copy').addEventListener('click',async()=>{
   const {amountPerPeriod,freq,totalInvested,totalValue,totalGain,pct,purchases} = lastDCA;
   if(!totalInvested) return;
-  const txt = `📈 Bitcoin DCA Calculator Result\n\n${formatUSD(amountPerPeriod)} invested ${freq} for ${Math.round(purchases.length/(freq==='daily'?365:freq==='weekly'?52:12))} years\nTotal invested: ${formatUSD(totalInvested)}\nWorth today: ${formatUSD(totalValue)}\nGain: ${totalGain>=0?'+':'−'}${formatUSD(Math.abs(totalGain))} (${pct>=0?'+':'−'}${Math.abs(pct).toFixed(0)}%)\n\nCalculate yours: ${CONFIG.siteUrl}`;
+  const txt = `📈 Bitcoin DCA Calculator Result\n\n${formatUSD(amountPerPeriod)} invested ${freq} for ${Math.round(purchases.length/(freq==='daily'?365:freq==='weekly'?52:12))} years\nTotal invested: ${formatUSD(totalInvested)}\nWorth today: ${formatUSD(totalValue)}\nGain: ${totalGain>=0?'+':'−'}${formatUSD(Math.abs(totalGain))} (${pct>=0?'+':'−'}${Math.abs(pct).toFixed(0)}%)\n\nSee it: ${permalinkFor({tab:'dca',amount:amountPerPeriod,start:lastDCA.startISO,freq})}`;
   try{
     await navigator.clipboard.writeText(txt);
     const btn=g('dca-share-copy'); btn.classList.add('copied');
@@ -1077,7 +1355,7 @@ g('share-x').addEventListener('click',()=>{
 });
 g('share-copy').addEventListener('click',async()=>{
   const{invested,now,mult,pct,pd}=lastTM; if(!invested) return;
-  const txt=`💰 Bitcoin Time Machine\n\n$${Math.round(invested).toLocaleString()} invested on ${pd.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})}\nWould be worth ${formatUSD(now)} today\nThat's ${fmtMult(mult)} (${pct>=0?'+':'−'}${Math.abs(pct).toFixed(0)}%)\n\nCalculate yours: ${CONFIG.siteUrl}`;
+  const txt=`💰 Bitcoin Time Machine\n\n$${Math.round(invested).toLocaleString()} invested on ${pd.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})}\nWould be worth ${formatUSD(now)} today\nThat's ${fmtMult(mult)} (${pct>=0?'+':'−'}${Math.abs(pct).toFixed(0)}%)\n\nSee it: ${permalinkFor({amount:Math.round(invested),date:pd.toISOString().slice(0,10),sell:lastTM.sellDate?lastTM.sellDate.toISOString().slice(0,10):''})}`;
   try{
     await navigator.clipboard.writeText(txt);
     const btn=g('share-copy'); btn.classList.add('copied'); g('copy-label').textContent='✓ Copied!';
