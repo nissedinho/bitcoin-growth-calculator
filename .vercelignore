@@ -1,0 +1,6 @@
+# Keep test tooling out of the deployment. tests/package.json must never be
+# mistaken for a project manifest — a root-level package.json turns this static
+# site into a Node build and breaks the deploy.
+tests/
+scripts/
+.github/

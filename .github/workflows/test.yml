@@ -1,0 +1,39 @@
+name: Tests
+
+# push is scoped to the default branch: on a PR branch, push and pull_request
+# would both fire and every run would be duplicated.
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install test dependencies
+        working-directory: tests
+        run: npm install --no-fund --no-audit
+
+      - name: Calculator tests
+        working-directory: tests
+        run: npm test
+
+      - name: Data script tests
+        run: python3 tests/test_scripts.py
+
+      - name: Data integrity
+        run: python3 scripts/verify_data.py
+
+      - name: Syntax check serverless functions
+        run: for f in api/*.js; do node --check "$f"; done
