@@ -22,16 +22,22 @@ from _sources import DATA_DIR, REPO_ROOT, fetch, load_json, write_json
 
 # Free, key-free, and returns the whole history in one call.
 COINGECKO = ("https://api.coingecko.com/api/v3/coins/bitcoin/market_chart"
-             "?vs_currency=usd&days=max&interval=daily")
+             "?vs_currency=usd&days=max")
 START = "2013-04"
 
 
 def fetch_daily():
     """{'YYYY-MM-DD': price} from CoinGecko's full daily history."""
-    payload = json.loads(fetch(COINGECKO))
+    raw = fetch(COINGECKO)
+    try:
+        payload = json.loads(raw)
+    except ValueError:
+        raise RuntimeError(
+            f"CoinGecko did not return JSON — got: {' '.join(raw.split())[:160]}") from None
     prices = payload.get("prices") or []
     if len(prices) < 365:
-        raise RuntimeError(f"CoinGecko returned only {len(prices)} points")
+        snippet = " ".join(raw.split())[:160]
+        raise RuntimeError(f"CoinGecko returned only {len(prices)} points — got: {snippet}")
     out = {}
     for ms, price in prices:
         day = datetime.datetime.fromtimestamp(ms / 1000, datetime.timezone.utc).strftime("%Y-%m-%d")

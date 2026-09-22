@@ -5,6 +5,7 @@ These matter more than usual: the refresh workflow rewrites index.html
 unattended, so a regression here ships bad prices to the site.
 """
 import importlib.util
+import json
 import os
 import re
 import subprocess
@@ -90,6 +91,57 @@ def test_empty_responses_raise():
                 raise AssertionError(f"{fn.__name__} accepted {bad!r}")
             except RuntimeError:
                 pass
+
+
+def test_yahoo_parses_chart_json():
+    src.fetch = lambda url, retries=3: json.dumps({"chart": {"result": [{
+        "timestamp": [1367366400, 1370044800],
+        "indicators": {"quote": [{"close": [1597.57, None]}]},
+    }]}})
+    assert src.yahoo_monthly("^GSPC") == {"2013-05": 1597.57}, "null closes must be skipped"
+
+
+def test_yahoo_rejects_garbage():
+    for bad in ["", "not json", '{"chart":{"result":[]}}', '{"chart":{"result":[{}]}}']:
+        src.fetch = lambda url, retries=3, b=bad: b
+        try:
+            src.yahoo_monthly("^GSPC")
+            raise AssertionError(f"accepted {bad!r}")
+        except RuntimeError:
+            pass
+
+
+def test_failures_quote_the_response():
+    """The first live run failed with 'no usable rows', which said nothing about
+    why. A parse failure must include what the provider actually sent."""
+    src.fetch = lambda url, retries=3: "Exceeded the daily hits limit"
+    for fn, arg in ((src.stooq_monthly, "^spx"), (src.yahoo_monthly, "^GSPC")):
+        try:
+            fn(arg)
+            raise AssertionError(f"{fn.__name__} accepted a limit notice")
+        except RuntimeError as e:
+            assert "Exceeded the daily hits limit" in str(e), f"{fn.__name__}: {e}"
+
+
+def test_stooq_url_encodes_the_symbol():
+    """A bare ^ in a query string is not safe; it must be percent-encoded."""
+    seen = {}
+
+    def spy(url, retries=3):
+        seen["url"] = url
+        return "Date,Close\n2013-04-30,1597.57\n"
+
+    src.fetch = spy
+    src.stooq_monthly("^spx")
+    assert "%5Espx" in seen["url"], seen["url"]
+    assert "^" not in seen["url"], seen["url"]
+
+
+def test_coingecko_url_has_no_paid_interval_param():
+    """`interval` is a paid-plan parameter; sending it made the public endpoint
+    reject the request on the first live run."""
+    assert "interval=" not in upd.COINGECKO, upd.COINGECKO
+    assert "days=max" in upd.COINGECKO
 
 
 # ── the guard must actually fail on bad data ──────────────────────────────────
