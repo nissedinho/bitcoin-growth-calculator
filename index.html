@@ -8,7 +8,13 @@
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
 
-  gtag('config', 'G-T29BL3EPHL');
+  // Shared scenarios stay in the calculator URL, not our explicit analytics fields.
+  function analyticsPageUrl(value) {
+    try { const u=new URL(value); return u.origin+u.pathname; } catch(_) { return ''; }
+  }
+  gtag('set', 'page_location', analyticsPageUrl(location.href));
+  gtag('set', 'page_referrer', analyticsPageUrl(document.referrer));
+  gtag('config', 'G-T29BL3EPHL', {page_location:analyticsPageUrl(location.href),page_referrer:analyticsPageUrl(document.referrer)});
 </script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -243,6 +249,11 @@
     .ec-input::placeholder { color: var(--text-muted); }
     .ec-btn { padding: 12px 22px; background: var(--orange); border: none; border-radius: 2px; font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 0.06em; color: var(--black); cursor: pointer; white-space: nowrap; transition: opacity 0.15s; -webkit-tap-highlight-color: transparent; }
     .ec-btn:hover { opacity: 0.9; }
+    .email-label { display: block; margin-bottom: 6px; }
+    .ec-privacy a, .guide a { color: var(--orange); }
+    .guide { margin-top: 28px; padding: 24px; border: 1px solid var(--border-subtle); background: var(--surface); font-size: 14px; line-height: 1.7; }
+    .guide h2 { font-size: 18px; margin-bottom: 10px; }
+    .guide p + p { margin-top: 10px; }
     .ec-privacy { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--text-muted); margin-top: 10px; }
 
     /* Email success */
@@ -336,7 +347,7 @@
   <header>
     <div class="btc-badge"><div class="btc-badge-dot"></div><span>Bitcoin Time Machine</span></div>
     <h1>WHAT IF YOU'D<br>BOUGHT <em>BITCOIN</em>?</h1>
-    <p class="subtitle">Every time you didn't — the money you spent on something else. See what it'd be worth now.</p>
+    <p class="subtitle">A free Bitcoin investment calculator for historical returns and recurring purchases. Try your own dates, compare DCA, and save a link to revisit.</p>
     <div class="live-price-bar">
       <div class="live-price-pill">
         <div class="live-dot fetching" id="live-dot"></div>
@@ -453,33 +464,21 @@
           </div>
         </div>
 
-        <!-- Affiliate CTA -->
-        <div class="affiliate-cta">
-          <div class="affiliate-text">
-            <strong>Buy Bitcoin on Coinbase</strong>
-            Get $10 in free Bitcoin when you sign up and trade on Coinbase.
-          </div>
-          <a class="affiliate-btn" id="affiliate-btn" href="#" target="_blank" rel="noopener sponsored">Start on Coinbase →</a>
-        </div>
+        <!-- Commercial promotions stay disabled until an approved partner link and terms are verified. -->
 
         <!-- Email capture — shown after result -->
         <div class="email-capture" id="email-capture">
-          <div class="ec-eyebrow">₿ Free Weekly Email</div>
-          <div class="ec-headline">THE NUMBERS, EVERY MONDAY.</div>
-          <div class="ec-sub">Current BTC price. What $100 last week would be worth. One historical fact. No hype, no predictions — just <strong>the actual numbers</strong>, every Monday morning.</div>
-          <div class="ec-row">
-            <input class="ec-input" type="email" id="ec-email" placeholder="your@email.com" />
-            <button class="ec-btn" id="ec-submit" onclick="submitEmail()">SEND ME IT</button>
-          </div>
+          <div class="ec-eyebrow">₿ Bitcoin by the Numbers</div>
+          <div class="ec-headline">BITCOIN DATA, WITHOUT THE HYPE.</div>
+          <div class="ec-sub">Subscribe for calculator updates and educational Bitcoin data notes. General updates, not personalized DCA plans or price predictions.</div>
+          <label class="ec-privacy email-label" for="ec-email">Email address</label>
+          <form class="ec-row" id="ec-form" action="/api/subscribe" method="post" novalidate>
+            <input class="ec-input" type="email" id="ec-email" name="email" autocomplete="email" inputmode="email" required maxlength="254" aria-describedby="ec-consent ec-status" placeholder="your@email.com" />
+            <button class="ec-btn" id="ec-submit" type="submit">SUBSCRIBE</button>
+          </form>
           <div class="ec-privacy" id="ec-status" role="status" aria-live="polite"></div>
-          <div class="ec-privacy">No spam. Unsubscribe anytime. We hate junk mail too.</div>
-        </div>
-        <div class="email-success" id="email-success">
-          <div class="email-success-icon">🎉</div>
-          <div class="email-success-text">
-            <strong>You're in! Check your inbox.</strong>
-            <span>Check your inbox for any confirmation steps. You can also try the DCA calculator →</span>
-          </div>
+          <div class="ec-privacy" id="ec-consent">By subscribing, you ask to receive Bitcoin by the Numbers emails via Beehiiv. Unsubscribe anytime. <a href="#data-use">Data &amp; email details</a></div>
+          <div class="ec-privacy"><a class="newsletter-direct" data-placement="time_machine" href="https://subscribe-forms.beehiiv.com/5cef7315-a3f9-400a-9597-6806aac54862" target="_blank" rel="noopener noreferrer">Use the Beehiiv signup page instead ↗</a> (opens a new tab). If a request is unconfirmed, check your inbox before submitting again.</div>
         </div>
       </div>
     </div>
@@ -558,14 +557,7 @@
 
         <div class="dca-fact" id="dca-fact"></div>
 
-        <!-- Affiliate CTA — DCA context -->
-        <div class="affiliate-cta">
-          <div class="affiliate-text">
-            <strong>Start your own DCA on Coinbase</strong>
-            Set up automatic recurring buys — daily, weekly, or monthly. Takes 2 minutes.
-          </div>
-          <a class="affiliate-btn" id="dca-affiliate-btn" href="#" target="_blank" rel="noopener sponsored">Set Up Recurring Buys →</a>
-        </div>
+        <!-- Commercial promotions stay disabled until an approved partner link and terms are verified. -->
 
         <!-- Share DCA -->
         <div class="share-section">
@@ -584,19 +576,31 @@
 
         <!-- DCA email nudge — different angle than TM -->
         <div class="dca-email-nudge" id="dca-email-nudge">
-          <div class="den-headline">WANT THIS UPDATE EVERY MONDAY?</div>
-          <div class="den-sub">We send one short email: current BTC price, what your DCA would look like this week, and one thing worth knowing. That's it. Free, no spam.</div>
-          <div class="den-row">
-            <input class="ec-input" type="email" id="dca-ec-email" placeholder="your@email.com" />
-            <button class="ec-btn" id="dca-ec-submit" onclick="submitDcaEmail()">GET MY PLAN</button>
-          </div>
+          <div class="den-headline">KEEP EXPLORING THE NUMBERS.</div>
+          <div class="den-sub">Subscribe to Bitcoin by the Numbers for calculator updates and educational Bitcoin data notes. Your scenario is not sent with your signup.</div>
+          <label class="ec-privacy email-label" for="dca-ec-email">Email address</label>
+          <form class="den-row" id="dca-ec-form" action="/api/subscribe" method="post" novalidate>
+            <input class="ec-input" type="email" id="dca-ec-email" name="email" autocomplete="email" inputmode="email" required maxlength="254" aria-describedby="dca-ec-consent dca-ec-status" placeholder="your@email.com" />
+            <button class="ec-btn" id="dca-ec-submit" type="submit">SUBSCRIBE</button>
+          </form>
           <div class="ec-privacy" id="dca-ec-status" role="status" aria-live="polite"></div>
-          <div class="ec-privacy" style="margin-top:10px">No spam. Free forever. Just useful Bitcoin data.</div>
+          <div class="ec-privacy" id="dca-ec-consent">By subscribing, you ask to receive Bitcoin by the Numbers emails via Beehiiv. Unsubscribe anytime. <a href="#data-use">Data &amp; email details</a></div>
+          <div class="ec-privacy"><a class="newsletter-direct" data-placement="dca" href="https://subscribe-forms.beehiiv.com/5cef7315-a3f9-400a-9597-6806aac54862" target="_blank" rel="noopener noreferrer">Use the Beehiiv signup page instead ↗</a> (opens a new tab). If a request is unconfirmed, check your inbox before submitting again.</div>
         </div>
       </div>
     </div>
 
   </div><!-- /card -->
+
+  <noscript><p class="guide">The calculators need JavaScript to run. You can still <a href="https://subscribe-forms.beehiiv.com/5cef7315-a3f9-400a-9597-6806aac54862" target="_blank" rel="noopener noreferrer">open the Bitcoin by the Numbers signup form on Beehiiv</a>.</p></noscript>
+
+  <section class="guide" id="how-it-works" aria-labelledby="guide-title">
+    <h2 id="guide-title">How this Bitcoin investment calculator works</h2>
+    <p>For “if I bought Bitcoin” questions, enter a USD amount and a purchase date. The Time Machine divides that amount by the historical BTC price, then values those coins at the current quote or your chosen sell date. Use the DCA tab to compare repeated daily, weekly, or calendar-month purchases.</p>
+    <p>Historical prices use daily observations where available and labelled monthly estimates elsewhere. Fees and slippage are excluded. This is a look back at hypothetical outcomes, not a forecast or a recommendation to buy. <a href="/faq">Read the calculation FAQ</a> and <a href="#data-coverage">check data coverage</a>.</p>
+    <p>Want to return to a scenario? Use <strong>Copy result</strong> after calculating, or bookmark the calculator URL. Opening that link later updates a still-holding scenario to the latest available quote; a selected sell date stays historical.</p>
+  </section>
+
 
   <footer>
     <p style="margin-bottom:10px;">
@@ -620,6 +624,13 @@
     <p id="live-price-asof" aria-live="polite">Current quote loading from CoinGecko…</p>
     <p>Not financial advice · Past performance does not guarantee future results</p>
     <p style="margin-top:8px;"><a href="/faq" style="color:var(--orange);text-decoration:none;font-family:'DM Mono',monospace;font-size:12px;letter-spacing:0.08em;">FAQ — Common Bitcoin Questions →</a></p>
+    <section id="data-use" aria-labelledby="data-use-title" style="margin-top:20px;">
+      <h2 id="data-use-title" style="font-size:12px;color:var(--text);">Data &amp; email</h2>
+      <p>Calculations run in your browser. Scenario inputs are included in the URL so you can revisit or share them; anyone you share the link with can see those inputs. Avoid putting personal information in URLs.</p>
+      <p>Newsletter signup sends your email address to this site's server and Beehiiv. The alternative signup link opens Beehiiv directly. Calculator amounts and dates are not included in the signup request. Acceptance is not proof of email delivery; check your inbox for any confirmation steps.</p>
+      <p>This site uses Google Analytics for usage measurement, including browser and device information, page visits and interactions. Google may use cookies; its automatic measurement may include page URLs. Explicit calculator events use categories, not email addresses or scenario values. Fonts load from Google and price quotes come from CoinGecko through this site.</p>
+      <p><a href="https://www.beehiiv.com/privacy" rel="noopener noreferrer" target="_blank" style="color:var(--orange)">Beehiiv privacy information</a> · <a href="https://policies.google.com/privacy" rel="noopener noreferrer" target="_blank" style="color:var(--orange)">Google privacy information</a></p>
+    </section>
   </footer>
 </div>
 
@@ -635,9 +646,7 @@ const CONFIG = {
   //    beehiiv.com → Your publication → Settings → Forms → Embed
   beehiivFormUrl: 'https://subscribe-forms.beehiiv.com/5cef7315-a3f9-400a-9597-6806aac54862',
 
-  // 3. Coinbase affiliate link — sign up at:
-  //    coinbase.com
-  affiliateUrl: 'YOUR_COINBASE_AFFILIATE_LINK_HERE',
+  // Commercial promotions are disabled; no approved affiliate is configured.
 };
 // ════════════════════════════════════════════════════════════
 
@@ -970,7 +979,7 @@ async function tmCalculate(silent=false) {
   }
 
   loadSeries();
-  if(sellPrice){ tmDisplay(amount,histPrice,sellPrice,pd,sellDate); return; }
+  if(sellPrice){ tmDisplay(amount,histPrice,sellPrice,pd,sellDate); if(!silent) track('calculate',{calculator:'time_machine'}); return; }
 
   showEl('tm-loading'); g('loading-msg').textContent='FETCHING LIVE BTC PRICE…';
   try {
@@ -979,6 +988,7 @@ async function tmCalculate(silent=false) {
     hideEl('tm-loading');
     if(!p){ if(!silent)showErr('tm-error','Could not fetch the current price. Try again or choose a historical sell date.'); return; }
     tmDisplay(amount,histPrice,p,pd,null);
+    if(!silent) track('calculate',{calculator:'time_machine'});
   } catch(e){ hideEl('tm-loading'); showErr('tm-error','Could not fetch live price. Try again.'); }
 }
 
@@ -1033,7 +1043,6 @@ function tmDisplay(invested, priceThen, priceNow, pd, sellDate) {
   tmExtras(invested, btc, priceThen, priceNow, pd, sellDate, now);
   updatePermalink({ amount: Math.round(invested), date: pd.toISOString().slice(0,10),
                     sell: sellDate?sellDate.toISOString().slice(0,10):'', tax: g('tm-tax').value });
-  track('calculate',{ calculator:'time_machine', multiple: Math.round(mult*10)/10, sold: !!sellDate });
   showEl('tm-result');
   // Show email capture after a short delay for impact
   setTimeout(()=>{ g('email-capture').classList.add('active'); },800);
@@ -1120,6 +1129,7 @@ async function dcaCalculate(silent=false) {
     hideEl('dca-loading');
     if(!p){if(!silent)showErr('dca-error','Could not fetch the current price. Try again.');return;}
     dcaDisplay(amount, startDate, freq, p);
+    if(!silent && g('dca-result').classList.contains('active')) track('calculate',{calculator:'dca'});
   } catch(e){ hideEl('dca-loading'); if(!silent)showErr('dca-error','Could not fetch live price. Try again.'); }
 }
 
@@ -1234,7 +1244,6 @@ function dcaDisplay(amountPerPeriod, startDate, freq, currentPrice) {
 
   updatePermalink({ tab:'dca', amount: amountPerPeriod,
                     start: startDate.toISOString().slice(0,10), freq });
-  track('calculate',{ calculator:'dca', gain_positive: dcaUp });
   showEl('dca-result');
   setTimeout(()=>{ g('dca-email-nudge').classList.add('active'); },900);
 }
@@ -1316,18 +1325,15 @@ function drawChart(labels, invested, value) {
 
 // ── Wire CONFIG into page ─────────────────────────────────────────────────────
 function track(name, params) {
-  try { if (typeof gtag === 'function') gtag('event', name, params || {}); } catch(e) {}
+  try { if (typeof gtag === 'function') gtag('event', name, {...(params || {}),page_location:analyticsPageUrl(location.href),page_referrer:analyticsPageUrl(document.referrer)}); } catch(e) {}
 }
 document.addEventListener('DOMContentLoaded', () => {
-  // Affiliate links (TM + DCA)
-  const affiliateHref = CONFIG.affiliateUrl !== 'YOUR_COINBASE_AFFILIATE_LINK_HERE'
-    ? CONFIG.affiliateUrl : 'https://coinbase.com';
-  [['affiliate-btn','time_machine'],['dca-affiliate-btn','dca']].forEach(([id,loc])=>{
-    const btn = g(id);
-    if(!btn) return;
-    btn.href = affiliateHref;
-    btn.addEventListener('click', ()=>track('affiliate_click',{ placement: loc }));
+  // Direct provider navigation is an attempt, not a confirmed subscription.
+  document.querySelectorAll('.newsletter-direct').forEach(link => {
+    link.addEventListener('click', () => track('newsletter_open',{placement:link.dataset.placement}));
   });
+  g('ec-form').addEventListener('submit', e => {e.preventDefault();submitEmail();});
+  g('dca-ec-form').addEventListener('submit', e => {e.preventDefault();submitDcaEmail();});
   // Deep link: #dca opens the DCA tab (shareable / linkable from SEO pages)
   if (location.hash === '#dca') switchTab('dca');
   applyPermalink();
@@ -1388,21 +1394,25 @@ async function submitSignup(placement) {
   if(!input.checkValidity() || !email){status.textContent='Please enter a valid email address.';input.focus();return;}
   const label=btn.textContent;
   btn.disabled=true; btn.textContent='SENDING…'; status.textContent='';
+  track('newsletter_submit',{placement});
   try {
     const response=await fetch('/api/subscribe',{
-      method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email})
+      method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email}),referrerPolicy:'no-referrer'
     });
     const data=await response.json();
     if(response.ok && data.status==='unknown'){
       status.textContent='We could not confirm whether your request was accepted. Check your inbox before trying again.';
+      track('newsletter_result',{placement,status:'unknown'});
       return;
     }
     if(!response.ok || data.success!==true) throw new Error('Unconfirmed subscription');
     input.value='';
     status.textContent='Subscription accepted. Check your inbox for any confirmation steps.';
     track('email_signup',{placement});
+    track('newsletter_result',{placement,status:'accepted'});
   } catch(_) {
     status.textContent='We could not confirm your subscription. If the request was sent, check your inbox before trying again.';
+    track('newsletter_result',{placement,status:'unconfirmed'});
   } finally {
     btn.disabled=false;btn.textContent=label;
   }
@@ -1424,6 +1434,7 @@ g('dca-share-copy').addEventListener('click',async()=>{
   const txt = `📈 Bitcoin DCA Calculator Result\n\n${formatUSD(amountPerPeriod)} invested ${freq} for ${Math.round(purchases.length/(freq==='daily'?365:freq==='weekly'?52:12))} years\nTotal invested: ${formatUSD(totalInvested)}\nWorth today: ${formatUSD(totalValue)}\nGain: ${totalGain>=0?'+':'−'}${formatUSD(Math.abs(totalGain))} (${pct>=0?'+':'−'}${Math.abs(pct).toFixed(0)}%)\n\nSee it: ${permalinkFor({tab:'dca',amount:amountPerPeriod,date:lastDCA.startISO,freq,value:Math.round(totalValue),inv:Math.round(totalInvested)})}`;
   try{
     await navigator.clipboard.writeText(txt);
+    track('share_copy',{calculator:'dca'});
     const btn=g('dca-share-copy'); btn.classList.add('copied');
     g('dca-copy-label').textContent='✓ Copied!';
     setTimeout(()=>{ btn.classList.remove('copied'); g('dca-copy-label').textContent='Copy result'; },2500);
@@ -1446,6 +1457,7 @@ g('share-copy').addEventListener('click',async()=>{
   const txt=`💰 Bitcoin Time Machine\n\n$${Math.round(invested).toLocaleString()} invested on ${pd.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})}\nEstimated value ${formatUSD(now)} ${lastTM.sellDate?"on "+lastTM.sellDate.toISOString().slice(0,10):"at the latest quote"}\nThat's ${fmtMult(mult)} (${pct>=0?'+':'−'}${Math.abs(pct).toFixed(0)}%)\n\nSee it: ${permalinkFor({amount:Math.round(invested),date:pd.toISOString().slice(0,10),sell:lastTM.sellDate?lastTM.sellDate.toISOString().slice(0,10):'',tax:g('tm-tax').value,value:Math.round(now)})}`;
   try{
     await navigator.clipboard.writeText(txt);
+    track('share_copy',{calculator:'time_machine'});
     const btn=g('share-copy'); btn.classList.add('copied'); g('copy-label').textContent='✓ Copied!';
     setTimeout(()=>{ btn.classList.remove('copied'); g('copy-label').textContent='Copy result'; },2500);
   }catch(e){}

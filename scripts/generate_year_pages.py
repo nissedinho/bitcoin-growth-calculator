@@ -17,7 +17,6 @@ MONTHLY = {key: int(value) for key, value in re.findall(
 DATE_MATCH = re.search(r"const BTC_MONTHLY_DATES = (\{[^;]*\});", INDEX)
 MONTHLY_DATES = json.loads(DATE_MATCH.group(1)) if DATE_MATCH else {}
 JAN_PRICE = {year: MONTHLY[f"{year}-{'04' if year == 2013 else '01'}"] for year in range(2013, 2026)}
-AFFILIATE_URL = "https://coinbase.com"  # replace with your Coinbase referral link and re-run
 
 NARRATIVE = {
     2013: "Bitcoin entered 2013 trading in the low hundreds and had its first true mania: it crossed $1,000 for the first time in November before crashing hard. Almost nobody you know bought it. This is the year of maximum regret.",
@@ -92,7 +91,10 @@ def page(year: int) -> str:
   window.dataLayer = window.dataLayer || [];
   function gtag(){{dataLayer.push(arguments);}}
   gtag('js', new Date());
-  gtag('config', 'G-T29BL3EPHL');
+  function analyticsPageUrl(value) {{ try {{ const u=new URL(value); return u.origin+u.pathname; }} catch(_) {{ return ''; }} }}
+  gtag('set','page_location',analyticsPageUrl(location.href));
+  gtag('set','page_referrer',analyticsPageUrl(document.referrer));
+  gtag('config','G-T29BL3EPHL',{{page_location:analyticsPageUrl(location.href),page_referrer:analyticsPageUrl(document.referrer)}});
 </script>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -160,16 +162,13 @@ footer {{ margin-top:40px; font-family:'DM Mono',monospace; font-size:11px; colo
 <p class="note" id="quote-status" role="status">Loading the current CoinGecko quote…</p>
 <h2>What happened in {year}</h2>
 <p>{NARRATIVE[year]}</p>
-<a class="cta" href="/?amount=1000&amp;date={reference_date}&amp;utm_source=whatif&amp;utm_medium=internal&amp;utm_campaign={year}">TRY YOUR OWN DATE & AMOUNT →</a>
-<a class="cta secondary" href="/?tab=dca&amp;amount=100&amp;start={reference_date}&amp;freq=monthly#dca">SEE WHAT A MONTHLY DCA WOULD HAVE DONE →</a>
-<div class="affiliate">
-  <strong>Want in before the next one?</strong>
-  Nobody can promise one — but if you want to own Bitcoin, <a href="{AFFILIATE_URL}" rel="noopener sponsored" target="_blank" onclick="try{{gtag('event','affiliate_click',{{placement:'whatif_{year}'}})}}catch(e){{}}">Coinbase</a> is the easiest place for most people to start, with automatic recurring buys.
-</div>
+<a class="cta" href="/?amount=1000&amp;date={reference_date}" onclick="gtag('event','calculator_open',{{calculator:'time_machine',placement:'year_page'}})">TRY YOUR OWN DATE & AMOUNT →</a>
+<a class="cta secondary" href="/?tab=dca&amp;amount=100&amp;start={reference_date}&amp;freq=monthly#dca" onclick="gtag('event','calculator_open',{{calculator:'dca',placement:'year_page'}})">SEE WHAT A MONTHLY DCA WOULD HAVE DONE →</a>
+<!-- Commercial promotions disabled until an approved partner and terms are verified. -->
 <div class="years"><strong style="color:var(--text)">Other years:</strong><br>{other_years}</div>
 <footer>
   <p>Not financial advice · Past performance does not guarantee future results</p>
-  <p><a href="/" style="color:var(--orange);text-decoration:none;">bitcoingrowthcalculator.com</a> · <a href="/faq" style="color:var(--orange);text-decoration:none;">FAQ</a></p>
+  <p><a href="/" style="color:var(--orange);text-decoration:none;">bitcoingrowthcalculator.com</a> · <a href="/faq" style="color:var(--orange);text-decoration:none;">FAQ</a> · <a href="/#data-use" style="color:var(--orange);text-decoration:none;">Data &amp; email</a></p>
 </footer>
 </div>
 <script>
