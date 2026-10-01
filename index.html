@@ -249,6 +249,8 @@
     .ec-input::placeholder { color: var(--text-muted); }
     .ec-btn { padding: 12px 22px; background: var(--orange); border: none; border-radius: 2px; font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 0.06em; color: var(--black); cursor: pointer; white-space: nowrap; transition: opacity 0.15s; -webkit-tap-highlight-color: transparent; }
     .ec-btn:hover { opacity: 0.9; }
+    [hidden] { display: none !important; }
+    .newsletter-primary { display: inline-block; max-width: 100%; white-space: normal; text-align: center; margin-top: 16px; text-decoration: none; }
     .email-label { display: block; margin-bottom: 6px; }
     .ec-privacy a, .guide a { color: var(--orange); }
     .guide { margin-top: 28px; padding: 24px; border: 1px solid var(--border-subtle); background: var(--surface); font-size: 14px; line-height: 1.7; }
@@ -471,14 +473,18 @@
           <div class="ec-eyebrow">₿ Bitcoin by the Numbers</div>
           <div class="ec-headline">BITCOIN DATA, WITHOUT THE HYPE.</div>
           <div class="ec-sub">Subscribe for calculator updates and educational Bitcoin data notes. General updates, not personalized DCA plans or price predictions.</div>
+          <!-- The custom signup bridge is not exposed while its provider contract is unverified. -->
+          <div class="inline-signup" hidden>
           <label class="ec-privacy email-label" for="ec-email">Email address</label>
           <form class="ec-row" id="ec-form" action="/api/subscribe" method="post" novalidate>
             <input class="ec-input" type="email" id="ec-email" name="email" autocomplete="email" inputmode="email" required maxlength="254" aria-describedby="ec-consent ec-status" placeholder="your@email.com" />
             <button class="ec-btn" id="ec-submit" type="submit">SUBSCRIBE</button>
           </form>
           <div class="ec-privacy" id="ec-status" role="status" aria-live="polite"></div>
+          </div>
           <div class="ec-privacy" id="ec-consent">By subscribing, you ask to receive Bitcoin by the Numbers emails via Beehiiv. Unsubscribe anytime. <a href="#data-use">Data &amp; email details</a></div>
-          <div class="ec-privacy"><a class="newsletter-direct" data-placement="time_machine" href="https://subscribe-forms.beehiiv.com/5cef7315-a3f9-400a-9597-6806aac54862" target="_blank" rel="noopener noreferrer">Use the Beehiiv signup page instead ↗</a> (opens a new tab). If a request is unconfirmed, check your inbox before submitting again.</div>
+          <a class="ec-btn newsletter-primary newsletter-direct" data-placement="time_machine" href="https://subscribe-forms.beehiiv.com/5cef7315-a3f9-400a-9597-6806aac54862" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer">OPEN NEWSLETTER SIGNUP ↗</a>
+          <div class="ec-privacy">Opens the Bitcoin by the Numbers form on Beehiiv in a new tab. Complete signup there and check your inbox for any confirmation steps. Opening the page does not subscribe you.</div>
         </div>
       </div>
     </div>
@@ -578,21 +584,25 @@
         <div class="dca-email-nudge" id="dca-email-nudge">
           <div class="den-headline">KEEP EXPLORING THE NUMBERS.</div>
           <div class="den-sub">Subscribe to Bitcoin by the Numbers for calculator updates and educational Bitcoin data notes. Your scenario is not sent with your signup.</div>
+          <!-- The custom signup bridge is not exposed while its provider contract is unverified. -->
+          <div class="inline-signup" hidden>
           <label class="ec-privacy email-label" for="dca-ec-email">Email address</label>
           <form class="den-row" id="dca-ec-form" action="/api/subscribe" method="post" novalidate>
             <input class="ec-input" type="email" id="dca-ec-email" name="email" autocomplete="email" inputmode="email" required maxlength="254" aria-describedby="dca-ec-consent dca-ec-status" placeholder="your@email.com" />
             <button class="ec-btn" id="dca-ec-submit" type="submit">SUBSCRIBE</button>
           </form>
           <div class="ec-privacy" id="dca-ec-status" role="status" aria-live="polite"></div>
+          </div>
           <div class="ec-privacy" id="dca-ec-consent">By subscribing, you ask to receive Bitcoin by the Numbers emails via Beehiiv. Unsubscribe anytime. <a href="#data-use">Data &amp; email details</a></div>
-          <div class="ec-privacy"><a class="newsletter-direct" data-placement="dca" href="https://subscribe-forms.beehiiv.com/5cef7315-a3f9-400a-9597-6806aac54862" target="_blank" rel="noopener noreferrer">Use the Beehiiv signup page instead ↗</a> (opens a new tab). If a request is unconfirmed, check your inbox before submitting again.</div>
+          <a class="ec-btn newsletter-primary newsletter-direct" data-placement="dca" href="https://subscribe-forms.beehiiv.com/5cef7315-a3f9-400a-9597-6806aac54862" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer">OPEN NEWSLETTER SIGNUP ↗</a>
+          <div class="ec-privacy">Opens the Bitcoin by the Numbers form on Beehiiv in a new tab. Complete signup there and check your inbox for any confirmation steps. Opening the page does not subscribe you.</div>
         </div>
       </div>
     </div>
 
   </div><!-- /card -->
 
-  <noscript><p class="guide">The calculators need JavaScript to run. You can still <a href="https://subscribe-forms.beehiiv.com/5cef7315-a3f9-400a-9597-6806aac54862" target="_blank" rel="noopener noreferrer">open the Bitcoin by the Numbers signup form on Beehiiv</a>.</p></noscript>
+  <noscript><p class="guide">The calculators need JavaScript to run. You can still <a href="https://subscribe-forms.beehiiv.com/5cef7315-a3f9-400a-9597-6806aac54862" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer">open the Bitcoin by the Numbers signup form on Beehiiv</a>.</p></noscript>
 
   <section class="guide" id="how-it-works" aria-labelledby="guide-title">
     <h2 id="guide-title">How this Bitcoin investment calculator works</h2>
@@ -627,7 +637,7 @@
     <section id="data-use" aria-labelledby="data-use-title" style="margin-top:20px;">
       <h2 id="data-use-title" style="font-size:12px;color:var(--text);">Data &amp; email</h2>
       <p>Calculations run in your browser. Scenario inputs are included in the URL so you can revisit or share them; anyone you share the link with can see those inputs. Avoid putting personal information in URLs.</p>
-      <p>Newsletter signup sends your email address to this site's server and Beehiiv. The alternative signup link opens Beehiiv directly. Calculator amounts and dates are not included in the signup request. Acceptance is not proof of email delivery; check your inbox for any confirmation steps.</p>
+      <p>The newsletter signup button opens Beehiiv, which collects your email address directly. The link does not include calculator amounts, dates or your email address, and suppresses the referring page URL. Opening the page is not a subscription; complete the provider form and check your inbox for any confirmation steps.</p>
       <p>This site uses Google Analytics for usage measurement, including browser and device information, page visits and interactions. Google may use cookies; its automatic measurement may include page URLs. Explicit calculator events use categories, not email addresses or scenario values. Fonts load from Google and price quotes come from CoinGecko through this site.</p>
       <p><a href="https://www.beehiiv.com/privacy" rel="noopener noreferrer" target="_blank" style="color:var(--orange)">Beehiiv privacy information</a> · <a href="https://policies.google.com/privacy" rel="noopener noreferrer" target="_blank" style="color:var(--orange)">Google privacy information</a></p>
     </section>

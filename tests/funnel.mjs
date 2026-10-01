@@ -26,6 +26,10 @@ const events=w=>w.dataLayer.map(a=>Array.from(a)).filter(a=>a[0]==='event');
    eq(w.analyticsPageUrl('https://example.test/path?email=synthetic@example.invalid#x'),'https://example.test/path');
  });
  check('commercial CTAs and affiliate fallback are absent',()=>{eq(w.document.querySelectorAll('a[href*="coinbase.com"]').length,0);ok(!g(w,'affiliate-btn'));});
+ check('unverified custom forms are hidden and hosted signup is primary',()=>{
+   eq(w.document.querySelectorAll('.inline-signup[hidden]').length,2);eq(w.document.querySelectorAll('.newsletter-primary').length,2);
+   for(const link of w.document.querySelectorAll('.newsletter-primary'))eq(link.getAttribute('referrerpolicy'),'no-referrer');
+ });
  check('newsletter promises do not invent cadence or personalization',()=>{
    const text=g(w,'email-capture').textContent+g(w,'dca-email-nudge').textContent;
    ok(!/Monday|weekly|GET MY PLAN|Free forever/i.test(text));ok(text.includes('Bitcoin by the Numbers'));
