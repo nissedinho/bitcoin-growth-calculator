@@ -42,11 +42,17 @@ function page(opts){const w=loadPage(opts); windows.push(w);return w;}
 }
 {
   const w=page({now:'2024-03-31T21:00:00Z',price:50,daily:{'2024-01-31':100,'2024-02-29':40,'2024-03-31':50}});await settle();
+  w.switchTab('dca');
   let captured;w.drawChart=(labels,invested,values)=>{captured={labels,invested,values};};
   w.dcaDisplay(100,new w.Date('2024-01-31T12:00:00Z'),'monthly',50);
   check('DCA chart marks holdings at their historical price',()=>{
     near(captured.values[0],100,0.001);near(captured.values[1],140,0.001);near(captured.values[2],275,0.001);
     eq(captured.labels.at(-1),'Current');near(captured.values.at(-1),275,0.001);
+  });
+  check('chart is rendered after result visibility, and redraws after tab changes',()=>{
+    let seen=false;w.drawChart=()=>{seen=g(w,'dca-result').classList.contains('active') && g(w,'panel-dca').classList.contains('active');};
+    w.dcaDisplay(100,new w.Date('2024-01-31T12:00:00Z'),'monthly',50);ok(seen,'chart drawn hidden');
+    seen=false;w.switchTab('tm');w.switchTab('dca');ok(seen,'chart not redrawn after tab return');
   });
   check('missing daily quote is labelled carried-forward',()=>{
     const q=w.getHistoricalQuote('2024-02-01');eq(q.price,100);ok(q.method.includes('carried'));eq(q.asOf,'2024-01-31');

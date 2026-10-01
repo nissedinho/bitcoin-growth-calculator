@@ -893,6 +893,7 @@ function switchTab(tab) {
     g('tab-'+t).classList.toggle('active', t===tab);
     g('panel-'+t).classList.toggle('active', t===tab);
   });
+  if(tab==='dca') redrawDcaChart();
 }
 
 // ── Show more chips ───────────────────────────────────────────────────────────
@@ -1190,7 +1191,9 @@ function dcaDisplay(amountPerPeriod, startDate, freq, currentPrice) {
   });
 
   chartLabels.push('Current'); chartInvested.push(totalInvested); chartValue.push(+totalValue.toFixed(2));
-  drawChart(chartLabels, chartInvested, chartValue);
+  lastDCA.chartData={labels:chartLabels,invested:chartInvested,value:chartValue};
+  showEl('dca-result');
+  redrawDcaChart();
   const estimated=purchases.filter(p=>p.quote.method!=='daily observation' && p.quote.method!=='current quote').length;
   g('dca-data-note').textContent=estimated+' of '+purchases.length+' purchases use monthly estimates or carried-forward observations. The chart values holdings at each purchase-date price plus the current quote ('+priceAsOf+'). It samples purchase dates and may miss intervening drawdowns. Fees and slippage excluded. The lump-sum comparison assumes all contributions were available on day one.';
 
@@ -1237,8 +1240,15 @@ function dcaDisplay(amountPerPeriod, startDate, freq, currentPrice) {
 }
 
 // ── Chart ─────────────────────────────────────────────────────────────────────
+function redrawDcaChart(){
+  if(!g('panel-dca').classList.contains('active') || !lastDCA.chartData) return;
+  const c=lastDCA.chartData;
+  drawChart(c.labels,c.invested,c.value);
+}
+window.addEventListener('resize',redrawDcaChart);
 function drawChart(labels, invested, value) {
   const canvas = g('dca-chart');
+  if(!canvas.offsetWidth) return;
   const ctx = canvas.getContext('2d');
 
   // Destroy old chart if exists
