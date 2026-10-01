@@ -7,7 +7,10 @@
         window.dataLayer = window.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}
         gtag('js', new Date());
-        gtag('config', 'G-T29BL3EPHL');
+        function analyticsPageUrl(value) { try { const u=new URL(value); return u.origin+u.pathname; } catch(_) { return ''; } }
+        gtag('set','page_location',analyticsPageUrl(location.href));
+        gtag('set','page_referrer',analyticsPageUrl(document.referrer));
+        gtag('config','G-T29BL3EPHL',{page_location:analyticsPageUrl(location.href),page_referrer:analyticsPageUrl(document.referrer)});
     </script>
 
     <meta charset="UTF-8" />
@@ -396,6 +399,7 @@
                 <a href="/what-if/2025/">2025</a>
             </p>
             <p>© 2026 <a href="/">Bitcoin Growth Calculator</a> — Not financial advice. Past performance does not guarantee future results.</p>
+            <p><a href="/#data-use">Data &amp; email</a></p>
         </footer>
     </div>
 

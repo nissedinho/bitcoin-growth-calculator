@@ -58,10 +58,10 @@ export function loadPage({ url = 'https://x.test/', daily = null, series = null,
         constructor(...args) { super(...(args.length ? args : [now])); }
         static now() { return new NativeDate(now).getTime(); }
       };
-      w.__events = []; w.__requests = [];
+      w.__events = []; w.__requests = []; w.__requestOptions = [];
       w.open = (...args) => { w.__opened = args; };
-      w.fetch = async (u) => {
-        u = String(u); w.__requests.push(u);
+      w.fetch = async (u, options) => {
+        u = String(u); w.__requests.push(u); w.__requestOptions.push({url:u,options});
         if (u.includes('/api/price') && priceQueue) return new Promise(resolve=>priceQueue.push(resolve));
         if (u.includes('/api/price')) return { ok: priceOk, json: async () => ({ price, asOf:now }) };
         if (u.includes('/api/subscribe')) { if(subscribeReject) throw new Error('offline'); return {ok:subscribeOk,json:async()=>subscribe}; }
