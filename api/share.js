@@ -44,6 +44,7 @@ module.exports = (req, res) => {
   const value = clampNum(q.get('value'), 0, 1e15, 0);
   const date = cleanDate(q.get('date'));
   const sell = cleanDate(q.get('sell'));
+  const tax = clampNum(q.get('tax'), 0, 60, 0);
   const tab = q.get('tab') === 'dca' ? 'dca' : 'tm';
   const freq = ['daily', 'weekly', 'monthly'].includes(q.get('freq')) ? q.get('freq') : '';
   // For DCA, `amount` is the per-period contribution, so the multiple has to be
@@ -61,9 +62,9 @@ module.exports = (req, res) => {
 
   const title = tab === 'dca'
     ? `Investing ${usd(amount)} at a time in Bitcoin${when ? ` since ${when}` : ''} → ${usd(value)}`
-    : `${usd(amount)} of Bitcoin${when ? ` in ${when}` : ''} would be ${usd(value)}${sell ? ' at sale' : ' today'}`;
+    : `${usd(amount)} of Bitcoin${when ? ` in ${when}` : ''} would be ${usd(value)}${sell ? ' at sale' : ' when calculated'}`;
   const description = value > 0
-    ? `That's ${multTxt} your money. Run your own dates and amounts on the free Bitcoin calculator.`
+    ? `An estimated ${multTxt} return multiple in this shared snapshot. Historical prices may be estimated; fees excluded. Open the calculator to refresh the quote.`
     : 'See what your money would be worth if you had bought Bitcoin. Free calculator with live prices, DCA and historical comparisons.';
 
   // Rebuild the destination from validated values only.
@@ -73,6 +74,7 @@ module.exports = (req, res) => {
   if (date) target.set(tab === 'dca' ? 'start' : 'date', date);
   if (freq && tab === 'dca') target.set('freq', freq);
   if (sell) target.set('sell', sell);
+  if (q.has('tax') && tab === 'tm') target.set('tax', String(tax));
   const dest = `/?${target.toString()}`;
 
   // Static card for now. A generated per-result image needs a renderer whose

@@ -10,17 +10,17 @@
 </script>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>What If You Bought Bitcoin in 2017? $1,000 Then = $89,930 Today</title>
-<meta name="description" content="$1,000 of Bitcoin bought in January 2017 (BTC at $963) would be worth $89,930 today — a 90× return. See the exact numbers and run your own dates." />
+<title>What If You Bought Bitcoin in 2017? Historical Return Calculator</title>
+<meta name="description" content="Estimate returns on a Bitcoin investment in 2017 using a dated monthly reference and the latest available BTC quote. See the assumptions and try your own dates." />
 <link rel="canonical" href="https://www.bitcoingrowthcalculator.com/what-if/2017/" />
 <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 <meta property="og:type" content="article" />
-<meta property="og:title" content="What If You Bought Bitcoin in 2017? $1,000 Then = $89,930 Today" />
-<meta property="og:description" content="$1,000 of Bitcoin bought in January 2017 (BTC at $963) would be worth $89,930 today — a 90× return. See the exact numbers and run your own dates." />
+<meta property="og:title" content="What If You Bought Bitcoin in 2017? Historical Return Calculator" />
+<meta property="og:description" content="Estimate returns on a Bitcoin investment in 2017 using a dated monthly reference and the latest available BTC quote. See the assumptions and try your own dates." />
 <meta property="og:url" content="https://www.bitcoingrowthcalculator.com/what-if/2017/" />
 <meta property="og:image" content="https://www.bitcoingrowthcalculator.com/og.png" />
 <meta name="twitter:card" content="summary_large_image" />
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "How much would $1,000 of Bitcoin bought in 2017 be worth today?", "acceptedAnswer": {"@type": "Answer", "text": "$1,000 invested in Bitcoin in January 2017, when BTC traded around $963, would have grown to approximately $89,930 at today's price — a 90× return."}}, {"@type": "Question", "name": "What was the price of Bitcoin in 2017?", "acceptedAnswer": {"@type": "Answer", "text": "In January 2017, Bitcoin traded at approximately $963."}}, {"@type": "Question", "name": "Is it too late to buy Bitcoin?", "acceptedAnswer": {"@type": "Answer", "text": "Nobody can predict future returns and past performance is no guarantee. Most long-term holders use dollar-cost averaging (DCA) — buying a fixed amount on a schedule — rather than trying to time a single entry. Our DCA calculator shows how that has performed historically."}}]}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "How much would $1,000 of Bitcoin bought in 2017 be worth today?", "acceptedAnswer": {"@type": "Answer", "text": "The estimate divides $1,000 by the January 31, 2017 monthly reference price of $963, then multiplies the resulting Bitcoin amount by the current quote. Prices are estimates; fees and slippage are excluded."}}, {"@type": "Question", "name": "What was the price of Bitcoin in 2017?", "acceptedAnswer": {"@type": "Answer", "text": "This example uses a monthly reference estimate of $963 dated January 31, 2017. Prices varied throughout the year; this is not an exact execution price."}}, {"@type": "Question", "name": "Is it too late to buy Bitcoin?", "acceptedAnswer": {"@type": "Answer", "text": "Nobody can predict future returns and past performance is no guarantee. Dollar-cost averaging (DCA) means buying a fixed amount on a schedule. It does not guarantee a profit. Our DCA calculator shows how that has performed historically."}}]}</script>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@300;400;500&family=Space+Grotesk:wght@300;400;500;600&display=swap" rel="stylesheet" />
 <style>
 :root { --orange:#f7931a; --orange-dim:rgba(247,147,26,0.08); --black:#080808; --surface:#0f0f0f; --surface2:#161616; --border:rgba(247,147,26,0.18); --border-subtle:rgba(255,255,255,0.06); --text:#e8e0d4; --text-muted:#6b6257; --green:#22c55e; --red:#ef4444; }
@@ -36,13 +36,13 @@ p { color:var(--text-muted); font-size:15px; margin-bottom:14px; }
 p strong { color:var(--text); }
 .hero-stat { background:var(--surface); border:1px solid var(--border); border-radius:2px; padding:26px; margin:26px 0; text-align:center; }
 .hero-stat .label { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.2em; text-transform:uppercase; color:var(--text-muted); }
-.hero-stat .big { font-family:'Bebas Neue',sans-serif; font-size:clamp(44px,10vw,72px); color:var(--green); line-height:1.1; }
+.hero-stat .big { font-family:'Bebas Neue',sans-serif; font-size:clamp(44px,10vw,72px); color:var(--text); line-height:1.1; }
 .hero-stat .sub { font-family:'DM Mono',monospace; font-size:12px; color:var(--text-muted); }
 table { width:100%; border-collapse:collapse; margin:18px 0 8px; font-family:'DM Mono',monospace; font-size:13px; }
 th,td { padding:12px 10px; text-align:right; border-bottom:1px solid var(--border-subtle); }
 th:first-child,td:first-child { text-align:left; }
 th { font-size:10px; letter-spacing:0.14em; text-transform:uppercase; color:var(--text-muted); }
-td.now { color:var(--green); font-weight:500; }
+td.now { color:var(--text); font-weight:500; }
 td.then { color:var(--orange); }
 .note { font-family:'DM Mono',monospace; font-size:11px; color:var(--text-muted); }
 .cta { display:block; text-align:center; background:var(--orange); color:var(--black); font-family:'Bebas Neue',sans-serif; font-size:22px; letter-spacing:0.08em; padding:17px; border-radius:2px; text-decoration:none; margin:28px 0 10px; }
@@ -59,24 +59,25 @@ footer { margin-top:40px; font-family:'DM Mono',monospace; font-size:11px; color
 <div class="container">
 <div class="crumb"><a href="/">₿ Bitcoin Growth Calculator</a> / What if · 2017</div>
 <h1>WHAT IF YOU BOUGHT <em>BITCOIN</em> IN 2017?</h1>
-<p>In January 2017, one Bitcoin cost about <strong>$963</strong>. At today's price of <strong class="live-price">$86,603</strong>, every dollar invested back then is worth <strong data-mult="0.0010384216" data-mult-suffix=" times">90 times</strong> what you paid.</p>
+<p>Using the <strong>January 31, 2017</strong> monthly reference estimate of <strong>$963</strong> per Bitcoin, each dollar invested would be worth <strong data-mult="0.001038421599" data-mult-suffix=" times">—</strong> as much at the current quote of <strong class="live-price">loading…</strong>.</p>
 <div class="hero-stat">
-  <div class="label">$1,000 in January 2017 would be worth</div>
-  <div class="big" id="hero-val" data-btc="1.03842160">$89,930</div>
-  <div class="sub"><span data-mult="0.0010384216" data-mult-suffix="×">90×</span> your money · BTC was $963 then</div>
+  <div class="label">$1,000 on January 31, 2017: estimated value</div>
+  <div class="big" id="hero-val" data-btc="1.038421599169">—</div>
+  <div class="sub"><span data-mult="0.001038421599" data-mult-suffix="×">—</span> your money · BTC reference: $963</div>
 </div>
 <h2>The numbers</h2>
 <table>
-  <tr><th>If you invested</th><th>You'd have bought</th><th>Worth today</th></tr>
-<tr><td>$100</td><td class="then">0.103842 BTC</td><td class="now" data-btc="0.10384216">$8,993</td></tr>
-<tr><td>$1,000</td><td class="then">1.038422 BTC</td><td class="now" data-btc="1.03842160">$89,930</td></tr>
-<tr><td>$10,000</td><td class="then">10.384216 BTC</td><td class="now" data-btc="10.38421599">$899,304</td></tr>
+  <tr><th>If you invested</th><th>You'd have bought</th><th>Value at current quote</th></tr>
+<tr><td>$100</td><td class="then">0.103842 BTC</td><td class="now" data-btc="0.103842159917">—</td></tr>
+<tr><td>$1,000</td><td class="then">1.038422 BTC</td><td class="now" data-btc="1.038421599169">—</td></tr>
+<tr><td>$10,000</td><td class="then">10.384216 BTC</td><td class="now" data-btc="10.384215991693">—</td></tr>
 </table>
-<p class="note">Based on a January 2017 price of $963 and a live BTC price (updated on page load). Excludes fees.</p>
+<p class="note">Historical input: a monthly reference estimate anchored to January 31, 2017, matching the main calculator. It is not an exact daily trade price. Excludes fees, slippage and tax.</p>
+<p class="note" id="quote-status" role="status">Loading the current CoinGecko quote…</p>
 <h2>What happened in 2017</h2>
 <p>The year Bitcoin went mainstream: from under $1,000 in January to nearly $20,000 by December. Your coworkers started asking about it at lunch. Buying in January — not December — made all the difference.</p>
-<a class="cta" href="/?utm_source=whatif&utm_medium=internal&utm_campaign=2017">TRY YOUR OWN DATE & AMOUNT →</a>
-<a class="cta secondary" href="/#dca">SEE WHAT A MONTHLY DCA WOULD HAVE DONE →</a>
+<a class="cta" href="/?amount=1000&amp;date=2017-01-31&amp;utm_source=whatif&amp;utm_medium=internal&amp;utm_campaign=2017">TRY YOUR OWN DATE & AMOUNT →</a>
+<a class="cta secondary" href="/?tab=dca&amp;amount=100&amp;start=2017-01-31&amp;freq=monthly#dca">SEE WHAT A MONTHLY DCA WOULD HAVE DONE →</a>
 <div class="affiliate">
   <strong>Want in before the next one?</strong>
   Nobody can promise one — but if you want to own Bitcoin, <a href="https://coinbase.com" rel="noopener sponsored" target="_blank" onclick="try{gtag('event','affiliate_click',{placement:'whatif_2017'})}catch(e){}">Coinbase</a> is the easiest place for most people to start, with automatic recurring buys.
@@ -90,8 +91,10 @@ footer { margin-top:40px; font-family:'DM Mono',monospace; font-size:11px; color
 <script>
 // Refresh headline numbers with the live BTC price
 const P_THEN = 963;
-fetch('/api/price').then(r=>r.json()).then(d=>{
-  if(!d.price) return;
+fetch('/api/price').then(r=>{if(!r.ok) throw new Error('Unavailable'); return r.json();}).then(d=>{
+  if(!Number.isFinite(d.price)||d.price<=0) throw new Error('Invalid quote');
+  const asOf=d.asOf && Number.isFinite(Date.parse(d.asOf)) ? d.asOf : new Date().toISOString();
+  document.getElementById('quote-status').textContent='CoinGecko quote as of '+asOf.replace('T',' ').replace('Z',' UTC')+'. Retrieved on page load; may be cached for up to 11 minutes.';
   const f=n=>n>=1e9?'$'+(n/1e9).toFixed(2)+'B':n>=1e6?'$'+(n/1e6).toFixed(2)+'M':'$'+Math.round(n).toLocaleString('en-US');
   const fmtMult=m=>m>=1000?Math.round(m/1000).toLocaleString('en-US')+'K':m>=10?Math.round(m).toLocaleString('en-US'):m.toFixed(2).replace(/\.?0+$/,'');
   document.querySelectorAll('.live-price').forEach(el=>el.textContent=f(d.price));
@@ -105,7 +108,10 @@ fetch('/api/price').then(r=>r.json()).then(d=>{
   const hero = document.getElementById('hero-val');
   if(hero) hero.style.color = col;
   document.querySelectorAll('td.now').forEach(el=>el.style.color=col);
-}).catch(()=>{});
+}).catch(()=>{
+  document.querySelectorAll('.live-price').forEach(el=>el.textContent='unavailable');
+  document.getElementById('quote-status').textContent='Current quote unavailable. No current valuation is shown; reload to retry.';
+});
 </script>
 </body>
 </html>

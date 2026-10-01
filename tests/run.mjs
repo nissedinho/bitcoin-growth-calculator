@@ -94,6 +94,7 @@ const tm = async (w, { amount, date, sell = '', tax = '' }) => {
   const w = loadPage();
   await settle();
   const dca = async (amount, start, freq) => {
+    w.switchTab('dca');
     g(w, 'dca-amount').value = amount;
     g(w, 'dca-start').value = start;
     g(w, 'dca-freq').value = freq;

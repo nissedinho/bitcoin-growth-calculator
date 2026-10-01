@@ -4,7 +4,7 @@
   "description": "Test-only package. Deliberately NOT at the repo root: a root package.json turns the static site into a Node build on Vercel and breaks the deploy.",
   "type": "module",
   "scripts": {
-    "test": "node run.mjs"
+    "test": "node run.mjs && node trust.mjs"
   },
   "devDependencies": {
     "jsdom": "^25.0.0"
