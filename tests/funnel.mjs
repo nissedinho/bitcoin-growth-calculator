@@ -19,6 +19,7 @@ const events=w=>w.dataLayer.map(a=>Array.from(a)).filter(a=>a[0]==='event');
  });
  w.switchTab('dca');await w.dcaCalculate();
  check('DCA user calculation records a categorical event',()=>eq(events(w).filter(e=>e[1]==='calculate').at(-1)[2].calculator,'dca'));
+ check('DCA gain is a hypothetical estimate, not passive income',()=>{ok(g(w,'dca-fact').textContent.includes('not income'));ok(!g(w,'dca-fact').textContent.includes('absolutely nothing'));});
  g(w,'dca-amount').value='0';await w.dcaCalculate();
  check('invalid calculation does not add completion',()=>eq(events(w).filter(e=>e[1]==='calculate').length,2));
  check('analytics configuration strips query and fragment',()=>{

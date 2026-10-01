@@ -256,7 +256,7 @@
     .guide { margin-top: 28px; padding: 24px; border: 1px solid var(--border-subtle); background: var(--surface); font-size: 14px; line-height: 1.7; }
     .guide h2 { font-size: 18px; margin-bottom: 10px; }
     .guide p + p { margin-top: 10px; }
-    .ec-privacy { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--text-muted); margin-top: 10px; }
+    .ec-privacy { font-family: 'DM Mono', monospace; font-size: 11px; color: #a99f92; margin-top: 10px; }
 
     /* Email success */
     .email-success {
@@ -483,7 +483,7 @@
           <div class="ec-privacy" id="ec-status" role="status" aria-live="polite"></div>
           </div>
           <div class="ec-privacy" id="ec-consent">By subscribing, you ask to receive Bitcoin by the Numbers emails via Beehiiv. Unsubscribe anytime. <a href="#data-use">Data &amp; email details</a></div>
-          <a class="ec-btn newsletter-primary newsletter-direct" data-placement="time_machine" href="https://subscribe-forms.beehiiv.com/5cef7315-a3f9-400a-9597-6806aac54862" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer">OPEN NEWSLETTER SIGNUP ↗</a>
+          <a class="ec-btn newsletter-primary newsletter-direct" data-placement="time_machine" href="https://subscribe-forms.beehiiv.com/5cef7315-a3f9-400a-9597-6806aac54862" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer">OPEN NEWSLETTER SIGNUP</a>
           <div class="ec-privacy">Opens the Bitcoin by the Numbers form on Beehiiv in a new tab. Complete signup there and check your inbox for any confirmation steps. Opening the page does not subscribe you.</div>
         </div>
       </div>
@@ -594,7 +594,7 @@
           <div class="ec-privacy" id="dca-ec-status" role="status" aria-live="polite"></div>
           </div>
           <div class="ec-privacy" id="dca-ec-consent">By subscribing, you ask to receive Bitcoin by the Numbers emails via Beehiiv. Unsubscribe anytime. <a href="#data-use">Data &amp; email details</a></div>
-          <a class="ec-btn newsletter-primary newsletter-direct" data-placement="dca" href="https://subscribe-forms.beehiiv.com/5cef7315-a3f9-400a-9597-6806aac54862" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer">OPEN NEWSLETTER SIGNUP ↗</a>
+          <a class="ec-btn newsletter-primary newsletter-direct" data-placement="dca" href="https://subscribe-forms.beehiiv.com/5cef7315-a3f9-400a-9597-6806aac54862" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer">OPEN NEWSLETTER SIGNUP</a>
           <div class="ec-privacy">Opens the Bitcoin by the Numbers form on Beehiiv in a new tab. Complete signup there and check your inbox for any confirmation steps. Opening the page does not subscribe you.</div>
         </div>
       </div>
@@ -1221,7 +1221,7 @@ function dcaDisplay(amountPerPeriod, startDate, freq, currentPrice) {
   const startLabel = startDate.toLocaleDateString('en-US',{month:'long',year:'numeric'});
   if (dcaUp) {
     const perDay = formatUSD(totalGain/((Date.now()-startDate)/(1000*60*60*24)));
-    g('dca-fact').innerHTML = `Investing just <strong>${formatUSD(amountPerPeriod)}</strong> every ${({daily:'day',weekly:'week',monthly:'month'}[freq])} since ${startLabel} would have grown to <strong>${formatUSD(totalValue)}</strong> — a gain of <strong>${formatUSD(totalGain)}</strong>. That's <strong>${perDay}</strong> earned per day on average, while doing absolutely nothing.`;
+    g('dca-fact').innerHTML = `For this historical scenario, <strong>${formatUSD(amountPerPeriod)}</strong> every ${({daily:'day',weekly:'week',monthly:'month'}[freq])} since ${startLabel} has an estimated value of <strong>${formatUSD(totalValue)}</strong>, including an estimated gain of <strong>${formatUSD(totalGain)}</strong>. This is not income you received or a prediction of future returns.`;
   } else {
     g('dca-fact').innerHTML = `A DCA started in ${startLabel} is currently down <strong>${formatUSD(Math.abs(totalGain))}</strong> — but you'd have accumulated <strong>₿ ${totalBtc.toFixed(4)}</strong> at an average price of <strong>${formatUSD(totalInvested/totalBtc)}</strong>. Regular buying does not guarantee recovery or a profit.`;
   }
