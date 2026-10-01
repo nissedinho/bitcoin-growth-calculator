@@ -4,6 +4,11 @@
 Run from repo root:  python3 scripts/generate_year_pages.py
 Regenerate after historical data changes. Current valuations are loaded from
 /api/price; no current prices are baked into metadata or visible results.
+
+Sitemap maintenance: this generator deliberately leaves sitemap.xml unchanged.
+After reviewing a material page-content change, update lastmod only for affected
+URLs to the actual content-change date. Do not stamp the build/regeneration date
+on unchanged pages or update dates for transient live-price responses.
 """
 import os, json, re, calendar, datetime
 from pathlib import Path

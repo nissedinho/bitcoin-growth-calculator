@@ -12,6 +12,9 @@ import subprocess
 import sys
 import tempfile
 import shutil
+import datetime
+import xml.etree.ElementTree as ET
+from urllib.parse import urlsplit
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SCRIPTS = os.path.join(ROOT, "scripts")
@@ -241,6 +244,8 @@ def test_guard_catches_bad_price():
 
 # ── the year pages must stay reproducible from the generator ──────────────────
 def test_year_pages_match_generator():
+    sitemap_path = os.path.join(ROOT, "sitemap.xml")
+    sitemap_before = open(sitemap_path, "rb").read()
     before = {}
     wi = os.path.join(ROOT, "what-if")
     for year in sorted(os.listdir(wi)):
@@ -249,9 +254,39 @@ def test_year_pages_match_generator():
             before[year] = open(p).read()
     subprocess.run([sys.executable, os.path.join(SCRIPTS, "generate_year_pages.py")],
                    check=True, stdout=subprocess.DEVNULL)
+    assert open(sitemap_path, "rb").read() == sitemap_before, \
+        "routine year-page regeneration must not refresh sitemap dates"
     for year, old in before.items():
         assert open(os.path.join(wi, year, "index.html")).read() == old, \
             f"what-if/{year} is out of sync with the generator"
+
+
+def test_sitemap_preserves_existing_canonical_page_set():
+    ns = {"s": "http://www.sitemaps.org/schemas/sitemap/0.9"}
+    entries = ET.parse(os.path.join(ROOT, "sitemap.xml")).getroot().findall("s:url", ns)
+    base = "https://www.bitcoingrowthcalculator.com"
+    expected = {base + "/", base + "/faq"} | {
+        f"{base}/what-if/{year}/" for year in range(2013, 2026)}
+    urls = [entry.findtext("s:loc", namespaces=ns) for entry in entries]
+    assert len(urls) == len(set(urls)) == 15
+    assert set(urls) == expected
+    for url in urls:
+        path = urlsplit(url).path.strip("/")
+        html = open(os.path.join(ROOT, path, "index.html")).read()
+        assert re.search(r'<link\s+rel="canonical"\s+href="' + re.escape(url) + r'"', html), url
+
+
+def test_sitemap_records_real_content_dates():
+    ns = {"s": "http://www.sitemaps.org/schemas/sitemap/0.9"}
+    entries = ET.parse(os.path.join(ROOT, "sitemap.xml")).getroot().findall("s:url", ns)
+    # The Oct 1 accuracy/trust releases materially changed every existing page:
+    # calculator/methodology, visible FAQ answers, and all 13 dated year examples.
+    released = datetime.date(2026, 10, 1)
+    for entry in entries:
+        value = entry.findtext("s:lastmod", namespaces=ns)
+        modified = datetime.date.fromisoformat(value)
+        assert value == modified.isoformat(), value
+        assert released <= modified <= datetime.datetime.now(datetime.timezone.utc).date(), value
 
 
 def test_year_pages_have_stable_metadata_and_loading_state():
