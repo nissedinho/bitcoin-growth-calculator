@@ -58,14 +58,15 @@ def test_rewrite_keeps_html_parseable():
     html = open(os.path.join(ROOT, "index.html")).read()
     new = re.sub(r"const BTC_MONTHLY = \{.*?\n\};",
                  lambda _: upd.render_block(current), html, count=1, flags=re.S)
-    assert "const BTC_MONTHLY" in new and new.count("const BTC_MONTHLY") == 1
+    assert "const BTC_MONTHLY" in new and new.count("const BTC_MONTHLY =") == 1
     assert len(new) > len(html) * 0.9, "rewrite lost a large chunk of the file"
 
 
-def test_monthly_uses_first_of_month():
+def test_monthly_uses_last_observation_and_retains_date():
     daily = {"2024-01-01": 42000, "2024-01-15": 45000, "2024-02-01": 48000, "2013-03-05": 99}
     got = upd.monthly_from_daily(dict(sorted(daily.items())))
-    assert got == {"2024-01": 42000, "2024-02": 48000}, got
+    assert got == {"2024-01": 45000, "2024-02": 48000}, got
+    assert upd.monthly_dates(daily) == {"2024-01": "2024-01-15", "2024-02": "2024-02-01"}
 
 
 # ── source parsers ────────────────────────────────────────────────────────────
@@ -251,6 +252,34 @@ def test_year_pages_match_generator():
     for year, old in before.items():
         assert open(os.path.join(wi, year, "index.html")).read() == old, \
             f"what-if/{year} is out of sync with the generator"
+
+
+def test_year_pages_have_stable_metadata_and_loading_state():
+    gen = load("generate_year_pages")
+    html = gen.page(2020)
+    title = re.search(r"<title>(.*?)</title>", html).group(1)
+    assert "$" not in title and "2020" in title
+    assert "PRICE_NOW" not in open(os.path.join(SCRIPTS, "generate_year_pages.py")).read()
+    assert 'id="hero-val"' in html and '>—</div>' in html
+    assert 'date=2020-01-31' in html and 'start=2020-01-31' in html
+    assert 'Current quote unavailable' in html
+    assert 'monthly reference estimate' in html
+    assert 'would have grown to' not in html
+
+
+def test_partial_month_does_not_get_a_future_anchor():
+    dates = upd.monthly_dates({"2026-09-01": 70000, "2026-09-28": 85000})
+    assert dates["2026-09"] == "2026-09-28"
+
+
+def test_faq_precision_matches_visible_and_structured_answers():
+    html = open(os.path.join(ROOT, "faq", "index.html")).read()
+    schema = json.loads(re.search(r'<script type="application/ld\+json">(.*?)</script>', html, re.S).group(1))
+    assert len(schema["mainEntity"]) == 8
+    assert "historical price data for every day" not in html
+    assert "exact current value" not in html and "exactly what" not in html
+    for q in schema["mainEntity"]:
+        assert q["acceptedAnswer"]["text"].split('.')[0] in html
 
 
 for name, fn in sorted((n, f) for n, f in list(globals().items()) if n.startswith("test_")):

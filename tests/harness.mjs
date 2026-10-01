@@ -47,20 +47,29 @@ export function report(label) {
 }
 
 /** Load index.html in a DOM with the network stubbed out. */
-export function loadPage({ url = 'https://x.test/', daily = null, series = null } = {}) {
+export function loadPage({ url = 'https://x.test/', daily = null, series = null, now = '2026-10-01T21:00:00Z', price = LIVE_PRICE, priceOk = true, subscribe = {success:true}, subscribeOk = true, subscribeReject = false, priceQueue = null } = {}) {
   const html = readFileSync(join(ROOT, 'index.html'), 'utf8');
   const dom = new JSDOM(html, {
     runScripts: 'dangerously',
     url,
     beforeParse(w) {
+      const NativeDate = w.Date;
+      w.Date = class extends NativeDate {
+        constructor(...args) { super(...(args.length ? args : [now])); }
+        static now() { return new NativeDate(now).getTime(); }
+      };
+      w.__events = []; w.__requests = [];
+      w.open = (...args) => { w.__opened = args; };
       w.fetch = async (u) => {
-        u = String(u);
-        if (u.includes('/api/price')) return { ok: true, json: async () => ({ price: LIVE_PRICE }) };
+        u = String(u); w.__requests.push(u);
+        if (u.includes('/api/price') && priceQueue) return new Promise(resolve=>priceQueue.push(resolve));
+        if (u.includes('/api/price')) return { ok: priceOk, json: async () => ({ price, asOf:now }) };
+        if (u.includes('/api/subscribe')) { if(subscribeReject) throw new Error('offline'); return {ok:subscribeOk,json:async()=>subscribe}; }
         if (u.includes('btc_daily')) return daily ? { ok: true, json: async () => ({ prices: daily }) } : { ok: false, json: async () => ({}) };
         if (u.includes('series.json')) return series ? { ok: true, json: async () => series } : { ok: false, json: async () => ({}) };
         return { ok: false, json: async () => ({}) };
       };
-      w.gtag = () => {};
+      w.gtag = (...args) => { w.__events.push(args); };
       w.navigator.clipboard = { writeText: async (t) => { w.__clip = t; } };
       // jsdom has no canvas; the chart only needs the calls not to throw.
       w.HTMLCanvasElement.prototype.getContext = () => new Proxy({}, {

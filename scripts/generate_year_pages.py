@@ -2,31 +2,21 @@
 """Generate /what-if/<year>/ SEO landing pages for bitcoingrowthcalculator.com.
 
 Run from repo root:  python3 scripts/generate_year_pages.py
-Regenerate whenever BTC_PRICE_NOW or the January prices change materially.
-Pages self-update their headline numbers from /api/price on load, so the
-baked-in numbers only need to be roughly right.
+Regenerate after historical data changes. Current valuations are loaded from
+/api/price; no current prices are baked into metadata or visible results.
 """
-import os, json
+import os, json, re, calendar, datetime
+from pathlib import Path
 
-# January price for each year (early-January BTC/USD, from site dataset)
-JAN_PRICE = {
-    2013: 130,     # dataset starts Apr 2013; using April for 2013
-    2014: 808,
-    2015: 217,
-    2016: 370,
-    2017: 963,
-    2018: 10163,
-    2019: 3457,
-    2020: 9350,
-    2021: 33141,
-    2022: 38466,
-    2023: 23130,
-    2024: 42514,
-    2025: 102405,
-}
-
-PRICE_NOW = 86603  # keep in sync with the last BTC_MONTHLY entry in index.html;
-                   # pages overwrite this with the live price from /api/price on load
+# Read the same monthly reference estimates as the main calculator. Legacy
+# monthly anchors are month-end estimates, not exact daily trade prices.
+ROOT = Path(__file__).resolve().parent.parent
+INDEX = (ROOT / 'index.html').read_text()
+MONTHLY = {key: int(value) for key, value in re.findall(
+    r"'(\d{4}-\d{2})':(\d+)", re.search(r"const BTC_MONTHLY = \{.*?\n\};", INDEX, re.S).group(0))}
+DATE_MATCH = re.search(r"const BTC_MONTHLY_DATES = (\{[^;]*\});", INDEX)
+MONTHLY_DATES = json.loads(DATE_MATCH.group(1)) if DATE_MATCH else {}
+JAN_PRICE = {year: MONTHLY[f"{year}-{'04' if year == 2013 else '01'}"] for year in range(2013, 2026)}
 AFFILIATE_URL = "https://coinbase.com"  # replace with your Coinbase referral link and re-run
 
 NARRATIVE = {
@@ -42,7 +32,7 @@ NARRATIVE = {
     2022: "The washout: Luna, Celsius, and FTX all collapsed, and Bitcoin bottomed near $15,500. Peak fear — and in hindsight, another generational entry.",
     2023: "The quiet recovery. Bitcoin more than doubled off the FTX lows while most people were still too burned to look. Spot-ETF anticipation built all year.",
     2024: "The ETF year: US spot Bitcoin ETFs launched in January, the fourth halving hit in April, and price broke six figures for the first time in December.",
-    2025: "Bitcoin peaked above $115,000 in mid-2025 before sliding into the 2026 drawdown. A January 2025 buy is underwater at today's prices — a live lesson in why timing single entries is hard (and why people DCA).",
+    2025: "Bitcoin peaked above $115,000 in mid-2025 before sliding into the 2026 drawdown. The return from any single entry depends on the chosen valuation date. Neither a lump sum nor DCA guarantees a profit.",
 }
 
 def fmt_mult(m: float) -> str:
@@ -59,24 +49,22 @@ def fmt_usd(n: float) -> str:
 def page(year: int) -> str:
     p_then = JAN_PRICE[year]
     month_label = "April" if year == 2013 else "January"
-    mult = PRICE_NOW / p_then
-    rows = [(100, 100*mult), (1000, 1000*mult), (10000, 10000*mult)]
-    v1k = fmt_usd(1000*mult)
-    mult_num = fmt_mult(mult)
-    mult_txt = mult_num + "×"
+    month = 4 if year == 2013 else 1
+    reference_date = MONTHLY_DATES.get(f"{year}-{month:02d}", f"{year}-{month:02d}-{calendar.monthrange(year, month)[1]:02d}")
+    reference_day = datetime.date.fromisoformat(reference_date)
+    reference_label = f"{month_label} {reference_day.day}, {year}"
+    rows = [100, 1000, 10000]
     per_dollar = 1 / p_then  # × live price = the current multiple
-    up = mult >= 1
-    gain_word = "grown to" if up else "fallen to"
-    title = f"What If You Bought Bitcoin in {year}? $1,000 Then = {v1k} Today"
-    desc = (f"$1,000 of Bitcoin bought in {month_label} {year} (BTC at {fmt_usd(p_then)}) "
-            f"would be worth {v1k} today — a {mult_txt} return. See the exact numbers and run your own dates.")
+    title = f"What If You Bought Bitcoin in {year}? Historical Return Calculator"
+    desc = (f"Estimate returns on a Bitcoin investment in {year} using a dated monthly reference "
+            "and the latest available BTC quote. See the assumptions and try your own dates.")
     other_years = " ".join(
         f'<a href="/what-if/{y}/">{y}</a>' for y in sorted(JAN_PRICE) if y != year
     )
     table_rows = "\n".join(
         f'<tr><td>{fmt_usd(a)}</td><td class="then">{a/p_then:.6f} BTC</td>'
-        f'<td class="now" data-btc="{a/p_then:.8f}">{fmt_usd(v)}</td></tr>'
-        for a, v in rows
+        f'<td class="now" data-btc="{a/p_then:.12f}">—</td></tr>'
+        for a in rows
     )
     faq_json = json.dumps({
         "@context": "https://schema.org",
@@ -85,15 +73,15 @@ def page(year: int) -> str:
             {"@type": "Question",
              "name": f"How much would $1,000 of Bitcoin bought in {year} be worth today?",
              "acceptedAnswer": {"@type": "Answer",
-              "text": f"$1,000 invested in Bitcoin in {month_label} {year}, when BTC traded around {fmt_usd(p_then)}, would have {gain_word} approximately {v1k} at today's price — a {mult_txt} return."}},
+              "text": f"The estimate divides $1,000 by the {reference_label} monthly reference price of {fmt_usd(p_then)}, then multiplies the resulting Bitcoin amount by the current quote. Prices are estimates; fees and slippage are excluded."}},
             {"@type": "Question",
              "name": f"What was the price of Bitcoin in {year}?",
              "acceptedAnswer": {"@type": "Answer",
-              "text": f"In {month_label} {year}, Bitcoin traded at approximately {fmt_usd(p_then)}."}},
+              "text": f"This example uses a monthly reference estimate of {fmt_usd(p_then)} dated {reference_label}. Prices varied throughout the year; this is not an exact execution price."}},
             {"@type": "Question",
              "name": "Is it too late to buy Bitcoin?",
              "acceptedAnswer": {"@type": "Answer",
-              "text": "Nobody can predict future returns and past performance is no guarantee. Most long-term holders use dollar-cost averaging (DCA) — buying a fixed amount on a schedule — rather than trying to time a single entry. Our DCA calculator shows how that has performed historically."}},
+              "text": "Nobody can predict future returns and past performance is no guarantee. Dollar-cost averaging (DCA) means buying a fixed amount on a schedule. It does not guarantee a profit. Our DCA calculator shows how that has performed historically."}},
         ],
     }, ensure_ascii=False)
     return f"""<!DOCTYPE html>
@@ -134,13 +122,13 @@ p {{ color:var(--text-muted); font-size:15px; margin-bottom:14px; }}
 p strong {{ color:var(--text); }}
 .hero-stat {{ background:var(--surface); border:1px solid var(--border); border-radius:2px; padding:26px; margin:26px 0; text-align:center; }}
 .hero-stat .label {{ font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.2em; text-transform:uppercase; color:var(--text-muted); }}
-.hero-stat .big {{ font-family:'Bebas Neue',sans-serif; font-size:clamp(44px,10vw,72px); color:{'var(--green)' if up else 'var(--red)'}; line-height:1.1; }}
+.hero-stat .big {{ font-family:'Bebas Neue',sans-serif; font-size:clamp(44px,10vw,72px); color:var(--text); line-height:1.1; }}
 .hero-stat .sub {{ font-family:'DM Mono',monospace; font-size:12px; color:var(--text-muted); }}
 table {{ width:100%; border-collapse:collapse; margin:18px 0 8px; font-family:'DM Mono',monospace; font-size:13px; }}
 th,td {{ padding:12px 10px; text-align:right; border-bottom:1px solid var(--border-subtle); }}
 th:first-child,td:first-child {{ text-align:left; }}
 th {{ font-size:10px; letter-spacing:0.14em; text-transform:uppercase; color:var(--text-muted); }}
-td.now {{ color:{'var(--green)' if up else 'var(--red)'}; font-weight:500; }}
+td.now {{ color:var(--text); font-weight:500; }}
 td.then {{ color:var(--orange); }}
 .note {{ font-family:'DM Mono',monospace; font-size:11px; color:var(--text-muted); }}
 .cta {{ display:block; text-align:center; background:var(--orange); color:var(--black); font-family:'Bebas Neue',sans-serif; font-size:22px; letter-spacing:0.08em; padding:17px; border-radius:2px; text-decoration:none; margin:28px 0 10px; }}
@@ -157,22 +145,23 @@ footer {{ margin-top:40px; font-family:'DM Mono',monospace; font-size:11px; colo
 <div class="container">
 <div class="crumb"><a href="/">₿ Bitcoin Growth Calculator</a> / What if · {year}</div>
 <h1>WHAT IF YOU BOUGHT <em>BITCOIN</em> IN {year}?</h1>
-<p>In {month_label} {year}, one Bitcoin cost about <strong>{fmt_usd(p_then)}</strong>. At today's price of <strong class="live-price">{fmt_usd(PRICE_NOW)}</strong>, every dollar invested back then is worth <strong data-mult="{per_dollar:.10f}" data-mult-suffix=" times">{mult_num} times</strong> what you paid.</p>
+<p>Using the <strong>{reference_label}</strong> monthly reference estimate of <strong>{fmt_usd(p_then)}</strong> per Bitcoin, each dollar invested would be worth <strong data-mult="{per_dollar:.12f}" data-mult-suffix=" times">—</strong> as much at the current quote of <strong class="live-price">loading…</strong>.</p>
 <div class="hero-stat">
-  <div class="label">$1,000 in {month_label} {year} would be worth</div>
-  <div class="big" id="hero-val" data-btc="{1000/p_then:.8f}">{v1k}</div>
-  <div class="sub"><span data-mult="{per_dollar:.10f}" data-mult-suffix="×">{mult_txt}</span> your money · BTC was {fmt_usd(p_then)} then</div>
+  <div class="label">$1,000 on {reference_label}: estimated value</div>
+  <div class="big" id="hero-val" data-btc="{1000/p_then:.12f}">—</div>
+  <div class="sub"><span data-mult="{per_dollar:.12f}" data-mult-suffix="×">—</span> your money · BTC reference: {fmt_usd(p_then)}</div>
 </div>
 <h2>The numbers</h2>
 <table>
-  <tr><th>If you invested</th><th>You'd have bought</th><th>Worth today</th></tr>
+  <tr><th>If you invested</th><th>You'd have bought</th><th>Value at current quote</th></tr>
 {table_rows}
 </table>
-<p class="note">Based on a {month_label} {year} price of {fmt_usd(p_then)} and a live BTC price (updated on page load). Excludes fees.</p>
+<p class="note">Historical input: a monthly reference estimate anchored to {reference_label}, matching the main calculator. It is not an exact daily trade price. Excludes fees, slippage and tax.</p>
+<p class="note" id="quote-status" role="status">Loading the current CoinGecko quote…</p>
 <h2>What happened in {year}</h2>
 <p>{NARRATIVE[year]}</p>
-<a class="cta" href="/?utm_source=whatif&utm_medium=internal&utm_campaign={year}">TRY YOUR OWN DATE & AMOUNT →</a>
-<a class="cta secondary" href="/#dca">SEE WHAT A MONTHLY DCA WOULD HAVE DONE →</a>
+<a class="cta" href="/?amount=1000&amp;date={reference_date}&amp;utm_source=whatif&amp;utm_medium=internal&amp;utm_campaign={year}">TRY YOUR OWN DATE & AMOUNT →</a>
+<a class="cta secondary" href="/?tab=dca&amp;amount=100&amp;start={reference_date}&amp;freq=monthly#dca">SEE WHAT A MONTHLY DCA WOULD HAVE DONE →</a>
 <div class="affiliate">
   <strong>Want in before the next one?</strong>
   Nobody can promise one — but if you want to own Bitcoin, <a href="{AFFILIATE_URL}" rel="noopener sponsored" target="_blank" onclick="try{{gtag('event','affiliate_click',{{placement:'whatif_{year}'}})}}catch(e){{}}">Coinbase</a> is the easiest place for most people to start, with automatic recurring buys.
@@ -186,10 +175,12 @@ footer {{ margin-top:40px; font-family:'DM Mono',monospace; font-size:11px; colo
 <script>
 // Refresh headline numbers with the live BTC price
 const P_THEN = {p_then};
-fetch('/api/price').then(r=>r.json()).then(d=>{{
-  if(!d.price) return;
+fetch('/api/price').then(r=>{{if(!r.ok) throw new Error('Unavailable'); return r.json();}}).then(d=>{{
+  if(!Number.isFinite(d.price)||d.price<=0) throw new Error('Invalid quote');
+  const asOf=d.asOf && Number.isFinite(Date.parse(d.asOf)) ? d.asOf : new Date().toISOString();
+  document.getElementById('quote-status').textContent='CoinGecko quote as of '+asOf.replace('T',' ').replace('Z',' UTC')+'. Retrieved on page load; may be cached for up to 11 minutes.';
   const f=n=>n>=1e9?'$'+(n/1e9).toFixed(2)+'B':n>=1e6?'$'+(n/1e6).toFixed(2)+'M':'$'+Math.round(n).toLocaleString('en-US');
-  const fmtMult=m=>m>=1000?Math.round(m/1000).toLocaleString('en-US')+'K':m>=10?Math.round(m).toLocaleString('en-US'):m.toFixed(2).replace(/\.?0+$/,'');
+  const fmtMult=m=>m>=1000?Math.round(m/1000).toLocaleString('en-US')+'K':m>=10?Math.round(m).toLocaleString('en-US'):m.toFixed(2).replace(/\\.?0+$/,'');
   document.querySelectorAll('.live-price').forEach(el=>el.textContent=f(d.price));
   document.querySelectorAll('[data-btc]').forEach(el=>{{ el.textContent=f(parseFloat(el.dataset.btc)*d.price); }});
   // Keep the multiple and the up/down colour in step with the live price,
@@ -201,7 +192,10 @@ fetch('/api/price').then(r=>r.json()).then(d=>{{
   const hero = document.getElementById('hero-val');
   if(hero) hero.style.color = col;
   document.querySelectorAll('td.now').forEach(el=>el.style.color=col);
-}}).catch(()=>{{}});
+}}).catch(()=>{{
+  document.querySelectorAll('.live-price').forEach(el=>el.textContent='unavailable');
+  document.getElementById('quote-status').textContent='Current quote unavailable. No current valuation is shown; reload to retry.';
+}});
 </script>
 </body>
 </html>

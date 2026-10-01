@@ -4,7 +4,7 @@
 Run from the repo root:  python3 scripts/update_btc_prices.py
 
 Writes two things:
-  * data/btc_daily.json   — daily closes, so a specific date is exact rather
+  * data/btc_daily.json   — daily observations, so a specific date uses a recorded price rather
                             than interpolated between month markers.
   * BTC_MONTHLY in index.html — the offline fallback the calculator ships with.
 
@@ -50,17 +50,21 @@ def fetch_daily():
 
 
 def monthly_from_daily(daily):
-    """First observation of each month.
-
-    Matches the existing BTC_MONTHLY convention, where a month's value is the
-    price at its start (which is why 2023-12 and 2024-01 share a value).
-    """
+    """Last available observation of each month; keep its actual anchor date."""
     monthly = {}
     for day in sorted(daily):
         key = day[:7]
-        if key >= START and key not in monthly:
+        if key >= START:
             monthly[key] = int(round(daily[day]))
     return monthly
+
+
+def monthly_dates(daily):
+    dates = {}
+    for day in sorted(daily):
+        if day[:7] >= START:
+            dates[day[:7]] = day
+    return dates
 
 
 def render_block(monthly):
@@ -92,13 +96,20 @@ def existing_monthly():
     return {k: int(v) for k, v in re.findall(r"'(\d{4}-\d{2})':(\d+)", block.group(0))}
 
 
-def update_index(monthly):
+def update_index(monthly, dates=None):
     path = os.path.join(REPO_ROOT, "index.html")
     html = open(path).read()
     pattern = re.compile(r"const BTC_MONTHLY = \{.*?\n\};", re.S)
     if not pattern.search(html):
         raise RuntimeError("could not locate the BTC_MONTHLY block in index.html")
     updated = pattern.sub(lambda _: render_block(monthly), html, count=1)
+    if dates is not None:
+        date_block = 'const BTC_MONTHLY_DATES = ' + json.dumps(dates, sort_keys=True) + ';'
+        date_pattern = r"const BTC_MONTHLY_DATES = \{[^;]*\};"
+        if re.search(date_pattern, updated):
+            updated = re.sub(date_pattern, lambda _: date_block, updated, count=1)
+        else:
+            updated = updated.replace(render_block(monthly), render_block(monthly) + '\n' + date_block, 1)
     if updated == html:
         return False
     open(path, "w").write(updated)
@@ -139,7 +150,7 @@ def main():
         return 1
     print(f"  monthly {len(combined)} months, latest {max(combined)} = ${combined[max(combined)]:,}")
 
-    if update_index(combined):
+    if update_index(combined, monthly_dates(merged)):
         print("  index.html BTC_MONTHLY updated")
     else:
         print("  index.html BTC_MONTHLY already current")

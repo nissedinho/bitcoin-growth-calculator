@@ -34,76 +34,76 @@
 
     <!-- FAQPage Schema -->
     <script type="application/ld+json">
-    {
-        "@context": "https://schema.org",
-        "@type": "FAQPage",
-        "mainEntity": [
-            {
-                "@type": "Question",
-                "name": "What if I had bought $1,000 of Bitcoin in 2013?",
-                "acceptedAnswer": {
-                    "@type": "Answer",
-                    "text": "If you had invested $1,000 in Bitcoin in January 2013 when Bitcoin was around $13, you would have purchased approximately 76.9 BTC. At current prices, that investment would be worth significantly more. Use our Bitcoin Investment Calculator to see the exact current value based on any date since 2013."
-                }
-            },
-            {
-                "@type": "Question",
-                "name": "What if I had bought Bitcoin during COVID lockdowns in 2020?",
-                "acceptedAnswer": {
-                    "@type": "Answer",
-                    "text": "Bitcoin was trading around $5,000–$9,000 during the early COVID lockdowns in March–April 2020. An investment made during that period would have seen substantial growth. Our calculator lets you pick any exact date to see your hypothetical returns."
-                }
-            },
-            {
-                "@type": "Question",
-                "name": "How do I calculate my Bitcoin investment returns?",
-                "acceptedAnswer": {
-                    "@type": "Answer",
-                    "text": "Enter the dollar amount you would have invested and select the date of your hypothetical purchase. Our calculator uses historical Bitcoin price data to show you exactly what your investment would be worth today, including total return percentage and dollar value."
-                }
-            },
-            {
-                "@type": "Question",
-                "name": "What is Dollar-Cost Averaging (DCA) for Bitcoin?",
-                "acceptedAnswer": {
-                    "@type": "Answer",
-                    "text": "Dollar-Cost Averaging means investing a fixed amount in Bitcoin at regular intervals (weekly, monthly) regardless of price. This strategy reduces the impact of volatility because you buy more when prices are low and less when prices are high. Our DCA Calculator shows how this strategy would have performed over any time period."
-                }
-            },
-            {
-                "@type": "Question",
-                "name": "Is it too late to invest in Bitcoin?",
-                "acceptedAnswer": {
-                    "@type": "Answer",
-                    "text": "Historical data shows that Bitcoin has rewarded long-term holders at almost any entry point. While past performance doesn't guarantee future results, our calculator lets you explore returns from any date since 2013 to see how different entry points have performed. Many investors use Dollar-Cost Averaging to reduce timing risk."
-                }
-            },
-            {
-                "@type": "Question",
-                "name": "What was Bitcoin's price on a specific date?",
-                "acceptedAnswer": {
-                    "@type": "Answer",
-                    "text": "Our Bitcoin Investment Calculator includes historical price data for every day since 2013. Simply select any date on the calculator to see Bitcoin's price on that day and calculate hypothetical returns from that starting point."
-                }
-            },
-            {
-                "@type": "Question",
-                "name": "How much Bitcoin can I buy with $100?",
-                "acceptedAnswer": {
-                    "@type": "Answer",
-                    "text": "You can buy a fraction of a Bitcoin with any amount — you don't need to buy a whole coin. The amount of Bitcoin you receive for $100 depends on the current market price. Our calculator shows real-time Bitcoin prices and lets you see how any investment amount would have grown from any historical date."
-                }
-            },
-            {
-                "@type": "Question",
-                "name": "What is the best day to buy Bitcoin?",
-                "acceptedAnswer": {
-                    "@type": "Answer",
-                    "text": "There's no single 'best day' to buy Bitcoin, which is why many investors use Dollar-Cost Averaging — investing small amounts regularly rather than trying to time the market. Our DCA Calculator lets you backtest this strategy over any time period to see how it would have performed."
-                }
+{
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+        {
+            "@type": "Question",
+            "name": "What if I had bought $1,000 of Bitcoin in 2013?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "The calculator covers dates from April 28, 2013. Choose an amount and a supported purchase date to estimate the Bitcoin acquired and its value at a current quote or a historical sale date. Older dates use monthly reference estimates, not exact daily trade prices."
             }
-        ]
-    }
+        },
+        {
+            "@type": "Question",
+            "name": "What if I had bought Bitcoin during COVID lockdowns in 2020?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Choose a purchase date during 2020 and an amount to explore that scenario. The result shows hypothetical returns and an approximate monthly drawdown. Interpolated monthly data cannot capture every daily price move during the COVID crash."
+            }
+        },
+        {
+            "@type": "Question",
+            "name": "How do I calculate my Bitcoin investment returns?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Bitcoin acquired equals the investment divided by the purchase-price estimate. Valuation equals that Bitcoin amount multiplied by the current quote or selected sale-price estimate. The calculator shows gain and return percentage. Fees and slippage are excluded; optional tax is a simplified estimate."
+            }
+        },
+        {
+            "@type": "Question",
+            "name": "What is Dollar-Cost Averaging (DCA) for Bitcoin?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Dollar-Cost Averaging means buying a fixed amount at regular intervals. The calculator supports daily, weekly and calendar-month purchases in UTC. Monthly purchases keep the original day, clamped to the last day in shorter months. Regular buying does not guarantee a profit or prevent losses."
+            }
+        },
+        {
+            "@type": "Question",
+            "name": "Is it too late to invest in Bitcoin?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Nobody can predict future Bitcoin returns. This calculator explores historical scenarios using recorded observations and estimates; it does not recommend whether or when to invest. Past performance does not guarantee future results."
+            }
+        },
+        {
+            "@type": "Question",
+            "name": "What was Bitcoin's price on a specific date?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Recorded daily CoinGecko observations are used where available; the calculator footer shows their coverage. Other supported dates use interpolated monthly reference estimates or a labelled prior observation. Each result identifies its price method and date. These are not executable trade prices."
+            }
+        },
+        {
+            "@type": "Question",
+            "name": "How much Bitcoin can I buy with $100?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Divide $100 by the displayed Bitcoin price to estimate the fraction of a Bitcoin it would buy, before fees and slippage. The current quote includes an as-of time and can be cached. Actual exchange execution prices may differ."
+            }
+        },
+        {
+            "@type": "Question",
+            "name": "What is the best day to buy Bitcoin?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "This calculator cannot identify the best future day to buy. It compares hypothetical outcomes for dates you choose. DCA spreads purchases over time, but neither DCA nor a lump sum guarantees a positive return."
+            }
+        }
+    ]
+}
     </script>
 
     <style>
@@ -298,7 +298,7 @@
                     <span class="faq-icon"><svg viewBox="0 0 12 12" fill="none" stroke-width="2" stroke-linecap="round"><path d="M6 1v10M1 6h10"/></svg></span>
                 </button>
                 <div class="faq-answer"><div class="faq-answer-inner">
-                    If you had invested $1,000 in Bitcoin in January 2013 when Bitcoin was around $13, you would have purchased approximately 76.9 BTC. At current prices, that investment would be worth significantly more. <a href="/">Use our Bitcoin Investment Calculator</a> to see the exact current value based on any date since 2013.
+                    The calculator covers dates from April 28, 2013. Choose an amount and a supported purchase date to estimate the Bitcoin acquired and its value at a current quote or a historical sale date. Older dates use monthly reference estimates, not exact daily trade prices. <a href="/">Open the calculator</a>.
                 </div></div>
             </div>
 
@@ -308,7 +308,7 @@
                     <span class="faq-icon"><svg viewBox="0 0 12 12" fill="none" stroke-width="2" stroke-linecap="round"><path d="M6 1v10M1 6h10"/></svg></span>
                 </button>
                 <div class="faq-answer"><div class="faq-answer-inner">
-                    Bitcoin was trading around $5,000–$9,000 during the early COVID lockdowns in March–April 2020. An investment made during that period would have seen substantial growth. <a href="/">Our calculator</a> lets you pick any exact date to see your hypothetical returns.
+                    Choose a purchase date during 2020 and an amount to explore that scenario. The result shows hypothetical returns and an approximate monthly drawdown. Interpolated monthly data cannot capture every daily price move during the COVID crash. <a href="/">Open the calculator</a>.
                 </div></div>
             </div>
 
@@ -318,7 +318,7 @@
                     <span class="faq-icon"><svg viewBox="0 0 12 12" fill="none" stroke-width="2" stroke-linecap="round"><path d="M6 1v10M1 6h10"/></svg></span>
                 </button>
                 <div class="faq-answer"><div class="faq-answer-inner">
-                    Enter the dollar amount you would have invested and select the date of your hypothetical purchase. <a href="/">Our calculator</a> uses historical Bitcoin price data to show you exactly what your investment would be worth today, including total return percentage and dollar value.
+                    Bitcoin acquired equals the investment divided by the purchase-price estimate. Valuation equals that Bitcoin amount multiplied by the current quote or selected sale-price estimate. The calculator shows gain and return percentage. Fees and slippage are excluded; optional tax is a simplified estimate. <a href="/">Open the calculator</a>.
                 </div></div>
             </div>
 
@@ -328,7 +328,7 @@
                     <span class="faq-icon"><svg viewBox="0 0 12 12" fill="none" stroke-width="2" stroke-linecap="round"><path d="M6 1v10M1 6h10"/></svg></span>
                 </button>
                 <div class="faq-answer"><div class="faq-answer-inner">
-                    Dollar-Cost Averaging means investing a fixed amount in Bitcoin at regular intervals (weekly, monthly) regardless of price. This strategy reduces the impact of volatility because you buy more when prices are low and less when prices are high. Our DCA Calculator shows how this strategy would have performed over any time period.
+                    Dollar-Cost Averaging means buying a fixed amount at regular intervals. The calculator supports daily, weekly and calendar-month purchases in UTC. Monthly purchases keep the original day, clamped to the last day in shorter months. Regular buying does not guarantee a profit or prevent losses. <a href="/">Open the calculator</a>.
                 </div></div>
             </div>
 
@@ -338,7 +338,7 @@
                     <span class="faq-icon"><svg viewBox="0 0 12 12" fill="none" stroke-width="2" stroke-linecap="round"><path d="M6 1v10M1 6h10"/></svg></span>
                 </button>
                 <div class="faq-answer"><div class="faq-answer-inner">
-                    Historical data shows that Bitcoin has rewarded long-term holders at almost any entry point. While past performance doesn't guarantee future results, <a href="/">our calculator</a> lets you explore returns from any date since 2013 to see how different entry points have performed. Many investors use Dollar-Cost Averaging to reduce timing risk.
+                    Nobody can predict future Bitcoin returns. This calculator explores historical scenarios using recorded observations and estimates; it does not recommend whether or when to invest. Past performance does not guarantee future results. <a href="/">Open the calculator</a>.
                 </div></div>
             </div>
 
@@ -348,7 +348,7 @@
                     <span class="faq-icon"><svg viewBox="0 0 12 12" fill="none" stroke-width="2" stroke-linecap="round"><path d="M6 1v10M1 6h10"/></svg></span>
                 </button>
                 <div class="faq-answer"><div class="faq-answer-inner">
-                    Our Bitcoin Investment Calculator includes historical price data for every day since 2013. Simply <a href="/">select any date on the calculator</a> to see Bitcoin's price on that day and calculate hypothetical returns from that starting point.
+                    Recorded daily CoinGecko observations are used where available; the calculator footer shows their coverage. Other supported dates use interpolated monthly reference estimates or a labelled prior observation. Each result identifies its price method and date. These are not executable trade prices. <a href="/">Open the calculator</a>.
                 </div></div>
             </div>
 
@@ -358,7 +358,7 @@
                     <span class="faq-icon"><svg viewBox="0 0 12 12" fill="none" stroke-width="2" stroke-linecap="round"><path d="M6 1v10M1 6h10"/></svg></span>
                 </button>
                 <div class="faq-answer"><div class="faq-answer-inner">
-                    You can buy a fraction of a Bitcoin with any amount — you don't need to buy a whole coin. The amount of Bitcoin you receive for $100 depends on the current market price. <a href="/">Our calculator</a> shows real-time Bitcoin prices and lets you see how any investment amount would have grown from any historical date.
+                    Divide $100 by the displayed Bitcoin price to estimate the fraction of a Bitcoin it would buy, before fees and slippage. The current quote includes an as-of time and can be cached. Actual exchange execution prices may differ. <a href="/">Open the calculator</a>.
                 </div></div>
             </div>
 
@@ -368,7 +368,7 @@
                     <span class="faq-icon"><svg viewBox="0 0 12 12" fill="none" stroke-width="2" stroke-linecap="round"><path d="M6 1v10M1 6h10"/></svg></span>
                 </button>
                 <div class="faq-answer"><div class="faq-answer-inner">
-                    There's no single "best day" to buy Bitcoin, which is why many investors use Dollar-Cost Averaging — investing small amounts regularly rather than trying to time the market. Our DCA Calculator lets you backtest this strategy over any time period to see how it would have performed.
+                    This calculator cannot identify the best future day to buy. It compares hypothetical outcomes for dates you choose. DCA spreads purchases over time, but neither DCA nor a lump sum guarantees a positive return. <a href="/">Open the calculator</a>.
                 </div></div>
             </div>
         </div>

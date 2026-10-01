@@ -13,12 +13,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Bitcoin Investment Calculator — What If You'd Bought Bitcoin?</title>
-  <meta name="description" content="See exactly how much money you'd have today if you bought Bitcoin at any point since 2013. Free Bitcoin return calculator with live prices and DCA simulator." />
+  <meta name="description" content="Estimate how much money you'd have today if you bought Bitcoin at any point since 2013. Free Bitcoin return calculator with live prices and DCA simulator." />
   <link rel="canonical" href="https://www.bitcoingrowthcalculator.com/" />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <meta property="og:type" content="website" />
   <meta property="og:title" content="Bitcoin Investment Calculator — What If You'd Bought Bitcoin?" />
-  <meta property="og:description" content="See exactly how much money you'd have today if you bought Bitcoin at any date since 2013. Try it free." />
+  <meta property="og:description" content="Estimate how much money you'd have today if you bought Bitcoin at any date since 2013. Try it free." />
   <meta property="og:url" content="https://www.bitcoingrowthcalculator.com/" />
   <meta property="og:image" content="https://www.bitcoingrowthcalculator.com/og.png" />
   <meta property="og:image:width" content="1200" />
@@ -26,7 +26,7 @@
   <meta property="og:site_name" content="Bitcoin Growth Calculator" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="What If You'd Bought Bitcoin?" />
-  <meta name="twitter:description" content="See exactly how much money you'd have today. Try any date since 2013." />
+  <meta name="twitter:description" content="Estimate how much money you'd have today. Try any date since 2013." />
   <meta name="twitter:image" content="https://www.bitcoingrowthcalculator.com/og.png" />
   <script type="application/ld+json">
   {
@@ -424,7 +424,7 @@
           <div class="stat"><div class="stat-label">% Return</div><div class="stat-val" id="tm-pct">—</div></div>
           <div class="stat"><div class="stat-label">Time Held</div><div class="stat-val" id="tm-years">—</div></div>
           <div class="stat"><div class="stat-label">Ann. Return</div><div class="stat-val" id="tm-ann">—</div></div>
-          <div class="stat"><div class="stat-label">Worst Drawdown</div><div class="stat-val red" id="tm-dd">—</div></div>
+          <div class="stat"><div class="stat-label">Monthly Drawdown (est.)</div><div class="stat-val red" id="tm-dd">—</div></div>
           <div class="stat" id="tm-tax-stat" style="display:none;"><div class="stat-label">After Tax</div><div class="stat-val" id="tm-after-tax">—</div></div>
           <div class="stat" id="tm-real-stat" style="display:none;"><div class="stat-label">In Today's $</div><div class="stat-val" id="tm-real">—</div></div>
         </div>
@@ -436,6 +436,7 @@
         <div class="bar-labels"><span>Invested</span><span>Today's value</span></div>
         <div class="bar-track"><div class="bar-fill" id="tm-bar"></div></div>
         <div class="fact-note" id="tm-note"></div>
+        <p class="fact-note" id="tm-data-note" aria-live="polite"></p>
 
         <!-- Share -->
         <div class="share-section">
@@ -468,15 +469,16 @@
           <div class="ec-sub">Current BTC price. What $100 last week would be worth. One historical fact. No hype, no predictions — just <strong>the actual numbers</strong>, every Monday morning.</div>
           <div class="ec-row">
             <input class="ec-input" type="email" id="ec-email" placeholder="your@email.com" />
-            <button class="ec-btn" onclick="submitEmail()">SEND ME IT</button>
+            <button class="ec-btn" id="ec-submit" onclick="submitEmail()">SEND ME IT</button>
           </div>
+          <div class="ec-privacy" id="ec-status" role="status" aria-live="polite"></div>
           <div class="ec-privacy">No spam. Unsubscribe anytime. We hate junk mail too.</div>
         </div>
         <div class="email-success" id="email-success">
           <div class="email-success-icon">🎉</div>
           <div class="email-success-text">
             <strong>You're in! Check your inbox.</strong>
-            <span>First email lands within the hour. In the meantime, try the DCA calculator →</span>
+            <span>Check your inbox for any confirmation steps. You can also try the DCA calculator →</span>
           </div>
         </div>
       </div>
@@ -485,12 +487,12 @@
     <!-- ══ DCA PANEL ══ -->
     <div class="tab-panel" id="panel-dca">
       <div class="dca-intro">
-        <strong>Dollar-Cost Averaging (DCA)</strong> means buying a fixed amount of Bitcoin on a regular schedule — ignoring the price. It's the strategy that turns ordinary people into long-term winners by removing emotion from the equation.
+        <strong>Dollar-Cost Averaging (DCA)</strong> means buying a fixed amount of Bitcoin on a regular schedule — ignoring the price. It spreads purchases over time, but does not guarantee a profit or protect against losses.
       </div>
 
       <div class="dca-form-grid">
         <div class="field">
-          <label>Monthly amount</label>
+          <label>Amount per purchase</label>
           <div class="input-wrap"><span class="input-prefix">$</span><input type="number" id="dca-amount" placeholder="100" min="1" inputmode="decimal" value="100" /></div>
         </div>
         <div class="field">
@@ -512,6 +514,7 @@
       <div class="loading" id="dca-loading"><div class="spinner"></div><div id="dca-loading-msg">CALCULATING…</div></div>
 
       <div class="dca-result" id="dca-result">
+        <p class="fact-note" id="dca-data-note" aria-live="polite"></p>
         <div class="divider"></div>
 
         <div class="dca-hero">
@@ -585,8 +588,9 @@
           <div class="den-sub">We send one short email: current BTC price, what your DCA would look like this week, and one thing worth knowing. That's it. Free, no spam.</div>
           <div class="den-row">
             <input class="ec-input" type="email" id="dca-ec-email" placeholder="your@email.com" />
-            <button class="ec-btn" onclick="submitDcaEmail()">GET MY PLAN</button>
+            <button class="ec-btn" id="dca-ec-submit" onclick="submitDcaEmail()">GET MY PLAN</button>
           </div>
+          <div class="ec-privacy" id="dca-ec-status" role="status" aria-live="polite"></div>
           <div class="ec-privacy" style="margin-top:10px">No spam. Free forever. Just useful Bitcoin data.</div>
         </div>
       </div>
@@ -611,7 +615,9 @@
       <a href="/what-if/2024/" style="color:var(--orange);text-decoration:none;">2024</a> ·
       <a href="/what-if/2025/" style="color:var(--orange);text-decoration:none;">2025</a>
     </p>
-    <p>Historical prices from built-in dataset (Apr 2013 – present) · Live price via CoinGecko</p>
+    <p id="data-coverage">Historical prices: daily CoinGecko observations where available; otherwise monthly reference estimates, interpolated between dated anchors.</p>
+    <p>Monthly drawdown uses reference observations and can miss intramonth losses. Benchmark comparisons use monthly observations; S&amp;P 500 excludes dividends. Fees and slippage excluded; optional tax is a simplified estimate.</p>
+    <p id="live-price-asof" aria-live="polite">Current quote loading from CoinGecko…</p>
     <p>Not financial advice · Past performance does not guarantee future results</p>
     <p style="margin-top:8px;"><a href="/faq" style="color:var(--orange);text-decoration:none;font-family:'DM Mono',monospace;font-size:12px;letter-spacing:0.08em;">FAQ — Common Bitcoin Questions →</a></p>
   </footer>
@@ -635,7 +641,7 @@ const CONFIG = {
 };
 // ════════════════════════════════════════════════════════════
 
-// ── Historical BTC monthly closes (USD) ──────────────────────────────────────
+// ── Historical BTC monthly reference estimates (USD; legacy anchors at month end) ──────────────────────────────────────
 const BTC_MONTHLY = {
   '2013-04':130,'2013-05':129,'2013-06':97,'2013-07':91,'2013-08':118,
   '2013-09':128,'2013-10':198,'2013-11':1057,'2013-12':732,
@@ -673,11 +679,12 @@ const BTC_MONTHLY = {
   '2024-06':62678,'2024-07':66000,'2024-08':59142,'2024-09':63301,'2024-10':72444,
   '2024-11':97716,'2024-12':93400,
   '2025-01':102405,'2025-02':84373,'2025-03':82549,'2025-04':94207,'2025-05':104638,
-  '2025-06':107135,'2025-07':115758,'2025-08':108237,'2025-09':112692,'2025-10':114088,
-  '2025-11':109567,'2025-12':90360,
-  '2026-01':87575,'2026-02':78647,'2026-03':67017,'2026-04':68107,'2026-05':76297,
-  '2026-06':73599,'2026-07':58566,'2026-08':62820,'2026-09':78553,
+  '2025-06':107135,'2025-07':115758,'2025-08':108237,'2025-09':114327,'2025-10':108409,
+  '2025-11':90832,'2025-12':88364,
+  '2026-01':84092,'2026-02':65891,'2026-03':66691,'2026-04':75785,'2026-05':73820,
+  '2026-06':60152,'2026-07':64743,'2026-08':77658,'2026-09':83622,
 };
+const BTC_MONTHLY_DATES = {"2025-09": "2025-09-30", "2025-10": "2025-10-31", "2025-11": "2025-11-30", "2025-12": "2025-12-31", "2026-01": "2026-01-31", "2026-02": "2026-02-28", "2026-03": "2026-03-31", "2026-04": "2026-04-30", "2026-05": "2026-05-31", "2026-06": "2026-06-30", "2026-07": "2026-07-31", "2026-08": "2026-08-31", "2026-09": "2026-09-28"};
 
 // Monthly keys from a..b inclusive, clamped to the dataset.
 function monthKeysBetween(aKey, bKey) {
@@ -740,12 +747,12 @@ function monthKey(dateStr) {
 // Exact daily closes, when the data workflow has produced them. Until then the
 // monthly interpolation below is used, so this is a precision upgrade rather
 // than a dependency.
-let DAILY = null;
+let DAILY = null, dailyGenerated = null;
 (function loadDaily(){
   try {
     fetch('/data/btc_daily.json')
       .then(r => r.ok ? r.json() : null)
-      .then(j => { if (j && j.prices) { DAILY = j.prices; retryAfterDaily(); } })
+      .then(j => { if (j && j.prices) { DAILY = j.prices; dailyGenerated = j.generated || null; updateDataCoverage(); retryAfterDaily(); } })
       .catch(() => {});
   } catch(e) {}
 })();
@@ -754,55 +761,84 @@ let DAILY = null;
 // rendered from the monthly approximation quietly sharpens instead of going stale.
 function retryAfterDaily(){
   try {
-    if (lastTM && lastTM.invested) tmCalculate(true);
-    if (lastDCA && lastDCA.totalInvested) dcaCalculate(true);
+    if (g('panel-tm').classList.contains('active') && lastTM && lastTM.invested) tmCalculate(true);
+    if (g('panel-dca').classList.contains('active') && lastDCA && lastDCA.totalInvested) dcaCalculate(true);
   } catch(e) {}
 }
 
-function getHistoricalPrice(dateStr) {
+// Legacy monthly reference values are treated as month-end estimates. Newer
+// references retain their actual observation date, including partial months.
+function monthAnchorDate(key) {
+  if (BTC_MONTHLY_DATES[key]) return BTC_MONTHLY_DATES[key];
+  const [y,m] = key.split('-').map(Number);
+  return new Date(Date.UTC(y,m,0)).toISOString().slice(0,10);
+}
+function getHistoricalQuote(dateStr) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return null;
+  const target = Date.parse(dateStr+'T00:00:00Z');
+  if (!Number.isFinite(target) || new Date(target).toISOString().slice(0,10)!==dateStr) return null;
+  if (DAILY && Number.isFinite(DAILY[dateStr]) && DAILY[dateStr]>0)
+    return {price:DAILY[dateStr], method:'daily observation', asOf:dateStr};
+  // Never silently call a nearby observation the requested day's actual price.
   if (DAILY) {
-    if (DAILY[dateStr] != null) return DAILY[dateStr];
-    // Fall back to the most recent earlier day (markets have gaps; BTC rarely,
-    // but the series can still miss a day).
-    const d0 = new Date(dateStr + 'T12:00:00Z');
-    for (let back = 1; back <= 7; back++) {
-      const probe = new Date(d0.getTime() - back * 86400000).toISOString().slice(0, 10);
-      if (DAILY[probe] != null) return DAILY[probe];
+    for (let back=1; back<=7; back++) {
+      const day = new Date(target-back*86400000).toISOString().slice(0,10);
+      if (Number.isFinite(DAILY[day]) && DAILY[day]>0)
+        return {price:DAILY[day], method:'prior daily observation carried forward', asOf:day};
     }
   }
-  const [y,m,d] = dateStr.split('-').map(Number);
-  const key = `${y}-${String(m).padStart(2,'0')}`;
-  if (!BTC_MONTHLY[key]) {
-    // Date is past the end of the dataset — fall back to live price for
-    // recent dates (within ~92 days) so the calculator never hard-breaks
-    // between dataset updates.
-    const ageDays = (Date.now() - new Date(dateStr+'T12:00:00Z')) / 86400000;
-    if (ageDays >= 0 && ageDays <= 92 && cachedPrice) return cachedPrice;
-    return null;
+  const anchors = Object.keys(BTC_MONTHLY).sort().map(key=>({
+    date:monthAnchorDate(key), price:BTC_MONTHLY[key]
+  }));
+  const first=anchors[0], last=anchors[anchors.length-1];
+  if (dateStr<first.date) {
+    if (dateStr.slice(0,7)!==first.date.slice(0,7)) return null;
+    return {price:first.price, method:'monthly reference estimate', asOf:first.date};
   }
-  const prev = BTC_MONTHLY[prevMK(key)] ?? BTC_MONTHLY[key];
-  const curr = BTC_MONTHLY[key];
-  const next = BTC_MONTHLY[nextMK(key)] ?? BTC_MONTHLY[key];
-  const days = new Date(y,m,0).getDate();
-  const t = (d-1)/Math.max(days-1,1);
-  return t < 0.5 ? prev+(curr-prev)*(t*2) : curr+(next-curr)*((t-0.5)*2);
+  for (let i=0; i<anchors.length; i++) {
+    const right=anchors[i];
+    if (dateStr===right.date) return {price:right.price, method:'monthly reference estimate', asOf:right.date};
+    if (dateStr<right.date && i>0) {
+      const left=anchors[i-1];
+      const lo=Date.parse(left.date+'T00:00:00Z'), hi=Date.parse(right.date+'T00:00:00Z');
+      const t=(target-lo)/(hi-lo);
+      return {price:left.price+(right.price-left.price)*t, method:'interpolated monthly estimate', asOf:left.date+' to '+right.date};
+    }
+  }
+  if ((target-Date.parse(last.date+'T00:00:00Z'))/86400000<=7)
+    return {price:last.price, method:'monthly reference carried forward', asOf:last.date};
+  return null;
+}
+function getHistoricalPrice(dateStr) { return getHistoricalQuote(dateStr)?.price ?? null; }
+function describeQuote(q) { return q ? q.method+' ('+q.asOf+')' : 'unavailable'; }
+function updateDataCoverage() {
+  const days=DAILY?Object.keys(DAILY).sort():[];
+  g('data-coverage').textContent=(days.length
+    ? 'Daily CoinGecko observations: '+days[0]+' to '+days[days.length-1]+'. '
+    : 'Daily observations unavailable. ')
+    +'Other dates use monthly reference estimates, interpolated between dated anchors. Historical inputs are estimates, not executable trade prices.';
 }
 function prevMK(k) { const [y,m]=k.split('-').map(Number),d=new Date(y,m-2,1); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`; }
 function nextMK(k) { const [y,m]=k.split('-').map(Number),d=new Date(y,m,1); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`; }
 
-// ── Live price — fetched once, cached forever ─────────────────────────────────
-let cachedPrice = null;
-
+// ── Current quote — refresh after one minute; retain its provider timestamp ──
+let cachedPrice = null, priceFetchedAt = 0, priceAsOf = null;
 async function fetchCurrentPrice() {
-  if (cachedPrice) return cachedPrice;
-
+  if (cachedPrice && Date.now()-priceFetchedAt<60000) return cachedPrice;
   try {
-    const r = await fetch("/api/price");
-    const data = await r.json();
-    cachedPrice = data.price;
+    const r=await fetch('/api/price');
+    if(!r.ok) throw new Error('Price service unavailable');
+    const data=await r.json();
+    if(!Number.isFinite(data.price)||data.price<=0) throw new Error('Invalid price');
+    cachedPrice=data.price; priceFetchedAt=Date.now();
+    priceAsOf=data.asOf && Number.isFinite(Date.parse(data.asOf)) ? data.asOf : new Date(priceFetchedAt).toISOString();
+    g('live-price-asof').textContent='CoinGecko quote as of '+priceAsOf.replace('T',' ').replace('Z',' UTC')+'. Quotes may be cached for up to 11 minutes.';
+    g('live-price-val').textContent=formatUSD(cachedPrice);
     return cachedPrice;
-  } catch (e) {
-    console.error("Price fetch failed:", e);
+  } catch(e) {
+    cachedPrice=null;
+    g('live-price-val').textContent='unavailable';
+    g('live-price-asof').textContent='Current CoinGecko quote unavailable. Please retry; historical sell-date calculations remain available.';
     return null;
   }
 }
@@ -817,7 +853,8 @@ fetchCurrentPrice().then(p=>{
   g('live-dot').classList.remove('fetching');
   g('live-price-val').textContent = formatUSD(p);
   g('live-price-val').style.color = 'var(--green)';
-  tmCalculate(true);
+  const deepTab=new URLSearchParams(location.search).get('tab');
+  if(deepTab!=='dca' && location.hash!=='#dca' && g('panel-tm').classList.contains('active')) tmCalculate(true);
 }).catch(()=>{
   g('live-price-val').textContent='unavailable';
 });
@@ -894,9 +931,10 @@ document.querySelectorAll('.moment-chip').forEach(chip=>{
 g('calc-btn').addEventListener('click',()=>tmCalculate());
 g('tm-amount').addEventListener('keydown',e=>{ if(e.key==='Enter') tmCalculate(); });
 
-let lastTM = {};
+let lastTM = {}, tmRequestId = 0;
 
 async function tmCalculate(silent=false) {
+  const requestId=++tmRequestId;
   const amount = parseFloat(g('tm-amount').value);
   const dateVal = g('tm-date').value;
   hideEl('tm-result'); hideErr('tm-error');
@@ -908,11 +946,12 @@ async function tmCalculate(silent=false) {
   if(pd<new Date('2013-04-28')){if(!silent)showErr('tm-error','Data available from April 2013.');return;}
   let histPrice = getHistoricalPrice(dateVal);
   if(!histPrice && !cachedPrice){
-    // A date just past the end of the dataset falls back to the live price, so
-    // the lookup can only succeed once that price is in hand. The page
-    // pre-fetches on load, but a fast click can land here first.
+    // Allow pending data requests to settle while the initial quote loads.
+    // The lookup is repeated, but a current quote never substitutes for an
+    // unavailable historical date.
     showEl('tm-loading'); g('loading-msg').textContent='FETCHING LIVE BTC PRICE…';
     try { await fetchCurrentPrice(); } catch(e) {}
+    if(requestId!==tmRequestId) return;
     hideEl('tm-loading');
     histPrice = getHistoricalPrice(dateVal);
   }
@@ -931,11 +970,14 @@ async function tmCalculate(silent=false) {
 
   loadSeries();
   if(sellPrice){ tmDisplay(amount,histPrice,sellPrice,pd,sellDate); return; }
-  if(cachedPrice){ tmDisplay(amount,histPrice,cachedPrice,pd,null); return; }
+
   showEl('tm-loading'); g('loading-msg').textContent='FETCHING LIVE BTC PRICE…';
   try {
     const p = await fetchCurrentPrice();
-    hideEl('tm-loading'); tmDisplay(amount,histPrice,p,pd,null);
+    if(requestId!==tmRequestId) return;
+    hideEl('tm-loading');
+    if(!p){ if(!silent)showErr('tm-error','Could not fetch the current price. Try again or choose a historical sell date.'); return; }
+    tmDisplay(amount,histPrice,p,pd,null);
   } catch(e){ hideEl('tm-loading'); showErr('tm-error','Could not fetch live price. Try again.'); }
 }
 
@@ -986,6 +1028,7 @@ function tmDisplay(invested, priceThen, priceNow, pd, sellDate) {
   }
 
   g('tm-note').textContent=buildTMNote(mult,pct,years,pd,invested,now,dd);
+  g('tm-data-note').textContent='Purchase price: '+describeQuote(getHistoricalQuote(pd.toISOString().slice(0,10)))+'. Valuation: '+(sellDate ? describeQuote(getHistoricalQuote(sellDate.toISOString().slice(0,10))) : 'CoinGecko quote as of '+priceAsOf)+'. Monthly drawdown is approximate and may miss intramonth losses. Fees and slippage excluded.';
   tmExtras(invested, btc, priceThen, priceNow, pd, sellDate, now);
   updatePermalink({ amount: Math.round(invested), date: pd.toISOString().slice(0,10),
                     sell: sellDate?sellDate.toISOString().slice(0,10):'', tax: g('tm-tax').value });
@@ -1045,17 +1088,18 @@ function buildTMNote(mult,pct,years,date,invested,now,dd){
   if(mult>=1000) return `A ${ds} investment that multiplied ${Math.round(mult).toLocaleString()}× — the equivalent of earning ${daily} every single day for ${years.toFixed(1)} years.`+held;
   if(mult>=100)  return `${ds} buyers who held through every crash turned $${Math.round(invested).toLocaleString()} into ${formatUSD(now)}. That's ${mult.toFixed(0)}× in ${years.toFixed(1)} years.`+held;
   if(mult>=10)   return `Buying in ${ds} and holding through the volatility rewarded patience with a ${pct.toFixed(0)}% return over ${years.toFixed(1)} years.`+held;
-  if(mult>=2)    return `A solid ${pct.toFixed(0)}% return over ${years.toFixed(1)} years. Bitcoin's long-term holders have consistently come out ahead.`+held;
+  if(mult>=2)    return `An estimated ${pct.toFixed(0)}% return over ${years.toFixed(1)} years for this selected window. Future outcomes can differ.`+held;
   if(mult>=1)    return `A modest gain from ${ds}. Many who bought around this time saw larger returns by holding through subsequent cycles.`+held;
-  return `This window shows a loss of ${formatUSD(Math.abs(now-invested))}. Bitcoin's volatility is real — but holders across most multi-year windows have been rewarded.`+held;
+  return `This selected window shows an estimated loss of ${formatUSD(Math.abs(now-invested))}. A longer holding period does not guarantee recovery.`+held;
 }
 
 // ── DCA CALCULATOR ────────────────────────────────────────────────────────────
-g('dca-btn').addEventListener('click', dcaCalculate);
+g('dca-btn').addEventListener('click', ()=>dcaCalculate());
 
-let lastDCA = {}, dcaChartInstance = null;
+let lastDCA = {}, dcaChartInstance = null, dcaRequestId = 0;
 
 async function dcaCalculate(silent=false) {
+  const requestId=++dcaRequestId;
   const amount = parseFloat(g('dca-amount').value);
   const startVal = g('dca-start').value;
   const freq = g('dca-freq').value;
@@ -1067,26 +1111,43 @@ async function dcaCalculate(silent=false) {
   if(startDate>=new Date()){if(!silent)showErr('dca-error','Start date must be in the past.');return;}
   if(startDate<new Date('2013-04-28')){if(!silent)showErr('dca-error','Data available from April 2013.');return;}
 
-  if(cachedPrice){ dcaDisplay(amount, startDate, freq, cachedPrice); return; }
+
   showEl('dca-loading'); g('dca-loading-msg').textContent='FETCHING LIVE BTC PRICE…';
   try {
     const p = await fetchCurrentPrice();
-    hideEl('dca-loading'); dcaDisplay(amount, startDate, freq, p);
+    if(requestId!==dcaRequestId) return;
+    hideEl('dca-loading');
+    if(!p){if(!silent)showErr('dca-error','Could not fetch the current price. Try again.');return;}
+    dcaDisplay(amount, startDate, freq, p);
   } catch(e){ hideEl('dca-loading'); if(!silent)showErr('dca-error','Could not fetch live price. Try again.'); }
 }
 
+// Anchor each monthly contribution to the original day, clamped in shorter
+// months (Jan 31 -> Feb 28/29 -> Mar 31), all in UTC to avoid DST drift.
+function purchaseDates(startDate,endDate,freq) {
+  if(!['daily','weekly','monthly'].includes(freq)) return [];
+  const out=[], y=startDate.getUTCFullYear(), m=startDate.getUTCMonth(), day=startDate.getUTCDate();
+  for(let i=0;i<6000;i++) {
+    let d;
+    if(freq==='monthly') {
+      const last=new Date(Date.UTC(y,m+i+1,0)).getUTCDate();
+      d=new Date(Date.UTC(y,m+i,Math.min(day,last),12));
+    } else d=new Date(Date.UTC(y,m,day+i*(freq==='weekly'?7:1),12));
+    if(d>endDate) break;
+    out.push(d);
+  }
+  return out;
+}
 function dcaDisplay(amountPerPeriod, startDate, freq, currentPrice) {
-  // Generate purchase dates
-  const purchases = [];
-  const d = new Date(startDate);
-  const today = new Date();
-  const stepDays = freq==='daily'?1:freq==='weekly'?7:30;
-
-  while(d < today) {
-    const dateStr = fmt(d);
-    const price = getHistoricalPrice(dateStr) || currentPrice;
-    purchases.push({ date: new Date(d), price, btc: amountPerPeriod/price });
-    d.setDate(d.getDate()+stepDays);
+  const purchases=[];
+  const today=new Date();
+  for(const d of purchaseDates(startDate,today,freq)) {
+    const dateStr=d.toISOString().slice(0,10);
+    const q=dateStr===today.toISOString().slice(0,10)
+      ? {price:currentPrice,method:'current quote',asOf:priceAsOf}
+      : getHistoricalQuote(dateStr);
+    if(!q){showErr('dca-error','Historical price unavailable for '+dateStr+'. Try an earlier end window after data refresh.');return;}
+    purchases.push({date:d,price:q.price,btc:amountPerPeriod/q.price,quote:q});
   }
 
   if(purchases.length===0){ showErr('dca-error','No data for that period.'); return; }
@@ -1124,19 +1185,22 @@ function dcaDisplay(amountPerPeriod, startDate, freq, currentPrice) {
     if(i%step===0||i===purchases.length-1){
       chartLabels.push(p.date.toLocaleDateString('en-US',{month:'short',year:'2-digit'}));
       chartInvested.push(+runInvested.toFixed(2));
-      chartValue.push(+(runBtc*currentPrice).toFixed(2));
+      chartValue.push(+(runBtc*p.price).toFixed(2));
     }
   });
 
+  chartLabels.push('Current'); chartInvested.push(totalInvested); chartValue.push(+totalValue.toFixed(2));
   drawChart(chartLabels, chartInvested, chartValue);
+  const estimated=purchases.filter(p=>p.quote.method!=='daily observation' && p.quote.method!=='current quote').length;
+  g('dca-data-note').textContent=estimated+' of '+purchases.length+' purchases use monthly estimates or carried-forward observations. The chart values holdings at each purchase-date price plus the current quote ('+priceAsOf+'). It samples purchase dates and may miss intervening drawdowns. Fees and slippage excluded. The lump-sum comparison assumes all contributions were available on day one.';
 
   // Fact
   const startLabel = startDate.toLocaleDateString('en-US',{month:'long',year:'numeric'});
   if (dcaUp) {
     const perDay = formatUSD(totalGain/((Date.now()-startDate)/(1000*60*60*24)));
-    g('dca-fact').innerHTML = `Investing just <strong>${formatUSD(amountPerPeriod)}</strong> every ${freq.replace('ly','')} since ${startLabel} would have grown to <strong>${formatUSD(totalValue)}</strong> — a gain of <strong>${formatUSD(totalGain)}</strong>. That's <strong>${perDay}</strong> earned per day on average, while doing absolutely nothing.`;
+    g('dca-fact').innerHTML = `Investing just <strong>${formatUSD(amountPerPeriod)}</strong> every ${({daily:'day',weekly:'week',monthly:'month'}[freq])} since ${startLabel} would have grown to <strong>${formatUSD(totalValue)}</strong> — a gain of <strong>${formatUSD(totalGain)}</strong>. That's <strong>${perDay}</strong> earned per day on average, while doing absolutely nothing.`;
   } else {
-    g('dca-fact').innerHTML = `A DCA started in ${startLabel} is currently down <strong>${formatUSD(Math.abs(totalGain))}</strong> — but you'd have accumulated <strong>₿ ${totalBtc.toFixed(4)}</strong> at an average price of <strong>${formatUSD(totalInvested/totalBtc)}</strong>. Every bear-market DCA window in Bitcoin's history has eventually turned green; try a longer window above to see it.`;
+    g('dca-fact').innerHTML = `A DCA started in ${startLabel} is currently down <strong>${formatUSD(Math.abs(totalGain))}</strong> — but you'd have accumulated <strong>₿ ${totalBtc.toFixed(4)}</strong> at an average price of <strong>${formatUSD(totalInvested/totalBtc)}</strong>. Regular buying does not guarantee recovery or a profit.`;
   }
 
   // Same money, all at once on the start date — the question every DCA article asks.
@@ -1196,7 +1260,7 @@ function drawChart(labels, invested, value) {
   const minV=0, maxV=Math.max(...allVals)*1.08;
   const n=labels.length;
 
-  function xOf(i){ return pad.left + (i/(n-1))*iW; }
+  function xOf(i){ return pad.left + (i/Math.max(n-1,1))*iW; }
   function yOf(v){ return pad.top + (1-(v-minV)/(maxV-minV))*iH; }
 
   // Grid lines
@@ -1285,6 +1349,9 @@ function applyPermalink(){
 
 // Rewrite the address bar after a calculation so copying the URL shares the result.
 function updatePermalink(params){
+  // Late background results must never overwrite the visible calculator's URL.
+  const targetTab=params.tab==='dca'?'dca':'tm';
+  if(!g('panel-'+targetTab).classList.contains('active')) return;
   try{
     const q=new URLSearchParams();
     Object.entries(params).forEach(([k,v])=>{ if(v!=null&&v!=='') q.set(k,v); });
@@ -1303,46 +1370,43 @@ function permalinkFor(params){
 }
 
 // ── Email capture — Beehiiv ───────────────────────────────────────────────────
-async function submitToBeehiiv(email) {
+async function submitSignup(placement) {
+  const prefix=placement==='dca'?'dca-ec':'ec';
+  const input=g(prefix+'-email'), btn=g(prefix+'-submit'), status=g(prefix+'-status');
+  if(btn.disabled) return;
+  const email=input.value.trim();
+  if(!input.checkValidity() || !email){status.textContent='Please enter a valid email address.';input.focus();return;}
+  const label=btn.textContent;
+  btn.disabled=true; btn.textContent='SENDING…'; status.textContent='';
   try {
-    const formData = new URLSearchParams();
-    formData.append('email', email);
-    formData.append('utm_source', 'bitcoingrowthcalculator');
-    formData.append('utm_medium', 'organic');
-
-    await fetch(CONFIG.beehiivFormUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: formData,
-      mode: 'no-cors'
+    const response=await fetch('/api/subscribe',{
+      method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email})
     });
-
-    return true;
-  } catch (e) {
-    console.error('Beehiiv submit failed:', e);
-    return false;
+    const data=await response.json();
+    if(response.ok && data.status==='unknown'){
+      status.textContent='We could not confirm whether your request was accepted. Check your inbox before trying again.';
+      return;
+    }
+    if(!response.ok || data.success!==true) throw new Error('Unconfirmed subscription');
+    input.value='';
+    status.textContent='Subscription accepted. Check your inbox for any confirmation steps.';
+    track('email_signup',{placement});
+  } catch(_) {
+    status.textContent='We could not confirm your subscription. If the request was sent, check your inbox before trying again.';
+  } finally {
+    btn.disabled=false;btn.textContent=label;
   }
 }
-function submitDcaEmail() {
-  const email = g('dca-ec-email').value.trim();
-  if(!email || !email.includes('@')) { g('dca-ec-email').focus(); return; }
-  submitToBeehiiv(email);
-  track('email_signup',{ placement:'dca' });
-  g('dca-email-nudge').style.display = 'none';
-  const conf = document.createElement('div');
-  conf.style.cssText = 'margin-top:16px;padding:14px 18px;background:var(--green-glow);border:1px solid rgba(34,197,94,0.28);border-radius:2px;font-family:DM Mono,monospace;font-size:13px;color:var(--green);';
-  conf.textContent = "✓ You're in! First email lands within the hour.";
-  g('dca-result').appendChild(conf);
-}
+function submitDcaEmail(){return submitSignup('dca');}
+function submitEmail(){return submitSignup('time_machine');}
 
 // ── DCA Share ─────────────────────────────────────────────────────────────────
 g('dca-share-x').addEventListener('click',()=>{
   const {amountPerPeriod,freq,totalInvested,totalValue,pct} = lastDCA;
   if(!totalInvested) return;
-  const tweet = pct>=0
-    ? `I ran the numbers: investing just ${formatUSD(amountPerPeriod)} ${freq} in Bitcoin would have turned ${formatUSD(totalInvested)} into ${formatUSD(totalValue)} — a +${pct.toFixed(0)}% return. 🤯\n\nThis is why people DCA. Calculate yours:`
-    : `I ran the numbers: investing ${formatUSD(amountPerPeriod)} ${freq} in Bitcoin since then would be down ${Math.abs(pct).toFixed(0)}% right now — ${formatUSD(totalInvested)} in, ${formatUSD(totalValue)} today.\n\nDCA is a long game. Calculate yours:`;
-  window.open('https://twitter.com/intent/tweet?text='+encodeURIComponent(tweet),'_blank');
+  const tweet = `${formatUSD(amountPerPeriod)} ${freq} Bitcoin purchases since ${lastDCA.startISO}: ${formatUSD(totalInvested)} invested → ${formatUSD(totalValue)} at the latest quote (${pct>=0?'+':''}${pct.toFixed(0)}%). Estimated historical returns; fees excluded. Try your own dates:`;
+  window.open('https://twitter.com/intent/tweet?text='+encodeURIComponent(tweet)+'&url='+encodeURIComponent(permalinkFor({tab:'dca',amount:amountPerPeriod,date:lastDCA.startISO,freq,value:Math.round(totalValue),inv:Math.round(totalInvested)})),'_blank','noopener');
+  track('share_attempt',{calculator:'dca',method:'x'});
 });
 g('dca-share-copy').addEventListener('click',async()=>{
   const {amountPerPeriod,freq,totalInvested,totalValue,totalGain,pct,purchases} = lastDCA;
@@ -1362,12 +1426,14 @@ g('share-x').addEventListener('click',()=>{
   const iFmt=Math.round(invested).toLocaleString(), nFmt=formatUSD(now);
   const mFmt=fmtMult(mult);
   const date=pd.toLocaleDateString('en-US',{month:'short',year:'numeric'});
-  const tweet=`$${iFmt} spent on literally anything else in ${date} would still just be $${iFmt}.\n\nInvested in Bitcoin instead? ${nFmt} today. That's ${mFmt}. 🤯\n\nWhat would YOUR money be worth?`;
-  window.open('https://twitter.com/intent/tweet?text='+encodeURIComponent(tweet),'_blank');
+  const endpoint=lastTM.sellDate ? "on "+lastTM.sellDate.toISOString().slice(0,10) : "at the latest quote";
+  const tweet=`$${iFmt} invested in Bitcoin in ${date}: estimated value ${nFmt} ${endpoint} (${mFmt}). Historical prices may be estimated; fees excluded.\n\nTry your own dates:`;
+  window.open('https://twitter.com/intent/tweet?text='+encodeURIComponent(tweet)+'&url='+encodeURIComponent(permalinkFor({amount:invested,date:pd.toISOString().slice(0,10),sell:lastTM.sellDate?lastTM.sellDate.toISOString().slice(0,10):'',tax:g('tm-tax').value,value:Math.round(now)})),'_blank','noopener');
+  track('share_attempt',{calculator:'time_machine',method:'x'});
 });
 g('share-copy').addEventListener('click',async()=>{
   const{invested,now,mult,pct,pd}=lastTM; if(!invested) return;
-  const txt=`💰 Bitcoin Time Machine\n\n$${Math.round(invested).toLocaleString()} invested on ${pd.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})}\nWould be worth ${formatUSD(now)} today\nThat's ${fmtMult(mult)} (${pct>=0?'+':'−'}${Math.abs(pct).toFixed(0)}%)\n\nSee it: ${permalinkFor({amount:Math.round(invested),date:pd.toISOString().slice(0,10),sell:lastTM.sellDate?lastTM.sellDate.toISOString().slice(0,10):'',value:Math.round(now)})}`;
+  const txt=`💰 Bitcoin Time Machine\n\n$${Math.round(invested).toLocaleString()} invested on ${pd.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})}\nEstimated value ${formatUSD(now)} ${lastTM.sellDate?"on "+lastTM.sellDate.toISOString().slice(0,10):"at the latest quote"}\nThat's ${fmtMult(mult)} (${pct>=0?'+':'−'}${Math.abs(pct).toFixed(0)}%)\n\nSee it: ${permalinkFor({amount:Math.round(invested),date:pd.toISOString().slice(0,10),sell:lastTM.sellDate?lastTM.sellDate.toISOString().slice(0,10):'',tax:g('tm-tax').value,value:Math.round(now)})}`;
   try{
     await navigator.clipboard.writeText(txt);
     const btn=g('share-copy'); btn.classList.add('copied'); g('copy-label').textContent='✓ Copied!';
@@ -1392,38 +1458,6 @@ function formatUSD(n){
   return '$'+n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
 }
 function fmt(d){ return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
-
-// === Email Subscribe (Beehiiv) ===
-function submitEmail() {
-    const emailInput = document.querySelector('input[placeholder*="email"]');
-    const email = emailInput?.value?.trim();
-    if (!email || !email.includes('@')) { alert('Please enter a valid email address.'); return; }
-    const btn = Array.from(document.querySelectorAll('button')).find(b => b.textContent.includes('SEND'));
-    const originalText = btn?.textContent;
-    if (btn) { btn.textContent = 'SENDING...'; btn.disabled = true; }
-
-    fetch('/api/subscribe', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: email })
-    })
-    .then(r => r.json())
-    .then(data => {
-        if (data.success) {
-            track('email_signup',{ placement:'time_machine' });
-            emailInput.value = '';
-            if (btn) { btn.textContent = '\u2713 SUBSCRIBED!'; btn.disabled = false; }
-            setTimeout(() => { if (btn) btn.textContent = originalText; }, 3000);
-        } else {
-            throw new Error(data.error || 'Subscription failed');
-        }
-    })
-    .catch(err => {
-        console.error('Subscribe error:', err);
-        if (btn) { btn.textContent = originalText; btn.disabled = false; }
-        alert('Something went wrong. Please try again.');
-    });
-}
 
 </script>
 </body>
