@@ -11,6 +11,7 @@ URLs to the actual content-change date. Do not stamp the build/regeneration date
 on unchanged pages or update dates for transient live-price responses.
 """
 import os, json, re, calendar, datetime
+from html import escape
 from pathlib import Path
 
 # Read the same monthly reference estimates as the main calculator. Legacy
@@ -23,21 +24,20 @@ DATE_MATCH = re.search(r"const BTC_MONTHLY_DATES = (\{[^;]*\});", INDEX)
 MONTHLY_DATES = json.loads(DATE_MATCH.group(1)) if DATE_MATCH else {}
 JAN_PRICE = {year: MONTHLY[f"{year}-{'04' if year == 2013 else '01'}"] for year in range(2013, 2026)}
 
-NARRATIVE = {
-    2013: "Bitcoin entered 2013 trading in the low hundreds and had its first true mania: it crossed $1,000 for the first time in November before crashing hard. Almost nobody you know bought it. This is the year of maximum regret.",
-    2014: "The Mt. Gox collapse defined 2014 — the largest Bitcoin exchange imploded and price bled all year. Buying into that fear was brutally hard, and brutally profitable.",
-    2015: "The depths of the first great bear market. Bitcoin spent 2015 flat and forgotten in the low hundreds while the media wrote its obituary. It was the single best accumulation window in its history.",
-    2016: "The quiet year before the storm. The second halving happened in July 2016, and price ground steadily upward while nobody paid attention.",
-    2017: "The year Bitcoin went mainstream: from under $1,000 in January to nearly $20,000 by December. Your coworkers started asking about it at lunch. Buying in January — not December — made all the difference.",
-    2018: "The hangover. Bitcoin fell roughly 80% from its 2017 peak, and 'crypto is dead' articles ran weekly. A January 2018 buy was the worst-timed entry in years — and it still recovered.",
-    2019: "The rebuilding year. Bitcoin tripled off the bear-market bottom in spring 2019 while mainstream attention was elsewhere.",
-    2020: "COVID crashed Bitcoin to ~$4,000 in March 2020 — then unprecedented money-printing sent it on the greatest run of its life, closing the year near $29,000. MicroStrategy and PayPal bought in.",
-    2021: "The institutional year: Tesla bought $1.5B, Coinbase IPO'd, El Salvador made it legal tender, and price hit ~$69,000 in November before rolling over.",
-    2022: "The washout: Luna, Celsius, and FTX all collapsed, and Bitcoin bottomed near $15,500. Peak fear — and in hindsight, another generational entry.",
-    2023: "The quiet recovery. Bitcoin more than doubled off the FTX lows while most people were still too burned to look. Spot-ETF anticipation built all year.",
-    2024: "The ETF year: US spot Bitcoin ETFs launched in January, the fourth halving hit in April, and price broke six figures for the first time in December.",
-    2025: "Bitcoin peaked above $115,000 in mid-2025 before sliding into the 2026 drawdown. The return from any single entry depends on the chosen valuation date. Neither a lump sum nor DCA guarantees a profit.",
-}
+def reference_summary(year: int) -> str:
+    """Describe only the saved reference inputs, not an unsourced market story."""
+    points = {key: value for key, value in MONTHLY.items() if key.startswith(f"{year}-")}
+    low = min(points, key=points.get)
+    high = max(points, key=points.get)
+    def label(key):
+        y, month = map(int, key.split('-'))
+        day = datetime.date.fromisoformat(MONTHLY_DATES.get(
+            key, f"{key}-{calendar.monthrange(y, month)[1]:02d}"))
+        return f"{calendar.month_name[day.month]} {day.day}, {day.year}"
+    return (f"The calculator's {len(points)} saved monthly reference prices for {year} range from "
+            f"{fmt_usd(points[low])} ({label(low)}) to {fmt_usd(points[high])} ({label(high)}). "
+            "These are sampled reference estimates, not the year's exact daily low and high. "
+            "Changing the purchase or valuation date changes the result; neither a lump sum nor DCA guarantees a profit.")
 
 def fmt_mult(m: float) -> str:
     """Render a return multiple. Mirrors fmtMult() in the page script below."""
@@ -70,27 +70,37 @@ def page(year: int) -> str:
         f'<td class="now" data-btc="{a/p_then:.12f}">—</td></tr>'
         for a in rows
     )
-    faq_json = json.dumps({
+    faq = {
         "@context": "https://schema.org",
         "@type": "FAQPage",
+        "@id": f"https://www.bitcoingrowthcalculator.com/what-if/{year}/#questions",
+        "url": f"https://www.bitcoingrowthcalculator.com/what-if/{year}/",
+        "inLanguage": "en",
         "mainEntity": [
             {"@type": "Question",
              "name": f"How much would $1,000 of Bitcoin bought in {year} be worth today?",
              "acceptedAnswer": {"@type": "Answer",
-              "text": f"The estimate divides $1,000 by the {reference_label} monthly reference price of {fmt_usd(p_then)}, then multiplies the resulting Bitcoin amount by the current quote. Prices are estimates; fees and slippage are excluded."}},
+              "text": f"Using the {reference_label} monthly reference estimate of {fmt_usd(p_then)}, $1,000 buys approximately {1000/p_then:.6f} BTC before fees. Multiply that Bitcoin amount by the latest available quote to estimate its value. Quotes may be cached or unavailable; no current valuation is shown until a quote loads."}},
             {"@type": "Question",
              "name": f"What was the price of Bitcoin in {year}?",
              "acceptedAnswer": {"@type": "Answer",
               "text": f"This example uses a monthly reference estimate of {fmt_usd(p_then)} dated {reference_label}. Prices varied throughout the year; this is not an exact execution price."}},
             {"@type": "Question",
-             "name": "Is it too late to buy Bitcoin?",
+             "name": "Does this calculation include fees or predict future returns?",
              "acceptedAnswer": {"@type": "Answer",
-              "text": "Nobody can predict future returns and past performance is no guarantee. Dollar-cost averaging (DCA) means buying a fixed amount on a schedule. It does not guarantee a profit. Our DCA calculator shows how that has performed historically."}},
+              "text": "This example excludes fees, slippage and tax. It is a hypothetical historical calculation, not a forecast or a recommendation to buy. Past performance does not guarantee future results. Use the main calculator to choose another purchase date or a historical sale date."}},
         ],
-    }, ensure_ascii=False)
+    }
+    faq_json = json.dumps(faq, ensure_ascii=False)
+    faq_html = "\n".join(
+        f'<details><summary>{escape(question["name"])}</summary>'
+        f'<p>{escape(question["acceptedAnswer"]["text"])}</p></details>'
+        for question in faq["mainEntity"]
+    )
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
+<meta charset="UTF-8" />
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-T29BL3EPHL"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
@@ -101,18 +111,21 @@ def page(year: int) -> str:
   gtag('set','page_referrer',analyticsPageUrl(document.referrer));
   gtag('config','G-T29BL3EPHL',{{page_location:analyticsPageUrl(location.href),page_referrer:analyticsPageUrl(document.referrer)}});
 </script>
-<meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>{title}</title>
 <meta name="description" content="{desc}" />
 <link rel="canonical" href="https://www.bitcoingrowthcalculator.com/what-if/{year}/" />
 <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-<meta property="og:type" content="article" />
+<meta property="og:type" content="website" />
 <meta property="og:title" content="{title}" />
 <meta property="og:description" content="{desc}" />
 <meta property="og:url" content="https://www.bitcoingrowthcalculator.com/what-if/{year}/" />
 <meta property="og:image" content="https://www.bitcoingrowthcalculator.com/og.png" />
+<meta property="og:site_name" content="Bitcoin Growth Calculator" />
 <meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="{title}" />
+<meta name="twitter:description" content="{desc}" />
+<meta name="twitter:image" content="https://www.bitcoingrowthcalculator.com/og.png" />
 <script type="application/ld+json">{faq_json}</script>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@300;400;500&family=Space+Grotesk:wght@300;400;500;600&display=swap" rel="stylesheet" />
 <style>
@@ -145,14 +158,20 @@ td.then {{ color:var(--orange); }}
 .affiliate a {{ color:var(--orange); text-decoration:none; font-weight:500; }}
 .years {{ margin-top:36px; padding-top:20px; border-top:1px solid var(--border-subtle); font-family:'DM Mono',monospace; font-size:12px; line-height:2.2; }}
 .years a {{ color:var(--orange); text-decoration:none; margin-right:12px; }}
+details {{ border-top:1px solid var(--border-subtle); padding:14px 0; }}
+summary {{ color:var(--text); font-weight:500; cursor:pointer; }}
+details p {{ margin:10px 0 0; }}
+summary:focus-visible {{ outline:2px solid var(--orange); outline-offset:4px; }}
+.note a {{ color:var(--orange); }}
 footer {{ margin-top:40px; font-family:'DM Mono',monospace; font-size:11px; color:var(--text-muted); }}
 </style>
 </head>
 <body>
-<div class="container">
+<main class="container">
 <div class="crumb"><a href="/">₿ Bitcoin Growth Calculator</a> / What if · {year}</div>
 <h1>WHAT IF YOU BOUGHT <em>BITCOIN</em> IN {year}?</h1>
-<p>Using the <strong>{reference_label}</strong> monthly reference estimate of <strong>{fmt_usd(p_then)}</strong> per Bitcoin, each dollar invested would be worth <strong data-mult="{per_dollar:.12f}" data-mult-suffix=" times">—</strong> as much at the current quote of <strong class="live-price">loading…</strong>.</p>
+<p>Using the <strong>{reference_label}</strong> monthly reference estimate of <strong>{fmt_usd(p_then)}</strong> per Bitcoin, a $1,000 investment would buy approximately <strong>{1000/p_then:.6f} BTC</strong> before fees. This is a dated price estimate, not an exact trade price.</p>
+<p>Value multiple at the latest available quote: <strong data-mult="{per_dollar:.12f}" data-mult-suffix=" times">—</strong>. Quote used: <strong class="live-price">loading…</strong>. A value multiple below 1 means a loss.</p>
 <div class="hero-stat">
   <div class="label">$1,000 on {reference_label}: estimated value</div>
   <div class="big" id="hero-val" data-btc="{1000/p_then:.12f}">—</div>
@@ -160,22 +179,29 @@ footer {{ margin-top:40px; font-family:'DM Mono',monospace; font-size:11px; colo
 </div>
 <h2>The numbers</h2>
 <table>
-  <tr><th>If you invested</th><th>You'd have bought</th><th>Value at current quote</th></tr>
+  <caption>Hypothetical purchases at the {reference_label} reference price</caption>
+  <tr><th scope="col">If you invested</th><th scope="col">You'd have bought</th><th scope="col">Value at current quote</th></tr>
 {table_rows}
 </table>
 <p class="note">Historical input: a monthly reference estimate anchored to {reference_label}, matching the main calculator. It is not an exact daily trade price. Excludes fees, slippage and tax.</p>
 <p class="note" id="quote-status" role="status">Loading the current CoinGecko quote…</p>
-<h2>What happened in {year}</h2>
-<p>{NARRATIVE[year]}</p>
+<noscript><p class="note">JavaScript is required to load the latest quote. The dated reference price, Bitcoin amounts and calculation method remain available here; current valuations are not shown.</p></noscript>
+<h2>Historical reference prices in {year}</h2>
+<p>{reference_summary(year)}</p>
+<p class="note">Daily observations come from CoinGecko where available. Older monthly inputs are built-in reference estimates. Read the <a href="/#price-method">price methods and limitations</a> or inspect the <a href="/data/btc_daily.json">saved daily observations</a>.</p>
 <a class="cta" href="/?amount=1000&amp;date={reference_date}" onclick="gtag('event','calculator_open',{{calculator:'time_machine',placement:'year_page'}})">TRY YOUR OWN DATE & AMOUNT →</a>
 <a class="cta secondary" href="/?tab=dca&amp;amount=100&amp;start={reference_date}&amp;freq=monthly#dca" onclick="gtag('event','calculator_open',{{calculator:'dca',placement:'year_page'}})">SEE WHAT A MONTHLY DCA WOULD HAVE DONE →</a>
 <!-- Commercial promotions disabled until an approved partner and terms are verified. -->
+<section id="questions" aria-labelledby="questions-title">
+<h2 id="questions-title">Questions about this {year} example</h2>
+{faq_html}
+</section>
 <div class="years"><strong style="color:var(--text)">Other years:</strong><br>{other_years}</div>
 <footer>
   <p>Not financial advice · Past performance does not guarantee future results</p>
   <p><a href="/" style="color:var(--orange);text-decoration:none;">bitcoingrowthcalculator.com</a> · <a href="/faq" style="color:var(--orange);text-decoration:none;">FAQ</a> · <a href="/#data-use" style="color:var(--orange);text-decoration:none;">Data &amp; email</a></p>
 </footer>
-</div>
+</main>
 <script>
 // Refresh headline numbers with the live BTC price
 const P_THEN = {p_then};

@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<meta charset="UTF-8" />
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-T29BL3EPHL"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
@@ -11,19 +12,22 @@
   gtag('set','page_referrer',analyticsPageUrl(document.referrer));
   gtag('config','G-T29BL3EPHL',{page_location:analyticsPageUrl(location.href),page_referrer:analyticsPageUrl(document.referrer)});
 </script>
-<meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>What If You Bought Bitcoin in 2014? Historical Return Calculator</title>
 <meta name="description" content="Estimate returns on a Bitcoin investment in 2014 using a dated monthly reference and the latest available BTC quote. See the assumptions and try your own dates." />
 <link rel="canonical" href="https://www.bitcoingrowthcalculator.com/what-if/2014/" />
 <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-<meta property="og:type" content="article" />
+<meta property="og:type" content="website" />
 <meta property="og:title" content="What If You Bought Bitcoin in 2014? Historical Return Calculator" />
 <meta property="og:description" content="Estimate returns on a Bitcoin investment in 2014 using a dated monthly reference and the latest available BTC quote. See the assumptions and try your own dates." />
 <meta property="og:url" content="https://www.bitcoingrowthcalculator.com/what-if/2014/" />
 <meta property="og:image" content="https://www.bitcoingrowthcalculator.com/og.png" />
+<meta property="og:site_name" content="Bitcoin Growth Calculator" />
 <meta name="twitter:card" content="summary_large_image" />
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "How much would $1,000 of Bitcoin bought in 2014 be worth today?", "acceptedAnswer": {"@type": "Answer", "text": "The estimate divides $1,000 by the January 31, 2014 monthly reference price of $808, then multiplies the resulting Bitcoin amount by the current quote. Prices are estimates; fees and slippage are excluded."}}, {"@type": "Question", "name": "What was the price of Bitcoin in 2014?", "acceptedAnswer": {"@type": "Answer", "text": "This example uses a monthly reference estimate of $808 dated January 31, 2014. Prices varied throughout the year; this is not an exact execution price."}}, {"@type": "Question", "name": "Is it too late to buy Bitcoin?", "acceptedAnswer": {"@type": "Answer", "text": "Nobody can predict future returns and past performance is no guarantee. Dollar-cost averaging (DCA) means buying a fixed amount on a schedule. It does not guarantee a profit. Our DCA calculator shows how that has performed historically."}}]}</script>
+<meta name="twitter:title" content="What If You Bought Bitcoin in 2014? Historical Return Calculator" />
+<meta name="twitter:description" content="Estimate returns on a Bitcoin investment in 2014 using a dated monthly reference and the latest available BTC quote. See the assumptions and try your own dates." />
+<meta name="twitter:image" content="https://www.bitcoingrowthcalculator.com/og.png" />
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "@id": "https://www.bitcoingrowthcalculator.com/what-if/2014/#questions", "url": "https://www.bitcoingrowthcalculator.com/what-if/2014/", "inLanguage": "en", "mainEntity": [{"@type": "Question", "name": "How much would $1,000 of Bitcoin bought in 2014 be worth today?", "acceptedAnswer": {"@type": "Answer", "text": "Using the January 31, 2014 monthly reference estimate of $808, $1,000 buys approximately 1.237624 BTC before fees. Multiply that Bitcoin amount by the latest available quote to estimate its value. Quotes may be cached or unavailable; no current valuation is shown until a quote loads."}}, {"@type": "Question", "name": "What was the price of Bitcoin in 2014?", "acceptedAnswer": {"@type": "Answer", "text": "This example uses a monthly reference estimate of $808 dated January 31, 2014. Prices varied throughout the year; this is not an exact execution price."}}, {"@type": "Question", "name": "Does this calculation include fees or predict future returns?", "acceptedAnswer": {"@type": "Answer", "text": "This example excludes fees, slippage and tax. It is a hypothetical historical calculation, not a forecast or a recommendation to buy. Past performance does not guarantee future results. Use the main calculator to choose another purchase date or a historical sale date."}}]}</script>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@300;400;500&family=Space+Grotesk:wght@300;400;500;600&display=swap" rel="stylesheet" />
 <style>
 :root { --orange:#f7931a; --orange-dim:rgba(247,147,26,0.08); --black:#080808; --surface:#0f0f0f; --surface2:#161616; --border:rgba(247,147,26,0.18); --border-subtle:rgba(255,255,255,0.06); --text:#e8e0d4; --text-muted:#6b6257; --green:#22c55e; --red:#ef4444; }
@@ -55,14 +59,20 @@ td.then { color:var(--orange); }
 .affiliate a { color:var(--orange); text-decoration:none; font-weight:500; }
 .years { margin-top:36px; padding-top:20px; border-top:1px solid var(--border-subtle); font-family:'DM Mono',monospace; font-size:12px; line-height:2.2; }
 .years a { color:var(--orange); text-decoration:none; margin-right:12px; }
+details { border-top:1px solid var(--border-subtle); padding:14px 0; }
+summary { color:var(--text); font-weight:500; cursor:pointer; }
+details p { margin:10px 0 0; }
+summary:focus-visible { outline:2px solid var(--orange); outline-offset:4px; }
+.note a { color:var(--orange); }
 footer { margin-top:40px; font-family:'DM Mono',monospace; font-size:11px; color:var(--text-muted); }
 </style>
 </head>
 <body>
-<div class="container">
+<main class="container">
 <div class="crumb"><a href="/">₿ Bitcoin Growth Calculator</a> / What if · 2014</div>
 <h1>WHAT IF YOU BOUGHT <em>BITCOIN</em> IN 2014?</h1>
-<p>Using the <strong>January 31, 2014</strong> monthly reference estimate of <strong>$808</strong> per Bitcoin, each dollar invested would be worth <strong data-mult="0.001237623762" data-mult-suffix=" times">—</strong> as much at the current quote of <strong class="live-price">loading…</strong>.</p>
+<p>Using the <strong>January 31, 2014</strong> monthly reference estimate of <strong>$808</strong> per Bitcoin, a $1,000 investment would buy approximately <strong>1.237624 BTC</strong> before fees. This is a dated price estimate, not an exact trade price.</p>
+<p>Value multiple at the latest available quote: <strong data-mult="0.001237623762" data-mult-suffix=" times">—</strong>. Quote used: <strong class="live-price">loading…</strong>. A value multiple below 1 means a loss.</p>
 <div class="hero-stat">
   <div class="label">$1,000 on January 31, 2014: estimated value</div>
   <div class="big" id="hero-val" data-btc="1.237623762376">—</div>
@@ -70,24 +80,33 @@ footer { margin-top:40px; font-family:'DM Mono',monospace; font-size:11px; color
 </div>
 <h2>The numbers</h2>
 <table>
-  <tr><th>If you invested</th><th>You'd have bought</th><th>Value at current quote</th></tr>
+  <caption>Hypothetical purchases at the January 31, 2014 reference price</caption>
+  <tr><th scope="col">If you invested</th><th scope="col">You'd have bought</th><th scope="col">Value at current quote</th></tr>
 <tr><td>$100</td><td class="then">0.123762 BTC</td><td class="now" data-btc="0.123762376238">—</td></tr>
 <tr><td>$1,000</td><td class="then">1.237624 BTC</td><td class="now" data-btc="1.237623762376">—</td></tr>
 <tr><td>$10,000</td><td class="then">12.376238 BTC</td><td class="now" data-btc="12.376237623762">—</td></tr>
 </table>
 <p class="note">Historical input: a monthly reference estimate anchored to January 31, 2014, matching the main calculator. It is not an exact daily trade price. Excludes fees, slippage and tax.</p>
 <p class="note" id="quote-status" role="status">Loading the current CoinGecko quote…</p>
-<h2>What happened in 2014</h2>
-<p>The Mt. Gox collapse defined 2014 — the largest Bitcoin exchange imploded and price bled all year. Buying into that fear was brutally hard, and brutally profitable.</p>
+<noscript><p class="note">JavaScript is required to load the latest quote. The dated reference price, Bitcoin amounts and calculation method remain available here; current valuations are not shown.</p></noscript>
+<h2>Historical reference prices in 2014</h2>
+<p>The calculator's 12 saved monthly reference prices for 2014 range from $319 (December 31, 2014) to $808 (January 31, 2014). These are sampled reference estimates, not the year's exact daily low and high. Changing the purchase or valuation date changes the result; neither a lump sum nor DCA guarantees a profit.</p>
+<p class="note">Daily observations come from CoinGecko where available. Older monthly inputs are built-in reference estimates. Read the <a href="/#price-method">price methods and limitations</a> or inspect the <a href="/data/btc_daily.json">saved daily observations</a>.</p>
 <a class="cta" href="/?amount=1000&amp;date=2014-01-31" onclick="gtag('event','calculator_open',{calculator:'time_machine',placement:'year_page'})">TRY YOUR OWN DATE & AMOUNT →</a>
 <a class="cta secondary" href="/?tab=dca&amp;amount=100&amp;start=2014-01-31&amp;freq=monthly#dca" onclick="gtag('event','calculator_open',{calculator:'dca',placement:'year_page'})">SEE WHAT A MONTHLY DCA WOULD HAVE DONE →</a>
 <!-- Commercial promotions disabled until an approved partner and terms are verified. -->
+<section id="questions" aria-labelledby="questions-title">
+<h2 id="questions-title">Questions about this 2014 example</h2>
+<details><summary>How much would $1,000 of Bitcoin bought in 2014 be worth today?</summary><p>Using the January 31, 2014 monthly reference estimate of $808, $1,000 buys approximately 1.237624 BTC before fees. Multiply that Bitcoin amount by the latest available quote to estimate its value. Quotes may be cached or unavailable; no current valuation is shown until a quote loads.</p></details>
+<details><summary>What was the price of Bitcoin in 2014?</summary><p>This example uses a monthly reference estimate of $808 dated January 31, 2014. Prices varied throughout the year; this is not an exact execution price.</p></details>
+<details><summary>Does this calculation include fees or predict future returns?</summary><p>This example excludes fees, slippage and tax. It is a hypothetical historical calculation, not a forecast or a recommendation to buy. Past performance does not guarantee future results. Use the main calculator to choose another purchase date or a historical sale date.</p></details>
+</section>
 <div class="years"><strong style="color:var(--text)">Other years:</strong><br><a href="/what-if/2013/">2013</a> <a href="/what-if/2015/">2015</a> <a href="/what-if/2016/">2016</a> <a href="/what-if/2017/">2017</a> <a href="/what-if/2018/">2018</a> <a href="/what-if/2019/">2019</a> <a href="/what-if/2020/">2020</a> <a href="/what-if/2021/">2021</a> <a href="/what-if/2022/">2022</a> <a href="/what-if/2023/">2023</a> <a href="/what-if/2024/">2024</a> <a href="/what-if/2025/">2025</a></div>
 <footer>
   <p>Not financial advice · Past performance does not guarantee future results</p>
   <p><a href="/" style="color:var(--orange);text-decoration:none;">bitcoingrowthcalculator.com</a> · <a href="/faq" style="color:var(--orange);text-decoration:none;">FAQ</a> · <a href="/#data-use" style="color:var(--orange);text-decoration:none;">Data &amp; email</a></p>
 </footer>
-</div>
+</main>
 <script>
 // Refresh headline numbers with the live BTC price
 const P_THEN = 808;

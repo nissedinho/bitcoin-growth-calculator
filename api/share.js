@@ -89,7 +89,8 @@ module.exports = (req, res) => {
 <meta charset="UTF-8" />
 <title>${t}</title>
 <meta name="description" content="${d}" />
-<link rel="canonical" href="${SITE}${escapeHtml(dest)}" />
+<meta name="robots" content="noindex, follow" />
+<link rel="canonical" href="${SITE}/" />
 <meta property="og:type" content="website" />
 <meta property="og:title" content="${t}" />
 <meta property="og:description" content="${d}" />
@@ -107,6 +108,8 @@ module.exports = (req, res) => {
 </body>
 </html>`;
 
+  // Scenario previews contain user-supplied snapshot values, not independent articles.
+  res.setHeader('X-Robots-Tag', 'noindex, follow');
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
   res.setHeader('Cache-Control', 's-maxage=3600, stale-while-revalidate=86400');
   res.status(200).send(body);

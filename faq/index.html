@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<meta charset="UTF-8" />
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-T29BL3EPHL"></script>
     <script>
@@ -13,17 +14,16 @@
         gtag('config','G-T29BL3EPHL',{page_location:analyticsPageUrl(location.href),page_referrer:analyticsPageUrl(document.referrer)});
     </script>
 
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
-    <title>Bitcoin Investment FAQ — Common Questions About Bitcoin Returns</title>
-    <meta name="description" content="Answers to the most common Bitcoin investment questions: What if I bought Bitcoin in 2013? How much would $1,000 be worth? Calculate your Bitcoin returns instantly." />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bitcoin Calculator FAQ | Data, DCA &amp; Return Estimates</title>
+    <meta name="description" content="How Bitcoin return and DCA estimates work: supported dates, price sources, formulas, fees and limitations. Read the calculator methodology and common questions." />
     <link rel="canonical" href="https://www.bitcoingrowthcalculator.com/faq" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 
     <!-- Open Graph -->
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="Bitcoin Investment FAQ — Common Questions About Bitcoin Returns" />
-    <meta property="og:description" content="Answers to the most common Bitcoin investment questions. Calculate what your Bitcoin would be worth today." />
+    <meta property="og:title" content="Bitcoin Calculator FAQ | Data, DCA &amp; Return Estimates" />
+    <meta property="og:description" content="How Bitcoin return and DCA estimates work: supported dates, price sources, formulas, fees and limitations. Read the calculator methodology and common questions." />
     <meta property="og:url" content="https://www.bitcoingrowthcalculator.com/faq" />
     <meta property="og:image" content="https://www.bitcoingrowthcalculator.com/og.png" />
     <meta property="og:image:width" content="1200" />
@@ -31,8 +31,8 @@
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Bitcoin Investment FAQ — Common Questions About Bitcoin Returns" />
-    <meta name="twitter:description" content="Answers to the most common Bitcoin investment questions. Calculate what your Bitcoin would be worth today." />
+    <meta name="twitter:title" content="Bitcoin Calculator FAQ | Data, DCA &amp; Return Estimates" />
+    <meta name="twitter:description" content="How Bitcoin return and DCA estimates work: supported dates, price sources, formulas, fees and limitations. Read the calculator methodology and common questions." />
     <meta name="twitter:image" content="https://www.bitcoingrowthcalculator.com/og.png" />
 
     <!-- FAQPage Schema -->
@@ -47,7 +47,8 @@
             "acceptedAnswer": {
                 "@type": "Answer",
                 "text": "The calculator covers dates from April 28, 2013. Choose an amount and a supported purchase date to estimate the Bitcoin acquired and its value at a current quote or a historical sale date. Older dates use monthly reference estimates, not exact daily trade prices."
-            }
+            },
+            "@id": "https://www.bitcoingrowthcalculator.com/faq#bitcoin-2013"
         },
         {
             "@type": "Question",
@@ -55,7 +56,8 @@
             "acceptedAnswer": {
                 "@type": "Answer",
                 "text": "Choose a purchase date during 2020 and an amount to explore that scenario. The result shows hypothetical returns and an approximate monthly drawdown. Interpolated monthly data cannot capture every daily price move during the COVID crash."
-            }
+            },
+            "@id": "https://www.bitcoingrowthcalculator.com/faq#bitcoin-2020"
         },
         {
             "@type": "Question",
@@ -63,7 +65,8 @@
             "acceptedAnswer": {
                 "@type": "Answer",
                 "text": "Bitcoin acquired equals the investment divided by the purchase-price estimate. Valuation equals that Bitcoin amount multiplied by the current quote or selected sale-price estimate. The calculator shows gain and return percentage. Fees and slippage are excluded; optional tax is a simplified estimate."
-            }
+            },
+            "@id": "https://www.bitcoingrowthcalculator.com/faq#return-formula"
         },
         {
             "@type": "Question",
@@ -71,7 +74,8 @@
             "acceptedAnswer": {
                 "@type": "Answer",
                 "text": "Dollar-Cost Averaging means buying a fixed amount at regular intervals. The calculator supports daily, weekly and calendar-month purchases in UTC. Monthly purchases keep the original day, clamped to the last day in shorter months. Regular buying does not guarantee a profit or prevent losses."
-            }
+            },
+            "@id": "https://www.bitcoingrowthcalculator.com/faq#dca-schedule"
         },
         {
             "@type": "Question",
@@ -79,15 +83,17 @@
             "acceptedAnswer": {
                 "@type": "Answer",
                 "text": "Nobody can predict future Bitcoin returns. This calculator explores historical scenarios using recorded observations and estimates; it does not recommend whether or when to invest. Past performance does not guarantee future results."
-            }
+            },
+            "@id": "https://www.bitcoingrowthcalculator.com/faq#future-returns"
         },
         {
             "@type": "Question",
             "name": "What was Bitcoin's price on a specific date?",
             "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "Recorded daily CoinGecko observations are used where available; the calculator footer shows their coverage. Other supported dates use interpolated monthly reference estimates or a labelled prior observation. Each result identifies its price method and date. These are not executable trade prices."
-            }
+                "text": "Recorded daily CoinGecko observations are used where available; the calculator footer shows their coverage. Other supported dates use interpolated monthly reference estimates or a labelled prior observation. The Time Machine identifies purchase and valuation methods and dates; DCA reports how many purchases use estimated or carried-forward prices. These are not executable trade prices."
+            },
+            "@id": "https://www.bitcoingrowthcalculator.com/faq#historical-prices"
         },
         {
             "@type": "Question",
@@ -95,7 +101,8 @@
             "acceptedAnswer": {
                 "@type": "Answer",
                 "text": "Divide $100 by the displayed Bitcoin price to estimate the fraction of a Bitcoin it would buy, before fees and slippage. The current quote includes an as-of time and can be cached. Actual exchange execution prices may differ."
-            }
+            },
+            "@id": "https://www.bitcoingrowthcalculator.com/faq#bitcoin-fractions"
         },
         {
             "@type": "Question",
@@ -103,9 +110,13 @@
             "acceptedAnswer": {
                 "@type": "Answer",
                 "text": "This calculator cannot identify the best future day to buy. It compares hypothetical outcomes for dates you choose. DCA spreads purchases over time, but neither DCA nor a lump sum guarantees a positive return."
-            }
+            },
+            "@id": "https://www.bitcoingrowthcalculator.com/faq#purchase-timing"
         }
-    ]
+    ],
+    "@id": "https://www.bitcoingrowthcalculator.com/faq#questions",
+    "url": "https://www.bitcoingrowthcalculator.com/faq",
+    "inLanguage": "en"
 }
     </script>
 
@@ -192,6 +203,9 @@
             line-height: 1.4;
         }
         .faq-question:hover { color: var(--accent); }
+        .faq-question { list-style: none; }
+        .faq-question::-webkit-details-marker { display: none; }
+        .faq-question:focus-visible { outline: 2px solid var(--accent); outline-offset: -4px; }
 
         .faq-icon {
             flex-shrink: 0;
@@ -204,22 +218,14 @@
             justify-content: center;
             transition: transform 0.3s, border-color 0.2s, background 0.2s;
         }
-        .faq-item.open .faq-icon {
+        .faq-item[open] .faq-icon {
             transform: rotate(45deg);
             border-color: var(--accent);
             background: var(--accent-glow);
         }
         .faq-icon svg { width: 12px; height: 12px; stroke: var(--text-muted); }
-        .faq-item.open .faq-icon svg { stroke: var(--accent); }
+        .faq-item[open] .faq-icon svg { stroke: var(--accent); }
 
-        .faq-answer {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.35s ease, padding 0.35s ease;
-        }
-        .faq-item.open .faq-answer {
-            max-height: 400px;
-        }
 
         .faq-answer-inner {
             padding: 0 24px 20px;
@@ -285,7 +291,7 @@
     </style>
 </head>
 <body>
-    <div class="container">
+    <main class="container">
         <a href="/" class="back-link">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
             Back to Calculator
@@ -294,91 +300,51 @@
         <h1>Bitcoin Investment <span>FAQ</span></h1>
         <p class="subtitle">Answers to the most common questions about Bitcoin investment returns, DCA strategy, and using our calculator.</p>
 
-        <div class="faq-list">
-            <div class="faq-item">
-                <button class="faq-question" onclick="toggleFaq(this)">
-                    What if I had bought $1,000 of Bitcoin in 2013?
-                    <span class="faq-icon"><svg viewBox="0 0 12 12" fill="none" stroke-width="2" stroke-linecap="round"><path d="M6 1v10M1 6h10"/></svg></span>
-                </button>
-                <div class="faq-answer"><div class="faq-answer-inner">
-                    The calculator covers dates from April 28, 2013. Choose an amount and a supported purchase date to estimate the Bitcoin acquired and its value at a current quote or a historical sale date. Older dates use monthly reference estimates, not exact daily trade prices. <a href="/">Open the calculator</a>.
-                </div></div>
-            </div>
+        <section class="faq-list" id="questions" aria-label="Calculator questions">
+            <details class="faq-item" id="bitcoin-2013">
+                <summary class="faq-question">What if I had bought $1,000 of Bitcoin in 2013?<span class="faq-icon" aria-hidden="true">+</span></summary>
+                <div class="faq-answer-inner"><p>The calculator covers dates from April 28, 2013. Choose an amount and a supported purchase date to estimate the Bitcoin acquired and its value at a current quote or a historical sale date. Older dates use monthly reference estimates, not exact daily trade prices.</p><a href="/">Open the calculator</a></div>
+            </details>
 
-            <div class="faq-item">
-                <button class="faq-question" onclick="toggleFaq(this)">
-                    What if I had bought Bitcoin during COVID lockdowns in 2020?
-                    <span class="faq-icon"><svg viewBox="0 0 12 12" fill="none" stroke-width="2" stroke-linecap="round"><path d="M6 1v10M1 6h10"/></svg></span>
-                </button>
-                <div class="faq-answer"><div class="faq-answer-inner">
-                    Choose a purchase date during 2020 and an amount to explore that scenario. The result shows hypothetical returns and an approximate monthly drawdown. Interpolated monthly data cannot capture every daily price move during the COVID crash. <a href="/">Open the calculator</a>.
-                </div></div>
-            </div>
+            <details class="faq-item" id="bitcoin-2020">
+                <summary class="faq-question">What if I had bought Bitcoin during COVID lockdowns in 2020?<span class="faq-icon" aria-hidden="true">+</span></summary>
+                <div class="faq-answer-inner"><p>Choose a purchase date during 2020 and an amount to explore that scenario. The result shows hypothetical returns and an approximate monthly drawdown. Interpolated monthly data cannot capture every daily price move during the COVID crash.</p><a href="/">Open the calculator</a></div>
+            </details>
 
-            <div class="faq-item">
-                <button class="faq-question" onclick="toggleFaq(this)">
-                    How do I calculate my Bitcoin investment returns?
-                    <span class="faq-icon"><svg viewBox="0 0 12 12" fill="none" stroke-width="2" stroke-linecap="round"><path d="M6 1v10M1 6h10"/></svg></span>
-                </button>
-                <div class="faq-answer"><div class="faq-answer-inner">
-                    Bitcoin acquired equals the investment divided by the purchase-price estimate. Valuation equals that Bitcoin amount multiplied by the current quote or selected sale-price estimate. The calculator shows gain and return percentage. Fees and slippage are excluded; optional tax is a simplified estimate. <a href="/">Open the calculator</a>.
-                </div></div>
-            </div>
+            <details class="faq-item" id="return-formula">
+                <summary class="faq-question">How do I calculate my Bitcoin investment returns?<span class="faq-icon" aria-hidden="true">+</span></summary>
+                <div class="faq-answer-inner"><p>Bitcoin acquired equals the investment divided by the purchase-price estimate. Valuation equals that Bitcoin amount multiplied by the current quote or selected sale-price estimate. The calculator shows gain and return percentage. Fees and slippage are excluded; optional tax is a simplified estimate.</p><a href="/">Open the calculator</a></div>
+            </details>
 
-            <div class="faq-item">
-                <button class="faq-question" onclick="toggleFaq(this)">
-                    What is Dollar-Cost Averaging (DCA) for Bitcoin?
-                    <span class="faq-icon"><svg viewBox="0 0 12 12" fill="none" stroke-width="2" stroke-linecap="round"><path d="M6 1v10M1 6h10"/></svg></span>
-                </button>
-                <div class="faq-answer"><div class="faq-answer-inner">
-                    Dollar-Cost Averaging means buying a fixed amount at regular intervals. The calculator supports daily, weekly and calendar-month purchases in UTC. Monthly purchases keep the original day, clamped to the last day in shorter months. Regular buying does not guarantee a profit or prevent losses. <a href="/">Open the calculator</a>.
-                </div></div>
-            </div>
+            <details class="faq-item" id="dca-schedule">
+                <summary class="faq-question">What is Dollar-Cost Averaging (DCA) for Bitcoin?<span class="faq-icon" aria-hidden="true">+</span></summary>
+                <div class="faq-answer-inner"><p>Dollar-Cost Averaging means buying a fixed amount at regular intervals. The calculator supports daily, weekly and calendar-month purchases in UTC. Monthly purchases keep the original day, clamped to the last day in shorter months. Regular buying does not guarantee a profit or prevent losses.</p><a href="/">Open the calculator</a></div>
+            </details>
 
-            <div class="faq-item">
-                <button class="faq-question" onclick="toggleFaq(this)">
-                    Is it too late to invest in Bitcoin?
-                    <span class="faq-icon"><svg viewBox="0 0 12 12" fill="none" stroke-width="2" stroke-linecap="round"><path d="M6 1v10M1 6h10"/></svg></span>
-                </button>
-                <div class="faq-answer"><div class="faq-answer-inner">
-                    Nobody can predict future Bitcoin returns. This calculator explores historical scenarios using recorded observations and estimates; it does not recommend whether or when to invest. Past performance does not guarantee future results. <a href="/">Open the calculator</a>.
-                </div></div>
-            </div>
+            <details class="faq-item" id="future-returns">
+                <summary class="faq-question">Is it too late to invest in Bitcoin?<span class="faq-icon" aria-hidden="true">+</span></summary>
+                <div class="faq-answer-inner"><p>Nobody can predict future Bitcoin returns. This calculator explores historical scenarios using recorded observations and estimates; it does not recommend whether or when to invest. Past performance does not guarantee future results.</p><a href="/">Open the calculator</a></div>
+            </details>
 
-            <div class="faq-item">
-                <button class="faq-question" onclick="toggleFaq(this)">
-                    What was Bitcoin's price on a specific date?
-                    <span class="faq-icon"><svg viewBox="0 0 12 12" fill="none" stroke-width="2" stroke-linecap="round"><path d="M6 1v10M1 6h10"/></svg></span>
-                </button>
-                <div class="faq-answer"><div class="faq-answer-inner">
-                    Recorded daily CoinGecko observations are used where available; the calculator footer shows their coverage. Other supported dates use interpolated monthly reference estimates or a labelled prior observation. Each result identifies its price method and date. These are not executable trade prices. <a href="/">Open the calculator</a>.
-                </div></div>
-            </div>
+            <details class="faq-item" id="historical-prices">
+                <summary class="faq-question">What was Bitcoin&#x27;s price on a specific date?<span class="faq-icon" aria-hidden="true">+</span></summary>
+                <div class="faq-answer-inner"><p>Recorded daily CoinGecko observations are used where available; the calculator footer shows their coverage. Other supported dates use interpolated monthly reference estimates or a labelled prior observation. The Time Machine identifies purchase and valuation methods and dates; DCA reports how many purchases use estimated or carried-forward prices. These are not executable trade prices.</p><a href="/">Open the calculator</a></div>
+            </details>
 
-            <div class="faq-item">
-                <button class="faq-question" onclick="toggleFaq(this)">
-                    How much Bitcoin can I buy with $100?
-                    <span class="faq-icon"><svg viewBox="0 0 12 12" fill="none" stroke-width="2" stroke-linecap="round"><path d="M6 1v10M1 6h10"/></svg></span>
-                </button>
-                <div class="faq-answer"><div class="faq-answer-inner">
-                    Divide $100 by the displayed Bitcoin price to estimate the fraction of a Bitcoin it would buy, before fees and slippage. The current quote includes an as-of time and can be cached. Actual exchange execution prices may differ. <a href="/">Open the calculator</a>.
-                </div></div>
-            </div>
+            <details class="faq-item" id="bitcoin-fractions">
+                <summary class="faq-question">How much Bitcoin can I buy with $100?<span class="faq-icon" aria-hidden="true">+</span></summary>
+                <div class="faq-answer-inner"><p>Divide $100 by the displayed Bitcoin price to estimate the fraction of a Bitcoin it would buy, before fees and slippage. The current quote includes an as-of time and can be cached. Actual exchange execution prices may differ.</p><a href="/">Open the calculator</a></div>
+            </details>
 
-            <div class="faq-item">
-                <button class="faq-question" onclick="toggleFaq(this)">
-                    What is the best day to buy Bitcoin?
-                    <span class="faq-icon"><svg viewBox="0 0 12 12" fill="none" stroke-width="2" stroke-linecap="round"><path d="M6 1v10M1 6h10"/></svg></span>
-                </button>
-                <div class="faq-answer"><div class="faq-answer-inner">
-                    This calculator cannot identify the best future day to buy. It compares hypothetical outcomes for dates you choose. DCA spreads purchases over time, but neither DCA nor a lump sum guarantees a positive return. <a href="/">Open the calculator</a>.
-                </div></div>
-            </div>
-        </div>
+            <details class="faq-item" id="purchase-timing">
+                <summary class="faq-question">What is the best day to buy Bitcoin?<span class="faq-icon" aria-hidden="true">+</span></summary>
+                <div class="faq-answer-inner"><p>This calculator cannot identify the best future day to buy. It compares hypothetical outcomes for dates you choose. DCA spreads purchases over time, but neither DCA nor a lump sum guarantees a positive return.</p><a href="/">Open the calculator</a></div>
+            </details>
+        </section>
 
         <div class="cta-box">
             <h2>Ready to see your numbers?</h2>
-            <p>Pick any date since 2013 and find out what your Bitcoin investment would be worth today.</p>
+            <p>Choose a date from April 28, 2013 and estimate a historical Bitcoin scenario. Read the <a href="/#how-it-works">formulas, data methods and limitations</a> before interpreting the result.</p>
             <a href="/" class="cta-btn">Try the Calculator →</a>
         </div>
 
@@ -401,17 +367,7 @@
             <p>© 2026 <a href="/">Bitcoin Growth Calculator</a> — Not financial advice. Past performance does not guarantee future results.</p>
             <p><a href="/#data-use">Data &amp; email</a></p>
         </footer>
-    </div>
+    </main>
 
-    <script>
-        function toggleFaq(btn) {
-            const item = btn.parentElement;
-            const wasOpen = item.classList.contains('open');
-            // Close all
-            document.querySelectorAll('.faq-item').forEach(el => el.classList.remove('open'));
-            // Toggle clicked
-            if (!wasOpen) item.classList.add('open');
-        }
-    </script>
 </body>
 </html>

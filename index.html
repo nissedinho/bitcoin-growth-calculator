@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<meta charset="UTF-8" />
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-T29BL3EPHL"></script>
 <script>
@@ -16,36 +17,49 @@
   gtag('set', 'page_referrer', analyticsPageUrl(document.referrer));
   gtag('config', 'G-T29BL3EPHL', {page_location:analyticsPageUrl(location.href),page_referrer:analyticsPageUrl(document.referrer)});
 </script>
-  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Bitcoin Investment Calculator — What If You'd Bought Bitcoin?</title>
-  <meta name="description" content="Estimate how much money you'd have today if you bought Bitcoin at any point since 2013. Free Bitcoin return calculator with live prices and DCA simulator." />
+  <title>Bitcoin Investment &amp; DCA Calculator | Historical Returns</title>
+  <meta name="description" content="Estimate hypothetical Bitcoin returns and daily, weekly or monthly DCA from April 28, 2013. See price methods, dates and assumptions. Free USD calculator." />
   <link rel="canonical" href="https://www.bitcoingrowthcalculator.com/" />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <meta property="og:type" content="website" />
-  <meta property="og:title" content="Bitcoin Investment Calculator — What If You'd Bought Bitcoin?" />
-  <meta property="og:description" content="Estimate how much money you'd have today if you bought Bitcoin at any date since 2013. Try it free." />
+  <meta property="og:title" content="Bitcoin Investment &amp; DCA Calculator | Historical Returns" />
+  <meta property="og:description" content="Estimate hypothetical Bitcoin returns and daily, weekly or monthly DCA from April 28, 2013. See price methods, dates and assumptions. Free USD calculator." />
   <meta property="og:url" content="https://www.bitcoingrowthcalculator.com/" />
   <meta property="og:image" content="https://www.bitcoingrowthcalculator.com/og.png" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
   <meta property="og:site_name" content="Bitcoin Growth Calculator" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="What If You'd Bought Bitcoin?" />
-  <meta name="twitter:description" content="Estimate how much money you'd have today. Try any date since 2013." />
+  <meta name="twitter:title" content="Bitcoin Investment &amp; DCA Calculator | Historical Returns" />
+  <meta name="twitter:description" content="Estimate hypothetical Bitcoin returns and daily, weekly or monthly DCA from April 28, 2013. See price methods, dates and assumptions. Free USD calculator." />
   <meta name="twitter:image" content="https://www.bitcoingrowthcalculator.com/og.png" />
   <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "WebApplication",
-    "name": "Bitcoin Growth Calculator",
-    "url": "https://www.bitcoingrowthcalculator.com/",
-    "description": "Calculate how much money you would have today if you had bought Bitcoin at any date since 2013. Includes a DCA calculator.",
-    "applicationCategory": "FinanceApplication",
-    "operatingSystem": "All",
-    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
-    "featureList": ["Historical Bitcoin return calculator", "Dollar-cost averaging simulator", "Real-time Bitcoin price", "Shareable results"]
-  }
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Bitcoin Growth Calculator",
+  "url": "https://www.bitcoingrowthcalculator.com/",
+  "description": "Estimate hypothetical Bitcoin returns and daily, weekly or monthly DCA from April 28, 2013. See price methods, dates and assumptions. Free USD calculator.",
+  "applicationCategory": "FinanceApplication",
+  "operatingSystem": "All",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  },
+  "featureList": [
+    "Historical Bitcoin return estimates in USD",
+    "Daily, weekly and calendar-month DCA simulations",
+    "Latest available Bitcoin quote with an as-of time",
+    "Shareable scenario links",
+    "Visible price methods and calculation assumptions"
+  ],
+  "@id": "https://www.bitcoingrowthcalculator.com/#calculator",
+  "inLanguage": "en",
+  "isAccessibleForFree": true,
+  "browserRequirements": "JavaScript is required for interactive calculations. Methodology and FAQs are readable without JavaScript."
+}
   </script>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@300;400;500&family=Space+Grotesk:wght@300;400;500;600&display=swap" rel="stylesheet" />
   <style>
@@ -255,6 +269,7 @@
     .ec-privacy a, .guide a { color: var(--orange); }
     .guide { margin-top: 28px; padding: 24px; border: 1px solid var(--border-subtle); background: var(--surface); font-size: 14px; line-height: 1.7; }
     .guide h2 { font-size: 18px; margin-bottom: 10px; }
+    .guide h3 { font-size: 15px; margin: 20px 0 8px; color: var(--orange); }
     .guide p + p { margin-top: 10px; }
     .ec-privacy { font-family: 'DM Mono', monospace; font-size: 11px; color: #a99f92; margin-top: 10px; }
 
@@ -343,7 +358,7 @@
 <div class="bg-glow"></div>
 <div class="ticker"><div class="ticker-inner" id="ticker-inner"></div></div>
 
-<div class="container">
+<main class="container" id="main-content">
 
   <!-- Header -->
   <header>
@@ -602,13 +617,20 @@
 
   </div><!-- /card -->
 
-  <noscript><p class="guide">The calculators need JavaScript to run. You can still <a href="https://subscribe-forms.beehiiv.com/5cef7315-a3f9-400a-9597-6806aac54862" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer">open the Bitcoin by the Numbers signup form on Beehiiv</a>.</p></noscript>
+  <noscript><p class="guide">The calculators need JavaScript to run. You can read the <a href="#how-it-works">formulas and assumptions</a> and <a href="/faq">calculator FAQ</a> without it, or <a href="https://subscribe-forms.beehiiv.com/5cef7315-a3f9-400a-9597-6806aac54862" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer">open the Bitcoin by the Numbers signup form on Beehiiv</a>.</p></noscript>
 
   <section class="guide" id="how-it-works" aria-labelledby="guide-title">
     <h2 id="guide-title">How this Bitcoin investment calculator works</h2>
-    <p>For “if I bought Bitcoin” questions, enter a USD amount and a purchase date. The Time Machine divides that amount by the historical BTC price, then values those coins at the current quote or your chosen sell date. Use the DCA tab to compare repeated daily, weekly, or calendar-month purchases.</p>
-    <p>Historical prices use daily observations where available and labelled monthly estimates elsewhere. Fees and slippage are excluded. This is a look back at hypothetical outcomes, not a forecast or a recommendation to buy. <a href="/faq">Read the calculation FAQ</a> and <a href="#data-coverage">check data coverage</a>.</p>
-    <p>Want to return to a scenario? Use <strong>Copy result</strong> after calculating, or bookmark the calculator URL. Opening that link later updates a still-holding scenario to the latest available quote; a selected sell date stays historical.</p>
+    <p>Estimate a hypothetical Bitcoin investment in US dollars from April 28, 2013. Choose a purchase amount and date, then use the latest available quote or a historical sell date. The DCA calculator models a fixed amount bought daily, weekly or monthly.</p>
+    <h3 id="return-formula">Lump-sum return formula</h3>
+    <p>Bitcoin acquired = investment amount ÷ purchase-price estimate. Estimated value = Bitcoin acquired × valuation price. Gain = estimated value − amount invested. Return (%) = gain ÷ amount invested × 100. A loss produces a negative return.</p>
+    <h3 id="dca-method">Dollar-cost averaging assumptions</h3>
+    <p>For each scheduled purchase, divide the contribution by that date’s price estimate, then add the Bitcoin amounts together. Value those coins at the latest available quote. Dates use UTC; calendar-month purchases keep the original day, clamped to the last day in shorter months. DCA does not guarantee a profit or prevent losses.</p>
+    <h3 id="price-method">Price sources and limitations</h3>
+    <p>Daily observations come from CoinGecko where available. Other supported dates use built-in monthly reference estimates, interpolation between dated anchors, or a labelled prior observation. Earlier monthly estimates are not verified daily trade prices. The Time Machine identifies purchase and valuation price methods and dates. DCA reports how many purchases use estimated or carried-forward prices. The latest quote may be cached or unavailable.</p>
+    <p>Fees and slippage are excluded. Optional tax applies the entered percentage to positive gains only; it is a simplified illustration, not a jurisdiction-specific tax calculation. Monthly drawdown can miss intramonth losses, and the S&amp;P 500 comparison excludes dividends. Results describe hypothetical past outcomes and do not predict future returns.</p>
+    <p><a href="/faq">Read the calculation FAQ</a>, <a href="#data-coverage">check loaded data coverage</a>, or inspect the saved <a href="/data/btc_daily.json">daily Bitcoin observations</a> and <a href="/data/series.json">benchmark data</a>.</p>
+    <p>Use <strong>Copy result</strong> after calculating, or bookmark the calculator URL. Opening that link later updates a still-holding scenario to the latest available quote; a selected sell date stays historical.</p>
   </section>
 
 
@@ -642,7 +664,7 @@
       <p><a href="https://www.beehiiv.com/privacy" rel="noopener noreferrer" target="_blank" style="color:var(--orange)">Beehiiv privacy information</a> · <a href="https://policies.google.com/privacy" rel="noopener noreferrer" target="_blank" style="color:var(--orange)">Google privacy information</a></p>
     </section>
   </footer>
-</div>
+</main>
 
 <script>
 // ╔══════════════════════════════════════════════════════════╗
