@@ -101,16 +101,7 @@ def page(year: int) -> str:
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-T29BL3EPHL"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){{dataLayer.push(arguments);}}
-  gtag('js', new Date());
-  function analyticsPageUrl(value) {{ try {{ const u=new URL(value); return u.origin+u.pathname; }} catch(_) {{ return ''; }} }}
-  gtag('set','page_location',analyticsPageUrl(location.href));
-  gtag('set','page_referrer',analyticsPageUrl(document.referrer));
-  gtag('config','G-T29BL3EPHL',{{page_location:analyticsPageUrl(location.href),page_referrer:analyticsPageUrl(document.referrer)}});
-</script>
+<script defer src="/analytics-consent.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>{title}</title>
 <meta name="description" content="{desc}" />

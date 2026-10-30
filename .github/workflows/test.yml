@@ -37,3 +37,18 @@ jobs:
 
       - name: Syntax check serverless functions
         run: for f in api/*.js; do node --check "$f"; done
+
+      - name: Install browser QA dependency
+        run: |
+          python -m pip install playwright==1.56.0
+          python -m playwright install --with-deps chromium
+
+      - name: Consent browser QA (analytics collection blocked)
+        run: python tests/consent-browser.py
+
+      - name: Save consent QA screenshot
+        uses: actions/upload-artifact@v4
+        with:
+          name: consent-browser-qa
+          path: consent-mobile.png
+          retention-days: 7

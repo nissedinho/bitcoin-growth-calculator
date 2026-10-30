@@ -3,7 +3,7 @@ import {check,eq,ok,report,loadPage,settle,ROOT} from './harness.mjs';
 import {readFileSync} from 'node:fs';
 import {join} from 'node:path';
 const windows=[];
-const page=o=>{const w=loadPage(o);windows.push(w);return w;};
+const page=o=>{const w=loadPage({analyticsConsent:'accepted',...o});windows.push(w);return w;};
 const g=(w,id)=>w.document.getElementById(id);
 const events=w=>w.dataLayer.map(a=>Array.from(a)).filter(a=>a[0]==='event');
 {
@@ -82,7 +82,7 @@ for(let year=2013;year<=2025;year++){
  const html=readFileSync(join(ROOT,'what-if',String(year),'index.html'),'utf8');
  check('year '+year+' has no unapproved promotion or internal attribution campaign',()=>{
   ok(!html.includes('coinbase.com'));ok(!html.includes('utm_medium=internal'));ok(!html.includes('affiliate_click'));
-  ok(html.includes('calculator_open'));ok(html.includes('/#data-use'));ok(html.includes('page_referrer'));
+  ok(html.includes('calculator_open'));ok(html.includes('/#data-use'));ok(html.includes('/analytics-consent.js'));ok(readFileSync(join(ROOT,'analytics-consent.js'),'utf8').includes('page_referrer:analyticsPageUrl(document.referrer)'));
  });
 }
 for(const w of windows)w.close();
