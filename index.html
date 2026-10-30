@@ -2,21 +2,98 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-T29BL3EPHL"></script>
+<!-- Optional analytics: the Google tag is loaded only after acceptance. -->
 <script>
+  const ANALYTICS_ID = 'G-T29BL3EPHL';
+  const ANALYTICS_CHOICE_KEY = 'bgc.analytics-consent.v1';
   window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  // Shared scenarios stay in the calculator URL, not our explicit analytics fields.
+  window['ga-disable-' + ANALYTICS_ID] = true;
+  let analyticsAccepted = false;
+  let analyticsLoaded = false;
   function analyticsPageUrl(value) {
     try { const u=new URL(value); return u.origin+u.pathname; } catch(_) { return ''; }
   }
-  gtag('set', 'page_location', analyticsPageUrl(location.href));
-  gtag('set', 'page_referrer', analyticsPageUrl(document.referrer));
-  gtag('config', 'G-T29BL3EPHL', {page_location:analyticsPageUrl(location.href),page_referrer:analyticsPageUrl(document.referrer)});
+  function gtag() {
+    // Drop, rather than buffer, interactions before acceptance or after withdrawal.
+    if (analyticsAccepted) window.dataLayer.push(arguments);
+  }
+  function readAnalyticsChoice() {
+    try { return localStorage.getItem(ANALYTICS_CHOICE_KEY); } catch (_) { return null; }
+  }
+  function showAnalyticsChoice() {
+    const choice = document.getElementById('analytics-choice');
+    const status = document.getElementById('analytics-status');
+    if (choice) choice.hidden = ['accepted','rejected'].includes(readAnalyticsChoice());
+    if (status) status.textContent = analyticsAccepted ? 'Optional analytics: accepted.' : 'Optional analytics: off.';
+  }
+  function startAnalytics() {
+    if (analyticsLoaded) return;
+    analyticsAccepted = true;
+    analyticsLoaded = true;
+    window['ga-disable-' + ANALYTICS_ID] = false;
+    gtag('js', new Date());
+    gtag('set', 'page_location', analyticsPageUrl(location.href));
+    gtag('set', 'page_referrer', analyticsPageUrl(document.referrer));
+    gtag('config', ANALYTICS_ID, {
+      page_location:analyticsPageUrl(location.href),
+      page_referrer:analyticsPageUrl(document.referrer),
+      allow_google_signals:false,
+      allow_ad_personalization_signals:false
+    });
+    const script = document.createElement('script');
+    script.id = 'analytics-tag'; script.async = true;
+    script.src = 'https://www.googletagmanager.com/gtag/js?id=' + ANALYTICS_ID;
+    document.head.appendChild(script);
+  }
+  function clearAnalyticsCookies() {
+    const host = location.hostname;
+    const parts = host.split('.');
+    const domains = ['', host, '.' + host];
+    for (let i=1; i<parts.length-1; i++) domains.push('.' + parts.slice(i).join('.'));
+    document.cookie.split(';').forEach(cookie => {
+      const name = cookie.split('=')[0].trim();
+      if (!/^_ga(?:_|$)|^_gid$|^_gat(?:_|$)/.test(name)) return;
+      domains.forEach(domain => { document.cookie = name + '=; Max-Age=0; path=/' + (domain ? '; domain=' + domain : '') + '; SameSite=Lax'; });
+    });
+  }
+  function setAnalyticsChoice(accepted) {
+    try { localStorage.setItem(ANALYTICS_CHOICE_KEY, accepted ? 'accepted' : 'rejected'); } catch (_) {}
+    if (accepted) startAnalytics();
+    else {
+      analyticsAccepted = false;
+      window['ga-disable-' + ANALYTICS_ID] = true;
+      window.dataLayer.length = 0;
+      clearAnalyticsCookies();
+      const tag = document.getElementById('analytics-tag');
+      if (tag) tag.remove();
+      // Remove the loaded vendor runtime as well as its tag element.
+      if (analyticsLoaded) { location.reload(); return; }
+    }
+    showAnalyticsChoice();
+  }
+  document.addEventListener('DOMContentLoaded', () => {
+    // Static guides use the same controls and stored preference as the calculator.
+    if (!document.getElementById('analytics-choice')) {
+      const main = document.querySelector('main') || document.body;
+      main.insertAdjacentHTML('afterbegin', '  <section id="analytics-choice" aria-labelledby="analytics-choice-title" style="margin:16px 0;padding:16px;border:1px solid var(--border);border-radius:12px;">\n    <h2 id="analytics-choice-title" style="font-size:16px;">Optional analytics</h2>\n    <p style="font-size:13px;line-height:1.6;">May we use Google Analytics to understand page visits and calculation successes or broad error categories? We do not load it until you accept. Your calculator amounts, dates and results are not included in explicit events. The calculator works either way.</p>\n    <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:12px;">\n      <button type="button" id="analytics-accept" class="analytics-choice-button">Accept analytics</button>\n      <button type="button" id="analytics-reject" class="analytics-choice-button">Reject</button>\n    </div>\n    <a href="/#data-use" style="display:inline-block;margin-top:10px;color:var(--orange);font-size:13px;">Data &amp; email details</a>\n  </section>');
+      (document.querySelector('footer') || main).insertAdjacentHTML('beforeend', '<p id="analytics-status" aria-live="polite">Optional analytics: off.</p><p><button type="button" id="analytics-settings" class="analytics-choice-button">Analytics settings</button> <button type="button" id="analytics-withdraw" class="analytics-choice-button">Withdraw analytics consent</button></p>');
+      const style = document.createElement('style'); style.textContent = '.analytics-choice-button { min-width:150px;min-height:44px;padding:10px 16px;border:1px solid var(--orange,#f7931a);border-radius:8px;background:var(--surface,#171717);color:var(--text,#fff);font:inherit;cursor:pointer; } .analytics-choice-button:focus-visible { outline:2px solid #f7931a;outline-offset:3px; } #analytics-choice[hidden] { display:none; }'; document.head.appendChild(style);
+    }
+    if (readAnalyticsChoice() === 'accepted') startAnalytics();
+    document.getElementById('analytics-accept').addEventListener('click', () => setAnalyticsChoice(true));
+    document.getElementById('analytics-reject').addEventListener('click', () => setAnalyticsChoice(false));
+    document.getElementById('analytics-settings').addEventListener('click', () => {
+      const choice = document.getElementById('analytics-choice'); choice.hidden = false;
+      document.getElementById('analytics-accept').focus();
+    });
+    document.getElementById('analytics-withdraw').addEventListener('click', () => setAnalyticsChoice(false));
+    showAnalyticsChoice();
+  });
+  window.addEventListener('storage', event => {
+    if (event.key === ANALYTICS_CHOICE_KEY && event.newValue !== 'accepted' && analyticsAccepted) setAnalyticsChoice(false);
+  });
 </script>
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Bitcoin Investment &amp; DCA Calculator | Historical Returns</title>
   <meta name="description" content="Estimate hypothetical Bitcoin returns and daily, weekly or monthly DCA from April 28, 2013. See price methods, dates and assumptions. Free USD calculator." />
@@ -352,6 +429,9 @@
     .affiliate-text strong { display: block; color: var(--text); font-size: 14px; margin-bottom: 3px; }
     .affiliate-btn { padding: 11px 20px; background: var(--orange); border: none; border-radius: 2px; font-family: 'Bebas Neue', sans-serif; font-size: 17px; letter-spacing: 0.06em; color: var(--black); cursor: pointer; white-space: nowrap; text-decoration: none; display: inline-block; transition: opacity 0.15s; -webkit-tap-highlight-color: transparent; }
     .affiliate-btn:hover { opacity: 0.88; }
+    .analytics-choice-button { min-width:150px;min-height:44px;padding:10px 16px;border:1px solid var(--orange);border-radius:8px;background:var(--surface);color:var(--text);font:inherit;cursor:pointer; }
+    .analytics-choice-button:focus-visible { outline:2px solid var(--orange);outline-offset:3px; }
+    #analytics-choice[hidden] { display:none; }
   </style>
 </head>
 <body>
@@ -359,6 +439,15 @@
 <div class="ticker"><div class="ticker-inner" id="ticker-inner"></div></div>
 
 <main class="container" id="main-content">
+  <section id="analytics-choice" aria-labelledby="analytics-choice-title" style="margin:16px 0;padding:16px;border:1px solid var(--border);border-radius:12px;">
+    <h2 id="analytics-choice-title" style="font-size:16px;">Optional analytics</h2>
+    <p style="font-size:13px;line-height:1.6;">May we use Google Analytics to understand page visits and calculation successes or broad error categories? We do not load it until you accept. Your calculator amounts, dates and results are not included in explicit events. The calculator works either way.</p>
+    <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:12px;">
+      <button type="button" id="analytics-accept" class="analytics-choice-button">Accept analytics</button>
+      <button type="button" id="analytics-reject" class="analytics-choice-button">Reject</button>
+    </div>
+    <a href="#data-use" style="display:inline-block;margin-top:10px;color:var(--orange);font-size:13px;">Data &amp; email details</a>
+  </section>
 
   <!-- Header -->
   <header>
@@ -660,7 +749,10 @@
       <h2 id="data-use-title" style="font-size:12px;color:var(--text);">Data &amp; email</h2>
       <p>Calculations run in your browser. Scenario inputs are included in the URL so you can revisit or share them; anyone you share the link with can see those inputs. Avoid putting personal information in URLs.</p>
       <p>The newsletter signup button opens Beehiiv, which collects your email address directly. The link does not include calculator amounts, dates or your email address, and suppresses the referring page URL. Opening the page is not a subscription; complete the provider form and check your inbox for any confirmation steps.</p>
-      <p>This site uses Google Analytics for usage measurement, including browser and device information, page visits and interactions. Google may use cookies; its automatic measurement may include page URLs. Explicit calculator events use categories, not email addresses or scenario values. Fonts load from Google and price quotes come from CoinGecko through this site.</p>
+      <p>Only if you accept, this site loads Google Analytics for usage measurement, including browser and device information, page visits and interactions. Google may use cookies; its automatic measurement may include page URLs. Explicit calculator events use categories, not email addresses or scenario values. When you explicitly try a calculation, usage measurement can record whether it succeeds and, if it fails, a broad error category. These explicit events do not include your amounts, dates, results or error-message text. Fonts load from Google and price quotes come from CoinGecko through this site.</p>
+      <p id="analytics-status" aria-live="polite">Optional analytics: off.</p>
+      <p><button type="button" id="analytics-settings" class="analytics-choice-button">Analytics settings</button> <button type="button" id="analytics-withdraw" class="analytics-choice-button">Withdraw analytics consent</button></p>
+      <p>Your choice is saved in this browser. Withdrawing turns analytics off, removes this site's accessible Google Analytics cookies and reloads the page to stop its loaded code. It does not erase data already sent to Google. If browser storage is unavailable, the choice lasts only for this page.</p>
       <p><a href="https://www.beehiiv.com/privacy" rel="noopener noreferrer" target="_blank" style="color:var(--orange)">Beehiiv privacy information</a> · <a href="https://policies.google.com/privacy" rel="noopener noreferrer" target="_blank" style="color:var(--orange)">Google privacy information</a></p>
     </section>
   </footer>
@@ -977,15 +1069,17 @@ let lastTM = {}, tmRequestId = 0;
 
 async function tmCalculate(silent=false) {
   const requestId=++tmRequestId;
+  if(!silent) track('calculate_attempt',{calculator:'time_machine'});
+  const failed = reason => { if(!silent && requestId===tmRequestId) track('calculate_error',{calculator:'time_machine',reason}); };
   const amount = parseFloat(g('tm-amount').value);
   const dateVal = g('tm-date').value;
   hideEl('tm-result'); hideErr('tm-error');
 
-  if(!amount||amount<=0){if(!silent)showErr('tm-error','Please enter a valid dollar amount.');return;}
-  if(!dateVal){if(!silent)showErr('tm-error','Please select a purchase date.');return;}
+  if(!amount||amount<=0){if(!silent)showErr('tm-error','Please enter a valid dollar amount.');failed('invalid_input');return;}
+  if(!dateVal){if(!silent)showErr('tm-error','Please select a purchase date.');failed('invalid_input');return;}
   const pd = new Date(dateVal+'T12:00:00Z');
-  if(pd>=new Date()){if(!silent)showErr('tm-error','Please select a date in the past.');return;}
-  if(pd<new Date('2013-04-28')){if(!silent)showErr('tm-error','Data available from April 2013.');return;}
+  if(pd>=new Date()){if(!silent)showErr('tm-error','Please select a date in the past.');failed('invalid_input');return;}
+  if(pd<new Date('2013-04-28')){if(!silent)showErr('tm-error','Data available from April 2013.');failed('invalid_input');return;}
   let histPrice = getHistoricalPrice(dateVal);
   if(!histPrice && !cachedPrice){
     // Allow pending data requests to settle while the initial quote loads.
@@ -997,17 +1091,17 @@ async function tmCalculate(silent=false) {
     hideEl('tm-loading');
     histPrice = getHistoricalPrice(dateVal);
   }
-  if(!histPrice){if(!silent)showErr('tm-error','No data for that date. Try a nearby date.');return;}
+  if(!histPrice){if(!silent)showErr('tm-error','No data for that date. Try a nearby date.');failed('historical_data_unavailable');return;}
 
   // Optional sell date — blank means "still holding", valued at the live price.
   const sellVal = g('tm-sell-date').value;
   let sellDate = null, sellPrice = null;
   if(sellVal){
     sellDate = new Date(sellVal+'T12:00:00Z');
-    if(sellDate<=pd){if(!silent)showErr('tm-error','Sell date must be after the purchase date.');return;}
-    if(sellDate>new Date()){if(!silent)showErr('tm-error','Sell date must be in the past.');return;}
+    if(sellDate<=pd){if(!silent)showErr('tm-error','Sell date must be after the purchase date.');failed('invalid_input');return;}
+    if(sellDate>new Date()){if(!silent)showErr('tm-error','Sell date must be in the past.');failed('invalid_input');return;}
     sellPrice = getHistoricalPrice(sellVal);
-    if(!sellPrice){if(!silent)showErr('tm-error','No data for that sell date. Try a nearby date.');return;}
+    if(!sellPrice){if(!silent)showErr('tm-error','No data for that sell date. Try a nearby date.');failed('historical_data_unavailable');return;}
   }
 
   loadSeries();
@@ -1018,10 +1112,10 @@ async function tmCalculate(silent=false) {
     const p = await fetchCurrentPrice();
     if(requestId!==tmRequestId) return;
     hideEl('tm-loading');
-    if(!p){ if(!silent)showErr('tm-error','Could not fetch the current price. Try again or choose a historical sell date.'); return; }
+    if(!p){ if(!silent)showErr('tm-error','Could not fetch the current price. Try again or choose a historical sell date.'); failed('live_price_unavailable');return; }
     tmDisplay(amount,histPrice,p,pd,null);
     if(!silent) track('calculate',{calculator:'time_machine'});
-  } catch(e){ hideEl('tm-loading'); showErr('tm-error','Could not fetch live price. Try again.'); }
+  } catch(e){ failed('calculation_failed'); hideEl('tm-loading'); showErr('tm-error','Could not fetch live price. Try again.'); }
 }
 
 function tmDisplay(invested, priceThen, priceNow, pd, sellDate) {
@@ -1142,16 +1236,18 @@ let lastDCA = {}, dcaChartInstance = null, dcaRequestId = 0;
 
 async function dcaCalculate(silent=false) {
   const requestId=++dcaRequestId;
+  if(!silent) track('calculate_attempt',{calculator:'dca'});
+  const failed = reason => { if(!silent && requestId===dcaRequestId) track('calculate_error',{calculator:'dca',reason}); };
   const amount = parseFloat(g('dca-amount').value);
   const startVal = g('dca-start').value;
   const freq = g('dca-freq').value;
   hideEl('dca-result'); hideErr('dca-error');
 
-  if(!amount||amount<=0){if(!silent)showErr('dca-error','Please enter a valid amount.');return;}
-  if(!startVal){if(!silent)showErr('dca-error','Please select a start date.');return;}
+  if(!amount||amount<=0){if(!silent)showErr('dca-error','Please enter a valid amount.');failed('invalid_input');return;}
+  if(!startVal){if(!silent)showErr('dca-error','Please select a start date.');failed('invalid_input');return;}
   const startDate = new Date(startVal+'T12:00:00Z');
-  if(startDate>=new Date()){if(!silent)showErr('dca-error','Start date must be in the past.');return;}
-  if(startDate<new Date('2013-04-28')){if(!silent)showErr('dca-error','Data available from April 2013.');return;}
+  if(startDate>=new Date()){if(!silent)showErr('dca-error','Start date must be in the past.');failed('invalid_input');return;}
+  if(startDate<new Date('2013-04-28')){if(!silent)showErr('dca-error','Data available from April 2013.');failed('invalid_input');return;}
 
 
   showEl('dca-loading'); g('dca-loading-msg').textContent='FETCHING LIVE BTC PRICE…';
@@ -1159,10 +1255,11 @@ async function dcaCalculate(silent=false) {
     const p = await fetchCurrentPrice();
     if(requestId!==dcaRequestId) return;
     hideEl('dca-loading');
-    if(!p){if(!silent)showErr('dca-error','Could not fetch the current price. Try again.');return;}
+    if(!p){if(!silent)showErr('dca-error','Could not fetch the current price. Try again.');failed('live_price_unavailable');return;}
     dcaDisplay(amount, startDate, freq, p);
     if(!silent && g('dca-result').classList.contains('active')) track('calculate',{calculator:'dca'});
-  } catch(e){ hideEl('dca-loading'); if(!silent)showErr('dca-error','Could not fetch live price. Try again.'); }
+    if(!g('dca-result').classList.contains('active')) failed('historical_data_unavailable');
+  } catch(e){ failed('calculation_failed'); hideEl('dca-loading'); if(!silent)showErr('dca-error','Could not fetch live price. Try again.'); }
 }
 
 // Anchor each monthly contribution to the original day, clamped in shorter
