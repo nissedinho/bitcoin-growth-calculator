@@ -47,12 +47,13 @@ export function report(label) {
 }
 
 /** Load index.html in a DOM with the network stubbed out. */
-export function loadPage({ url = 'https://x.test/', daily = null, series = null, now = '2026-10-01T21:00:00Z', price = LIVE_PRICE, priceOk = true, subscribe = {success:true}, subscribeOk = true, subscribeReject = false, priceQueue = null } = {}) {
+export function loadPage({ analyticsConsent = null, url = 'https://x.test/', daily = null, series = null, now = '2026-10-01T21:00:00Z', price = LIVE_PRICE, priceOk = true, subscribe = {success:true}, subscribeOk = true, subscribeReject = false, priceQueue = null } = {}) {
   const html = readFileSync(join(ROOT, 'index.html'), 'utf8');
   const dom = new JSDOM(html, {
     runScripts: 'dangerously',
     url,
     beforeParse(w) {
+      if (analyticsConsent !== null) w.localStorage.setItem('bgc.analytics-consent.v1', analyticsConsent);
       const NativeDate = w.Date;
       w.Date = class extends NativeDate {
         constructor(...args) { super(...(args.length ? args : [now])); }
