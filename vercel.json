@@ -17,5 +17,10 @@
       "source": "/s",
       "destination": "/api/share"
     }
-  ]
+  ],
+  "git": {
+    "deploymentEnabled": {
+      "fix/consent-diagnostics-20261030": false
+    }
+  }
 }
